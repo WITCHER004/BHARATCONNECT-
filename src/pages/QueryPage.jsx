@@ -292,7 +292,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
       </section>
 
       {/* Main Content Area */}
-      <section className="py-12 sm:py-16 bg-surface-1 flex-1">
+      <section className="theme-cream py-12 sm:py-16 bg-surface-1 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
 
           {/* ──────────────── TAB 1: SUBMIT AN INQUIRY ──────────────── */}
@@ -301,7 +301,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
               <div className="lg:col-span-8">
                 {status === 'submitted' && assignedTicket ? (
                   <div className="surface-card rounded-2xl p-8 sm:p-10 border border-line-strong shadow-xl animate-fade-in">
-                    <div className="w-12 h-12 rounded-xl bg-fg text-surface-0 flex items-center justify-center mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-fg text-surface-1 flex items-center justify-center mb-6">
                       <Check className="w-6 h-6" strokeWidth={2.5} />
                     </div>
 
@@ -316,7 +316,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                     </p>
 
                     {/* Official Ticket Card */}
-                    <div className="my-8 p-6 rounded-2xl bg-surface-0 border-2 border-gold-foil/40 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-[0_0_30px_rgba(217,179,106,0.12)]">
+                    <div className="my-8 p-6 rounded-2xl bg-surface-2 border-2 border-gold-foil/50 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-[0_4px_24px_rgba(184,137,58,0.12)]">
                       <div>
                         <span className="text-xs font-mono uppercase tracking-widest text-gold-text block">
                           Official Query Tracking Ticket
@@ -435,8 +435,8 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                               onClick={() => setForm({ ...form, category: c.id })}
                               className={`p-3 rounded-xl border text-left text-xs sm:text-sm transition-colors cursor-pointer ${
                                 form.category === c.id
-                                  ? 'bg-surface-3 border-line-strong font-medium text-fg'
-                                  : 'border-line text-fg-2 hover:bg-surface-2 hover:text-fg'
+                                  ? 'bg-surface-3 border-line-strong font-medium text-fg shadow-xs'
+                                  : 'border-line text-fg-2 bg-surface-2 hover:bg-surface-3 hover:text-fg'
                               }`}
                             >
                               <span className="block font-medium">{c.label}</span>
@@ -697,7 +697,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                 {searched && (
                   <div className="mt-8 pt-8 border-t border-line">
                     {searchResult ? (
-                      <div className="surface-raised rounded-2xl p-6 sm:p-8 border border-line-strong shadow-lg animate-fade-in">
+                      <div className="surface-card rounded-2xl p-6 sm:p-8 border border-line-strong shadow-sm animate-fade-in">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-line">
                           <div>
                             <span className="text-xs font-mono uppercase tracking-widest text-gold-text block">
@@ -890,3 +890,4 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
     </div>
   );
 }
+
