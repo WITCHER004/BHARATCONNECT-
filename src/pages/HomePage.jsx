@@ -123,15 +123,15 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Startup registration: black card with a gold double frame */}
-            <article className="theme-dark lg:col-span-7 bg-[#0b0b0b] border border-line-strong rounded-[20px] p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
+            <article className="theme-dark lg:col-span-7 bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
               <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-10 flex flex-col">
                 <p className="ref-line text-gold-text">Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi</p>
                 <h3 className="mt-4 font-serif text-3xl sm:text-4xl font-medium text-fg leading-tight tracking-[-0.01em]">
                   Want to register a startup?
                 </h3>
                 <p className="mt-4 text-[15px] text-fg-2 leading-relaxed max-w-xl">
-                  Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Registration
-                  makes your startup eligible for this and other upcoming events of Bharat Mahotsav Festivals LLP.
+                  Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
+                  receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-numbers</span>) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                 </p>
                 <dl className="mt-8 grid grid-cols-3 gap-4 text-sm border-t border-line pt-6">
                   <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure">₹5,900 incl. GST</dd></div>
@@ -148,7 +148,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             </article>
 
             {/* Event registration */}
-            <article className="theme-dark lg:col-span-5 bg-[#0b0b0b] border border-line-strong rounded-[20px] p-6 sm:p-10 flex flex-col shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
+            <article className="theme-dark lg:col-span-5 bg-[#0b0b0b] border border-line-strong rounded-2xl p-6 sm:p-10 flex flex-col shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
               <p className="ref-line text-gold-text">500 accreditations · 18–19 Dec 2026</p>
               <h3 className="mt-4 font-serif text-3xl font-medium text-fg leading-tight">Event registration</h3>
               <p className="mt-4 text-[15px] text-fg-2 leading-relaxed">

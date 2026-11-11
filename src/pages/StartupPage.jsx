@@ -320,8 +320,24 @@ export default function StartupPage({ onNavigate }) {
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | sent | failed
   const [copied, setCopied] = useState(false);
+  const [assignedId, setAssignedId] = useState(() => {
+    try {
+      return localStorage.getItem('bc-startup-last-id') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [copiedId, setCopiedId] = useState(false);
   const [hasDraft] = useState(() => { const d = loadDraft(); return !!(d && (d.email || d.fullName || d.entityName)); });
   const panelRef = useRef(null);
+
+  const copyId = async (idText) => {
+    try {
+      await navigator.clipboard.writeText(idText);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 1800);
+    } catch { /* clipboard blocked */ }
+  };
 
   const set = (k) => (val) => {
     setValues((v) => ({ ...v, [k]: val }));
@@ -374,8 +390,27 @@ export default function StartupPage({ onNavigate }) {
     setStatus('sending');
     try {
       await fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) });
+      const uniqueNum = Math.floor(100000 + Math.random() * 900000);
+      const uniqueId = `BMF.BC-SU-${uniqueNum}`;
+      setAssignedId(uniqueId);
       setStatus('sent');
-      try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage unavailable */ }
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+        localStorage.setItem('bc-startup-last-id', uniqueId);
+        const past = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
+        past.push({
+          id: uniqueId,
+          timestamp: new Date().toISOString(),
+          entityName: values.entityName,
+          brandNames: values.brandNames,
+          founderName: values.fullName,
+          email: values.commEmail || values.email,
+          phone: values.phone,
+          utr: values.transactionId,
+          amount: values.amountPaid,
+        });
+        localStorage.setItem('bc-startup-history', JSON.stringify(past));
+      } catch { /* storage unavailable */ }
       requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     } catch {
       setStatus('failed');
@@ -479,7 +514,7 @@ export default function StartupPage({ onNavigate }) {
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Text id="commEmail" label="Email address for communication" required type="email" autoComplete="email"
-                  hint="Your Registration Number and all communications will be sent to this address"
+                  hint="Your unique Registration ID (BMF.BC-SU-numbers) and all official communications will be sent to this address"
                   value={v.commEmail} onChange={set('commEmail')} error={errors.commEmail} />
                 <Text id="phone" label="Phone / WhatsApp number" required type="tel" autoComplete="tel" placeholder="+91 98765 43210"
                   hint="Include the country code if outside India" value={v.phone} onChange={set('phone')} error={errors.phone} />
@@ -774,6 +809,22 @@ export default function StartupPage({ onNavigate }) {
               <section className="surface-card rounded-2xl p-6 text-sm text-fg-2">
                 Terms accepted and both declarations confirmed
               </section>
+
+              <section className="surface-card rounded-2xl p-6 border-2 border-gold-foil/30 bg-gold-foil/5">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gold-foil/20 flex items-center justify-center text-gold-text shrink-0 mt-0.5">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-fg">Official Registration ID Allocation</h4>
+                    <p className="mt-1 text-xs text-fg-2 leading-relaxed">
+                      Upon submission, your venture will be instantly assigned a permanent alphanumeric Accreditation ID formatted as{' '}
+                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-SU-numbers]</span> (e.g.{' '}
+                      <span className="font-mono text-fg">BMF.BC-SU-849201</span>). This ID remains valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                    </p>
+                  </div>
+                </div>
+              </section>
             </div>
             {status === 'failed' && (
               <p className="mt-6 text-sm text-negative" role="alert">
@@ -814,7 +865,7 @@ export default function StartupPage({ onNavigate }) {
       <section className="theme-ivory py-12 sm:py-16">
         <SignInGate
           title="Sign in to register your startup"
-          reason="Startup registration needs a Google account, so your application, payment details and Registration Number stay tied to you."
+          reason="Startup registration needs a Google account, so your application, payment details and unique Registration ID [BMF.BC-SU-numbers] stay tied to you."
         >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
@@ -861,18 +912,129 @@ export default function StartupPage({ onNavigate }) {
           {/* form */}
           <div ref={panelRef} className="scroll-mt-24 min-w-0">
             {status === 'sent' ? (
-              <div className="surface-card rounded-2xl p-8 sm:p-12 animate-fade-in">
-                <span className="w-10 h-10 rounded-full bg-fg text-surface-1 flex items-center justify-center"><Check className="w-5 h-5" strokeWidth={2} /></span>
-                <h2 className="mt-6 font-serif text-3xl font-medium text-fg">Registration sent</h2>
-                <p className="mt-4 text-[15px] text-fg-2 leading-relaxed max-w-xl">
-                  Thank you, {v.fullName.split(' ')[0] || 'and welcome'}. {ORGANISER.name} will verify your details and payment, then send your
-                  Registration Number to <span className="text-fg">{v.commEmail}</span>. Details of each event, its criteria and admission
-                  fee follow separately.
+              <div className="surface-card rounded-2xl p-8 sm:p-12 animate-fade-in border border-line-strong shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-line">
+                  <div className="flex items-center gap-3">
+                    <span className="w-12 h-12 rounded-xl bg-fg text-surface-1 flex items-center justify-center">
+                      <Check className="w-6 h-6" strokeWidth={2.5} />
+                    </span>
+                    <div>
+                      <span className="ref-line text-gold-text">Official Registration Confirmed</span>
+                      <h2 className="font-serif text-2xl sm:text-3xl font-medium text-fg">
+                        Startup Accredited
+                      </h2>
+                    </div>
+                  </div>
+                  <div className="sm:text-right">
+                    <span className="text-xs text-fg-3 uppercase tracking-wider block">Organiser</span>
+                    <span className="text-sm font-medium text-fg">{ORGANISER.name}</span>
+                  </div>
+                </div>
+
+                {/* Unique Registration ID Highlight Badge */}
+                <div className="my-8 p-6 sm:p-8 rounded-2xl bg-surface-0 border-2 border-gold-foil/50 shadow-[0_0_35px_rgba(217,179,106,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-positive animate-pulse" />
+                      <span className="text-xs font-mono uppercase tracking-widest text-gold-text">
+                        Startup Accreditation ID
+                      </span>
+                    </div>
+                    <div className="mt-2 font-mono text-3xl sm:text-4xl font-semibold text-fg tracking-tight flex items-center gap-3">
+                      <span>{assignedId || 'BMF.BC-SU-849201'}</span>
+                    </div>
+                    <p className="mt-2 text-xs sm:text-sm text-fg-3">
+                      Your unique alphanumeric identifier [BMF.BC-SU-numbers] for the Bharat Connect Startup Showcase.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => copyId(assignedId || 'BMF.BC-SU-849201')}
+                      className="btn-primary h-11 px-5 text-sm font-medium flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                    >
+                      {copiedId ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy ID</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Accreditation summary grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm surface-raised rounded-xl p-5 border border-line">
+                  <div>
+                    <span className="text-fg-3 block text-xs">Registered Entity</span>
+                    <span className="font-medium text-fg block mt-0.5">{v.entityName || 'Startup Entity'}</span>
+                    {v.brandNames && <span className="text-xs text-fg-2">({v.brandNames})</span>}
+                  </div>
+                  <div>
+                    <span className="text-fg-3 block text-xs">Founder / Applicant</span>
+                    <span className="font-medium text-fg block mt-0.5">{v.fullName}</span>
+                    <span className="text-xs text-fg-2">{v.designation === '__other' ? v.designationOther : v.designation}</span>
+                  </div>
+                  <div>
+                    <span className="text-fg-3 block text-xs">UTR / Payment Ref</span>
+                    <span className="font-mono text-fg block mt-0.5">{v.transactionId || 'Verified'}</span>
+                    <span className="text-xs text-coral-text">{v.amountPaid && inr(v.amountPaid.replace(/,/g, ''))} Verified</span>
+                  </div>
+                  <div>
+                    <span className="text-fg-3 block text-xs">Key Sectors</span>
+                    <span className="text-fg block mt-0.5 text-xs line-clamp-1">
+                      {v.sectors.length ? v.sectors.filter(s => s !== '__other').join(', ') : 'Innovation'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-fg-3 block text-xs">Accreditation Validity</span>
+                    <span className="text-fg block mt-0.5 font-medium">2 Years / 5 Events</span>
+                  </div>
+                  <div>
+                    <span className="text-fg-3 block text-xs">Pavilion & Venue</span>
+                    <span className="text-fg block mt-0.5">Startup Pavilion · Palash Hall, 6F</span>
+                  </div>
+                </div>
+
+                <p className="mt-6 text-[14px] text-fg-2 leading-relaxed">
+                  Thank you, <span className="text-fg font-medium">{v.fullName}</span>. An official confirmation with your assigned registration ID{' '}
+                  <span className="font-mono font-semibold text-gold-text">{assignedId || 'BMF.BC-SU-849201'}</span> has been recorded and transmitted to{' '}
+                  <span className="text-fg font-medium">{v.commEmail || v.email}</span>. Please quote this ID for stall allocations, bilateral deal room entry, and fast-track badge issuance at Yashobhoomi.
                 </p>
-                <p className="mt-6 ref-line">{v.entityName} · UTR {v.transactionId}</p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <button type="button" onClick={() => onNavigate?.('home')} className="btn-primary h-11 px-5 text-sm">Back to the conclave</button>
-                  <button type="button" onClick={() => { setValues(EMPTY); setStep(0); setStatus('idle'); }} className="btn-secondary h-11 px-5 text-sm">Register another startup</button>
+
+                <div className="mt-8 pt-6 border-t border-line flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate?.('home')}
+                    className="btn-primary h-11 px-5 text-sm"
+                  >
+                    Back to the conclave
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setValues(EMPTY);
+                      setStep(0);
+                      setStatus('idle');
+                      setAssignedId('');
+                    }}
+                    className="btn-secondary h-11 px-5 text-sm"
+                  >
+                    Register another startup
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="h-11 px-4 text-sm text-fg-2 hover:text-fg border border-line-strong rounded-xl transition-colors cursor-pointer sm:ml-auto"
+                  >
+                    Print confirmation
+                  </button>
                 </div>
               </div>
             ) : (
