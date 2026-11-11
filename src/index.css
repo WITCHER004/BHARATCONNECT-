@@ -8,16 +8,16 @@
 */
 
 @theme {
-  /* Jewel-teal ramp */
-  --color-surface-0: #072723;   /* deepest: hero, footer */
-  --color-surface-1: #0b312c;   /* page */
-  --color-surface-2: #103b35;   /* card */
-  --color-surface-3: #164740;   /* raised: inputs, active rows */
-  --color-surface-4: #1c544c;   /* hover on raised */
+  /* Luxury Obsidian / Black ramp */
+  --color-surface-0: #000000;   /* deepest pure black: hero, footer */
+  --color-surface-1: #070707;   /* page ground */
+  --color-surface-2: #0f0f0f;   /* card */
+  --color-surface-3: #171717;   /* raised: inputs, active rows */
+  --color-surface-4: #222222;   /* hover on raised */
 
   --color-fg: #f7f2e8;          /* primary text, ivory */
-  --color-fg-2: #bccbc5;        /* secondary text */
-  --color-fg-3: #9db3ac;        /* muted text, icons, meta */
+  --color-fg-2: #c4d0cb;        /* secondary text */
+  --color-fg-3: #8a9e97;        /* muted text, icons, meta */
   --color-line: rgb(217 179 106 / 0.16);         /* gold hairline */
   --color-line-strong: rgb(217 179 106 / 0.3);
 
@@ -60,9 +60,9 @@
   --color-positive: #4cc38a;
   --color-negative: #e5484d;
 
-  --color-obsidian: #072723;
-  --color-obsidian-teal: #0b312c;
-  --color-ink: #082C29;
+  --color-obsidian: #000000;
+  --color-obsidian-teal: #070707;
+  --color-ink: #000000;
 
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -152,11 +152,11 @@
   --color-surface-2: #FFFCF6;
   --color-surface-3: #EFE6D6;
   --color-surface-4: #E7DCC8;
-  --color-fg: #082C29;
-  --color-fg-2: #3d5853;
-  --color-fg-3: #52685f;
-  --color-line: rgb(8 44 41 / 0.12);
-  --color-line-strong: rgb(8 44 41 / 0.22);
+  --color-fg: #141414;
+  --color-fg-2: #3f3c37;
+  --color-fg-3: #66625b;
+  --color-line: rgb(20 20 20 / 0.1);
+  --color-line-strong: rgb(20 20 20 / 0.2);
   --color-gold-foil: #B8893A;
   --color-gold-text: #7d5c1d;
   --color-coral-text: #b93d2c;
@@ -188,13 +188,13 @@
 
 /* Dark tokens restored inside a light section (e.g. black cards on a white band) */
 .theme-dark {
-  --color-surface-1: #0b312c;
-  --color-surface-2: #103b35;
-  --color-surface-3: #164740;
-  --color-surface-4: #1c544c;
+  --color-surface-1: #070707;
+  --color-surface-2: #0f0f0f;
+  --color-surface-3: #171717;
+  --color-surface-4: #222222;
   --color-fg: #f7f2e8;
-  --color-fg-2: #bccbc5;
-  --color-fg-3: #9db3ac;
+  --color-fg-2: #c4d0cb;
+  --color-fg-3: #8a9e97;
   --color-line: rgb(217 179 106 / 0.16);
   --color-line-strong: rgb(217 179 106 / 0.3);
   --color-gold-foil: #D9B36A;
@@ -204,11 +204,11 @@
   color: var(--color-fg);
 }
 
-/* Royal hero ground: one hue, lit from above, plus a faint printed jaali */
+/* Royal hero ground: deep obsidian black with subtle directional lighting */
 .bg-royal {
   background:
-    radial-gradient(120% 80% at 70% 0%, #11564e 0%, rgb(17 86 78 / 0) 60%),
-    var(--color-surface-0);
+    radial-gradient(120% 80% at 70% 0%, #1a1a1a 0%, rgb(0 0 0 / 0) 65%),
+    #000000;
 }
 
 /* Section ornament: a gold diamond between two foil rules */
@@ -329,25 +329,25 @@
 .babc-film .film-mask { display: block; overflow: hidden; }
 .babc-film .film-mask > span { display: block; opacity: 0; }
 
-.babc-film .film-group { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; visibility: hidden; color: #082C29; }
+.babc-film .film-group { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; visibility: hidden; color: #141414; }
 .babc-film .film-card { position: absolute; inset: 0; border-radius: 24px; background: #F7F2E8; box-shadow: 0 40px 80px -32px rgb(0 0 0 / 0.75); opacity: 0; }
 .babc-film .film-frame { position: absolute; inset: 12px; border-radius: 16px; border: 1.5px solid rgb(184 137 58 / 0.7); box-shadow: inset 0 0 0 5px #F7F2E8, inset 0 0 0 6px rgb(184 137 58 / 0.35); opacity: 0; }
 .babc-film .film-jaali { position: absolute; left: 12px; width: 616px; height: 14px; opacity: 0; }
 .babc-film .film-content { position: absolute; inset: 0; }
 
-.babc-film .film-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: rgb(8 44 41 / 0.7); }
+.babc-film .film-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: rgb(20 20 20 / 0.7); }
 .babc-film .film-title { position: absolute; left: 56px; top: 96px; width: 420px; font-family: var(--font-serif); font-size: 38px; line-height: 1.12; }
 .babc-film .film-date { position: absolute; left: 50px; top: 236px; display: flex; align-items: flex-end; gap: 22px; }
 .babc-film .film-big { font-family: var(--font-serif); font-size: 184px; line-height: 0.86; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; }
 .babc-film .film-month { font-size: 24px; line-height: 32px; padding-bottom: 14px; }
 .babc-film .film-grid { position: absolute; left: 56px; right: 56px; top: 474px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
 .babc-film .film-grid > div { opacity: 0; }
-.babc-film .film-grid dt { font-size: 17px; color: rgb(8 44 41 / 0.7); }
+.babc-film .film-grid dt { font-size: 17px; color: rgb(20 20 20 / 0.7); }
 .babc-film .film-grid dd { margin-top: 6px; font-size: 23px; }
 .babc-film .film-rule { position: absolute; left: 56px; right: 56px; top: 680px; height: 1.5px; background: rgb(184 137 58 / 0.6); transform-origin: left center; transform: scaleX(0); }
 .babc-film .film-foot { position: absolute; left: 56px; right: 56px; top: 704px; display: flex; justify-content: space-between; align-items: baseline; opacity: 0; }
 .babc-film .film-theme { font-family: var(--font-serif); font-size: 24px; }
-.babc-film .film-time { font-family: var(--font-mono); font-size: 18px; color: rgb(8 44 41 / 0.7); }
+.babc-film .film-time { font-family: var(--font-mono); font-size: 18px; color: rgb(20 20 20 / 0.7); }
 
 .babc-film .film-seal { position: absolute; left: 512px; top: 56px; width: 96px; height: 96px; opacity: 0; }
 .babc-film .film-dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--color-coral); opacity: 0; }
