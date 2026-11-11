@@ -64,9 +64,9 @@ function AccountMenu({ onSignIn }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Account: ${user.name}`}
-        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer"
+        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer"
       >
-        <Avatar user={user} size={30} />
+        <Avatar user={user} />
       </button>
       {open && (
         <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgb(0_0_0/0.5)] animate-fade-in">
@@ -109,6 +109,7 @@ const NAV_ITEMS = [
   { id: 'experience', label: 'Venue & Delhi' },
   { id: 'startup', label: 'Startups' },
   { id: 'register', label: 'Event registration' },
+  { id: 'query', label: 'Inquiries' },
 ];
 
 export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
@@ -179,11 +180,11 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+              className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Menu className="w-5 h-5" strokeWidth={1.5} />}
+              {mobileMenuOpen ? <X className="w-[18px] h-[18px]" strokeWidth={1.5} /> : <Menu className="w-[18px] h-[18px]" strokeWidth={1.5} />}
             </button>
           </div>
         </div>

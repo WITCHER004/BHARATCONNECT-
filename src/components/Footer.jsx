@@ -9,6 +9,7 @@ const PAGES = [
   { id: 'experience', label: 'Venue and Delhi' },
   { id: 'register', label: 'Event registration' },
   { id: 'startup', label: 'Register a startup' },
+  { id: 'query', label: 'Inquiries and Helpdesk' },
 ];
 
 const icon = 'w-4 h-4 text-fg-3 shrink-0';
