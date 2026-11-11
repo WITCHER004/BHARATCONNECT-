@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bharat Connect 2026 teaser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500&family=Playfair+Display:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<!--
+  Bharat Connect 2026 teaser, 8 s, 1080×1080.
+  Central rule: two routes, one from India and one from the Arab world, meet at a single point.
+  That point becomes the brand mark, the mark becomes the invitation card, and the point returns as the seal.
+  Every style is computed from time in seek(t), so the film is deterministic and can be recorded frame by frame.
+  Controls: Space play/pause · ← → scrub 0.5 s · R restart · ?t=5 opens at 5 s · ?record hides the controls.
+-->
+<style>
+  :root {
+    --bg: #070f0e;
+    --fg: #efeae1;
+    --fg2: #a8b3af;
+    --fg3: #85938f;
+    --coral: #FF6F5E;
+    --coral-ink: #2a0d08;
+    --cream: #F1EEE8;
+    --ink: #082C29;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  #stage { position: relative; width: 1080px; height: 1080px; background: var(--bg); overflow: hidden; transform-origin: center; flex-shrink: 0; }
+  #routes { position: absolute; inset: 0; }
+
+  .label { position: absolute; font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--fg3); letter-spacing: 0.01em; white-space: nowrap; }
+
+  .mask { overflow: hidden; display: block; }
+  .mask > span { display: block; will-change: transform, opacity; }
+
+  #headline { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-family: 'Playfair Display', Georgia, serif; font-weight: 500; font-size: 64px; line-height: 1.12; letter-spacing: -0.02em; color: var(--fg); }
+
+  #cardGroup { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; }
+  #card { position: absolute; inset: 0; border-radius: 24px; background: var(--cream); box-shadow: 0 40px 80px -32px rgb(0 0 0 / 0.75); }
+  #frame { position: absolute; inset: 12px; border-radius: 16px; border: 1.5px solid rgb(8 44 41 / 0.2); }
+  .jaali { position: absolute; left: 12px; right: 12px; height: 14px; }
+  #content { position: absolute; inset: 0; color: var(--ink); }
+
+  .c-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: rgb(8 44 41 / 0.7); }
+  .c-title { position: absolute; left: 56px; top: 96px; width: 420px; font-family: 'Playfair Display', Georgia, serif; font-size: 38px; line-height: 1.12; }
+  .c-date { position: absolute; left: 50px; top: 236px; display: flex; align-items: flex-end; gap: 22px; }
+  .c-date .big { font-family: 'Playfair Display', Georgia, serif; font-size: 184px; line-height: 0.86; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; }
+  .c-date .month { font-size: 24px; line-height: 32px; padding-bottom: 14px; }
+  .c-grid { position: absolute; left: 56px; right: 56px; top: 474px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; row-gap: 32px; }
+  .c-grid dt { font-size: 17px; color: rgb(8 44 41 / 0.7); }
+  .c-grid dd { margin-top: 6px; font-size: 23px; }
+  .c-rule { position: absolute; left: 56px; right: 56px; top: 680px; height: 1.5px; background: rgb(8 44 41 / 0.18); transform-origin: left center; }
+  .c-foot { position: absolute; left: 56px; right: 56px; top: 704px; display: flex; justify-content: space-between; align-items: baseline; }
+  .c-foot .theme { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; }
+  .c-foot .time { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: rgb(8 44 41 / 0.7); }
+
+  #seal { position: absolute; left: 512px; top: 56px; width: 96px; height: 96px; }
+  #dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--coral); }
+
+  #cta { position: absolute; left: 0; right: 0; top: 1000px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--fg2); letter-spacing: 0.01em; }
+
+  #hud { position: fixed; left: 16px; bottom: 12px; font: 12px/16px 'IBM Plex Mono', monospace; color: var(--fg3); }
+  body.record #hud { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="routes" viewBox="0 0 1080 1080" aria-hidden="true">
+    <path id="routeIndia" d="M -20 780 C 210 780 380 470 540 470" fill="none" stroke="#efeae1" stroke-width="1.5" stroke-linecap="round" />
+    <path id="routeArab" d="M 1100 300 C 870 300 700 470 540 470" fill="none" stroke="#efeae1" stroke-width="1.5" stroke-linecap="round" />
+    <path id="shape" fill="none" stroke="#efeae1" stroke-width="1.5" stroke-linejoin="round" />
+    <path id="inner" fill="none" stroke="#efeae1" stroke-width="1" stroke-linejoin="round" />
+  </svg>
+
+  <div class="label" id="labelIndia" style="left:40px; top:732px">India</div>
+  <div class="label" id="labelArab" style="right:40px; top:318px">22 Arab nations</div>
+
+  <div id="headline">
+    <span class="mask"><span id="h1">India and 22 Arab nations</span></span>
+    <span class="mask"><span id="h2">at one table</span></span>
+  </div>
+
+  <div id="cardGroup">
+    <div id="card"></div>
+    <div id="frame"></div>
+    <svg class="jaali" id="jaaliTop" style="top:12px" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <pattern id="jaali-row" width="14" height="14" patternUnits="userSpaceOnUse">
+          <path d="M7 1.5 L12.5 7 L7 12.5 L1.5 7 Z" fill="none" stroke="#082C29" stroke-width="0.8" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="14" fill="url(#jaali-row)" opacity="0.3" />
+    </svg>
+    <svg class="jaali" id="jaaliBot" style="bottom:12px" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="100%" height="14" fill="url(#jaali-row)" opacity="0.3" />
+    </svg>
+
+    <div id="content">
+      <span class="mask c-small"><span id="cSmall">IACCIA requests the pleasure of your company at</span></span>
+      <span class="mask c-title"><span id="cTitle">Bharat-Arab Business Conclave</span></span>
+      <div class="c-date">
+        <span class="mask"><span class="big" id="cBig">18–19</span></span>
+        <span class="mask"><span class="month" id="cMonth">December<br>2026</span></span>
+      </div>
+      <dl class="c-grid">
+        <div class="cell"><dt>Hall</dt><dd>Palash Hall, 6th floor</dd></div>
+        <div class="cell"><dt>Venue</dt><dd>Yashobhoomi, New Delhi</dd></div>
+        <div class="cell"><dt>Delegations</dt><dd>India and 22 Arab nations</dd></div>
+        <div class="cell"><dt>Doors open</dt><dd>Friday, 09:00 IST</dd></div>
+      </dl>
+      <div class="c-rule" id="cRule"></div>
+      <div class="c-foot" id="cFoot"><span class="theme">People. Partnerships. Prosperity</span><span class="time">Bharat Connect</span></div>
+    </div>
+
+    <svg id="seal" viewBox="0 0 48 48" aria-hidden="true">
+      <g id="sealBody" style="transform-origin: 24px 24px">
+        <circle cx="24" cy="24" r="22" fill="#FF6F5E" />
+        <circle id="sealRing" cx="24" cy="24" r="17" fill="none" stroke="#2a0d08" stroke-opacity="0.35" stroke-width="0.75" />
+        <path id="sealDiamond" d="M24 13 L35 24 L24 35 L13 24 Z" fill="none" stroke="#2a0d08" stroke-opacity="0.55" stroke-width="1" />
+        <circle id="sealCore" cx="24" cy="24" r="3" fill="#2a0d08" fill-opacity="0.55" />
+      </g>
+    </svg>
+  </div>
+
+  <div id="dot"></div>
+  <div id="cta">Registration open · Organised by IACCIA</div>
+</div>
+<div id="hud"></div>
+
+<script>
+(() => {
+  const DURATION = 8;
+  const $ = (id) => document.getElementById(id);
+
+  // ── timing helpers ─────────────────────────────────────
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const span = (t, a, b) => clamp((t - a) / (b - a));
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const out = (k) => 1 - Math.pow(1 - k, 3);                  // entrances
+  const inn = (k) => k * k * k;                                 // exits, the stamp's fall
+  const io = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2); // on-screen moves
+
+  // masked rise: the line lifts out of its own baseline
+  function rise(el, t, a, b, dist = 100) {
+    const k = out(span(t, a, b));
+    el.style.transform = `translateY(${(1 - k) * dist}%)`;
+    el.style.opacity = k;
+  }
+  function fade(el, k) { el.style.opacity = k; }
+
+  // ── geometry ───────────────────────────────────────────
+  const C = { x: 540, y: 470 };            // where the two routes meet
+  const R = 56;                             // brand-mark radius
+  const diamond = (r) => [[C.x, C.y - r], [C.x + r, C.y], [C.x, C.y + r], [C.x - r, C.y]];
+  const cardRect = [[220, 140], [860, 140], [860, 940], [220, 940]];
+  const poly = (pts) => 'M ' + pts.map((p) => p.join(' ')).join(' L ') + ' Z';
+  const SEAL = { x: 220 + 560, y: 140 + 104 }; // seal centre in stage space
+
+  const routeIndia = $('routeIndia'), routeArab = $('routeArab'), shape = $('shape'), inner = $('inner');
+  const lenIndia = routeIndia.getTotalLength(), lenArab = routeArab.getTotalLength();
+  const lenDiamond = 4 * R * Math.SQRT2;
+  routeIndia.style.strokeDasharray = lenIndia;
+  routeArab.style.strokeDasharray = lenArab;
+  inner.setAttribute('d', poly(diamond(32)));
+
+  const cells = [...document.querySelectorAll('.cell')];
+  const sealDiamond = $('sealDiamond'), sealRing = $('sealRing');
+  const lenSealD = 4 * 11 * Math.SQRT2, lenSealR = 2 * Math.PI * 17;
+  sealDiamond.style.strokeDasharray = lenSealD;
+  sealRing.style.strokeDasharray = lenSealR;
+
+  // ── the film ───────────────────────────────────────────
+  function seek(t) {
+    // 0.1–1.0  two routes travel in from opposite edges
+    const pr = io(span(t, 0.1, 1.0));
+    routeIndia.style.strokeDashoffset = lenIndia * (1 - pr);
+    routeArab.style.strokeDashoffset = lenArab * (1 - pr);
+    const routesOut = 1 - span(t, 1.4, 1.8);
+    routeIndia.style.opacity = 0.45 * routesOut;
+    routeArab.style.opacity = 0.45 * routesOut;
+    fade($('labelIndia'), out(span(t, 0.15, 0.45)) * (1 - span(t, 1.3, 1.6)));
+    fade($('labelArab'), out(span(t, 0.25, 0.55)) * (1 - span(t, 1.3, 1.6)));
+
+    // 0.95–1.15  they meet: a coral point
+    // 2.85–3.6   the point travels to where the seal will land
+    const dotIn = out(span(t, 0.95, 1.15));
+    const dm = io(span(t, 2.85, 3.6));
+    const dot = $('dot');
+    dot.style.left = lerp(C.x, SEAL.x, dm) + 'px';
+    dot.style.top = lerp(C.y, SEAL.y, dm) + 'px';
+    dot.style.transform = `scale(${dotIn})`;
+    dot.style.opacity = t < 5.45 ? (dotIn > 0 ? 1 : 0) : 0;
+
+    // 1.0–1.45  the mark draws around the point
+    // 2.85–3.6  one shape, never cut: the diamond opens into the card
+    const md = io(span(t, 1.0, 1.45));
+    const morph = io(span(t, 2.85, 3.6));
+    const from = diamond(R);
+    const pts = from.map((p, i) => [lerp(p[0], cardRect[i][0], morph), lerp(p[1], cardRect[i][1], morph)]);
+    shape.setAttribute('d', poly(pts));
+    if (morph === 0) {
+      shape.style.strokeDasharray = lenDiamond;
+      shape.style.strokeDashoffset = lenDiamond * (1 - md);
+    } else {
+      shape.style.strokeDasharray = 'none';
+    }
+    shape.style.opacity = md > 0 ? 1 - span(t, 3.35, 3.6) : 0;
+    inner.style.opacity = 0.5 * out(span(t, 1.2, 1.45)) * (1 - span(t, 2.7, 2.9));
+
+    // 1.45–3.0  the line the whole film is about, held to be read
+    rise($('h1'), t, 1.45, 1.85);
+    rise($('h2'), t, 1.65, 2.05);
+    const hOut = inn(span(t, 2.75, 3.0));
+    const hl = $('headline');
+    hl.style.opacity = 1 - hOut;
+    hl.style.transform = `translateY(${-12 * hOut}px)`;
+
+    // 3.3–3.9  card stock fills the outline
+    const fill = out(span(t, 3.3, 3.65));
+    $('card').style.opacity = fill;
+    fade($('frame'), out(span(t, 3.5, 3.8)));
+    fade($('jaaliTop'), out(span(t, 3.55, 3.85)));
+    fade($('jaaliBot'), out(span(t, 3.6, 3.9)));
+
+    // 3.7–5.25  the invitation prints, top to bottom
+    rise($('cSmall'), t, 3.7, 4.0);
+    rise($('cTitle'), t, 3.85, 4.2);
+    rise($('cBig'), t, 4.15, 4.55);
+    rise($('cMonth'), t, 4.35, 4.7);
+    cells.forEach((c, i) => {
+      const k = out(span(t, 4.6 + i * 0.06, 4.9 + i * 0.06));
+      c.style.opacity = k;
+      c.style.transform = `translateY(${(1 - k) * 10}px)`;
+    });
+    $('cRule').style.transform = `scaleX(${io(span(t, 4.85, 5.15))})`;
+    const fk = out(span(t, 4.95, 5.25));
+    $('cFoot').style.opacity = fk;
+    $('cFoot').style.transform = `translateY(${(1 - fk) * 8}px)`;
+
+    // 5.3–5.95  the seal is pressed onto the card where the point has waited
+    const fall = inn(span(t, 5.3, 5.45));
+    const press = span(t, 5.45, 5.65);
+    const pressScale = press === 0 ? 1 : 1 - 0.03 * Math.sin(Math.PI * press);
+    const sealScale = lerp(1.25, 1, fall) * pressScale;
+    const sealBody = $('sealBody');
+    sealBody.style.transform = `scale(${sealScale})`;
+    $('seal').style.opacity = fall;
+    sealRing.style.strokeDashoffset = lenSealR * (1 - io(span(t, 5.55, 5.9)));
+    sealDiamond.style.strokeDashoffset = lenSealD * (1 - io(span(t, 5.6, 5.9)));
+    $('sealCore').style.opacity = out(span(t, 5.75, 5.95));
+    const impact = Math.sin(Math.PI * span(t, 5.45, 5.62));            // the card gives a little
+
+    // 6.0–6.8  step back; the card settles at its resting angle
+    const settle = io(span(t, 6.0, 6.8));
+    $('cardGroup').style.transform =
+      `translateY(${3 * impact - 34 * settle}px) rotate(${-1.5 * settle}deg) scale(${1 - 0.1 * settle})`;
+    $('cardGroup').style.visibility = fill > 0 ? 'visible' : 'hidden';
+
+    // 6.3–6.8  the call to act; 6.8–8 hold completely still
+    const ck = out(span(t, 6.3, 6.8));
+    $('cta').style.opacity = ck;
+    $('cta').style.transform = `translateY(${(1 - ck) * 8}px)`;
+  }
+
+  // ── playback ───────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  if (params.has('record')) document.body.classList.add('record');
+  let t = clamp(parseFloat(params.get('t')) || 0, 0, DURATION);
+  let playing = !params.has('record');
+  let last = null;
+
+  function fit() {
+    const s = Math.min(innerWidth, innerHeight) / 1080;
+    $('stage').style.transform = `scale(${s})`;
+  }
+  function hud() {
+    $('hud').textContent = `${t.toFixed(2)} / ${DURATION}s · ${playing ? 'playing' : 'paused'} · Space play/pause · ← → scrub · R restart`;
+  }
+  function frame(now) {
+    if (playing) {
+      if (last !== null) t = Math.min(DURATION, t + (now - last) / 1000);
+      if (t >= DURATION) playing = false;
+    }
+    last = now;
+    seek(t);
+    hud();
+    requestAnimationFrame(frame);
+  }
+
+  addEventListener('resize', fit);
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); if (t >= DURATION) t = 0; playing = !playing; }
+    if (e.code === 'ArrowRight') t = Math.min(DURATION, t + 0.5);
+    if (e.code === 'ArrowLeft') t = Math.max(0, t - 0.5);
+    if (e.code === 'KeyR') { t = 0; playing = true; }
+  });
+
+  // exposed for frame-by-frame recording: await window.babcSeek(seconds)
+  window.babcSeek = (s) => { playing = false; t = clamp(s, 0, DURATION); seek(t); };
+  window.babcDuration = DURATION;
+
+  fit();
+  seek(t);
+  document.fonts.ready.then(() => requestAnimationFrame(frame));
+})();
+</script>
+</body>
+</html>

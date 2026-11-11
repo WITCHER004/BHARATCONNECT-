@@ -1,0 +1,397 @@
+@import "tailwindcss";
+
+/*
+  Bharat Connect 2026 design system
+  World: a royal diplomatic invitation. Jewel teal, gold foil, ivory card stock, one coral seal.
+  Dark sections use a jewel-teal ramp; .theme-ivory sections swap the same tokens to ivory and ink.
+  Coral marks the primary action. Gold carries ornament, key figures and the film.
+*/
+
+@theme {
+  /* Jewel-teal ramp */
+  --color-surface-0: #072723;   /* deepest: hero, footer */
+  --color-surface-1: #0b312c;   /* page */
+  --color-surface-2: #103b35;   /* card */
+  --color-surface-3: #164740;   /* raised: inputs, active rows */
+  --color-surface-4: #1c544c;   /* hover on raised */
+
+  --color-fg: #f7f2e8;          /* primary text, ivory */
+  --color-fg-2: #bccbc5;        /* secondary text */
+  --color-fg-3: #9db3ac;        /* muted text, icons, meta */
+  --color-line: rgb(217 179 106 / 0.16);         /* gold hairline */
+  --color-line-strong: rgb(217 179 106 / 0.3);
+
+  /* Gold foil */
+  --color-gold-foil: #D9B36A;   /* ornament, rules, the film */
+  --color-gold-text: #e6c47f;   /* gold used as text */
+
+  /* Brand */
+  --color-cream: #F1EEE8;
+  --color-cream-50: #FCFBF9;
+  --color-cream-100: #FAF8F5;
+  --color-cream-200: #F1EEE8;
+  --color-cream-300: #E6E1D7;
+  --color-cream-400: #D5CDBF;
+  --color-cream-500: #BAAF9B;
+
+  --color-teal: #0E4F4A;
+  --color-teal-deep: #082C29;
+  --color-teal-dark: #0A3B37;
+  --color-teal-brand: #0E4F4A;
+  --color-teal-light: #1B746D;
+  --color-teal-vibrant: #27968D;
+  --color-teal-soft: #E5EFEE;
+  --color-teal-muted: #8FB5B1;
+
+  --color-coral: #FF6F5E;
+  --color-coral-ink: #2a0d08;   /* text on coral, 7:1 */
+  --color-coral-text: #ff9384;  /* coral used as text on dark */
+  --color-coral-50: #FFF5F4;
+  --color-coral-100: #FFEBE8;
+  --color-coral-200: #FFD4CF;
+  --color-coral-brand: #FF6F5E;
+  --color-coral-hover: #ff8172;
+  --color-coral-dark: #CF4333;
+
+  --color-gold: #C89D52;
+  --color-gold-light: #E8C789;
+  --color-gold-dark: #A67C34;
+
+  --color-positive: #4cc38a;
+  --color-negative: #e5484d;
+
+  --color-obsidian: #072723;
+  --color-obsidian-teal: #0b312c;
+  --color-ink: #082C29;
+
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-scale-in: fade-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee-scroll 80s linear infinite;
+  --animate-marquee-reverse: marquee-scroll 80s linear infinite reverse;
+}
+
+/* ── Motion ──────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Base ────────────────────────────────────────────── */
+
+@layer base {
+  *, *::before, *::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color: var(--color-fg);
+    background-color: var(--color-surface-1);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: var(--color-surface-1);
+    color: var(--color-fg);
+  }
+
+  ::selection {
+    background-color: var(--color-coral);
+    color: var(--color-coral-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-coral);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-surface-0); }
+::-webkit-scrollbar-thumb { background: var(--color-surface-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-surface-4); }
+
+/* ── Ivory sections: the same tokens, printed on card stock ── */
+
+.theme-ivory {
+  --color-surface-1: #F7F2E8;
+  --color-surface-2: #FFFCF6;
+  --color-surface-3: #EFE6D6;
+  --color-surface-4: #E7DCC8;
+  --color-fg: #082C29;
+  --color-fg-2: #3d5853;
+  --color-fg-3: #52685f;
+  --color-line: rgb(8 44 41 / 0.12);
+  --color-line-strong: rgb(8 44 41 / 0.22);
+  --color-gold-foil: #B8893A;
+  --color-gold-text: #7d5c1d;
+  --color-coral-text: #b93d2c;
+  --color-negative: #b4232a;
+  background-color: var(--color-surface-1);
+  color: var(--color-fg);
+}
+
+/* Cream sections with black ink (Programme sessions) */
+.theme-cream {
+  --color-surface-0: #EFE7D8;
+  --color-surface-1: #F7F2E8;
+  --color-surface-2: #FFFCF6;
+  --color-surface-3: #EFE7D8;
+  --color-surface-4: #E6DCC9;
+  --color-fg: #141414;
+  --color-fg-2: #3f3c37;
+  --color-fg-3: #66625b;
+  --color-line: rgb(20 20 20 / 0.1);
+  --color-line-strong: rgb(20 20 20 / 0.2);
+  --color-gold-foil: #B8893A;
+  --color-gold-text: #7d5c1d;
+  --color-coral-text: #b93d2c;
+  --color-negative: #b4232a;
+  --color-positive: #16803c;
+  background-color: var(--color-surface-1);
+  color: var(--color-fg);
+}
+
+/* Dark tokens restored inside a light section (e.g. black cards on a white band) */
+.theme-dark {
+  --color-surface-1: #0b312c;
+  --color-surface-2: #103b35;
+  --color-surface-3: #164740;
+  --color-surface-4: #1c544c;
+  --color-fg: #f7f2e8;
+  --color-fg-2: #bccbc5;
+  --color-fg-3: #9db3ac;
+  --color-line: rgb(217 179 106 / 0.16);
+  --color-line-strong: rgb(217 179 106 / 0.3);
+  --color-gold-foil: #D9B36A;
+  --color-gold-text: #e6c47f;
+  --color-coral-text: #ff9384;
+  --color-negative: #e5484d;
+  color: var(--color-fg);
+}
+
+/* Royal hero ground: one hue, lit from above, plus a faint printed jaali */
+.bg-royal {
+  background:
+    radial-gradient(120% 80% at 70% 0%, #11564e 0%, rgb(17 86 78 / 0) 60%),
+    var(--color-surface-0);
+}
+
+/* Section ornament: a gold diamond between two foil rules */
+.ornament { display: flex; align-items: center; gap: 12px; color: var(--color-gold-foil); }
+.ornament::before, .ornament::after { content: ""; height: 1px; width: 32px; background: currentColor; opacity: 0.6; }
+
+/* ── Surfaces ────────────────────────────────────────── */
+
+.surface-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
+}
+
+.surface-raised {
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-line);
+}
+
+/* Printed jaali, used once as a static mark in the hero */
+.jaali-print {
+  background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23efeae1' stroke-width='1'%3E%3Cpath d='M24 4 L44 24 L24 44 L4 24 Z'/%3E%3Ccircle cx='24' cy='24' r='8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 48px 48px;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-coral);
+  color: var(--color-coral-ink);
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--color-coral-hover); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--color-surface-3);
+  color: var(--color-fg);
+  font-weight: 500;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+  cursor: pointer;
+}
+.btn-secondary:hover { background: var(--color-surface-4); }
+.btn-secondary:active { transform: scale(0.98); }
+
+/* Legacy aliases, kept so nothing renders unstyled */
+.btn-coral { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-coral); color: var(--color-coral-ink); font-weight: 600; border-radius: 10px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18); transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out); cursor: pointer; }
+.btn-coral:hover { background: var(--color-coral-hover); }
+.btn-coral:active { transform: scale(0.98); }
+.btn-glass { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-surface-3); color: var(--color-fg); border: 1px solid var(--color-line-strong); border-radius: 10px; transition: background-color 150ms var(--ease-out); cursor: pointer; }
+.btn-glass:hover { background: var(--color-surface-4); }
+.glass-card, .glass-morphism, .glass-card-cream { background: var(--color-surface-2); border: 1px solid var(--color-line); }
+.hover-glow, .hover-glow-dark { transition: border-color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
+.hover-glow:hover, .hover-glow-dark:hover { border-color: var(--color-line-strong); }
+.orb-coral, .orb-teal, .orb-gold, .holographic-sheen { display: none; }
+.text-shimmer { color: var(--color-fg); }
+.bg-obsidian-hero, .bg-hero-gradient { background: var(--color-surface-0); }
+.bg-obsidian-surface, .bg-section-dark, .bg-section-teal { background: var(--color-surface-1); }
+.bg-section-cream { background: var(--color-surface-1); }
+
+/* ── Type helpers ────────────────────────────────────── */
+
+/* The signature: a printed-programme reference line */
+.ref-line {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.01em;
+  color: var(--color-fg-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.figure {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* ── Marquee ─────────────────────────────────────────── */
+
+.marquee-container {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+}
+
+/* ── Page transition: one short fade and rise ────────── */
+
+.page-enter {
+  animation: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Hero film (components/HeroFilm.jsx) ─────────────────
+   Drawn in 1080 × 1080 film space, scaled and cropped by the component. */
+
+.babc-film .film-stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1080px; transform-origin: 0 0; }
+.babc-film .film-routes { position: absolute; inset: 0; width: 1080px; height: 1080px; }
+.babc-film .film-label { position: absolute; font-family: var(--font-mono); font-size: 24px; color: var(--color-gold-text); white-space: nowrap; opacity: 0; }
+.babc-film .film-mask { display: block; overflow: hidden; }
+.babc-film .film-mask > span { display: block; opacity: 0; }
+
+.babc-film .film-group { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; visibility: hidden; color: #082C29; }
+.babc-film .film-card { position: absolute; inset: 0; border-radius: 24px; background: #F7F2E8; box-shadow: 0 40px 80px -32px rgb(0 0 0 / 0.75); opacity: 0; }
+.babc-film .film-frame { position: absolute; inset: 12px; border-radius: 16px; border: 1.5px solid rgb(184 137 58 / 0.7); box-shadow: inset 0 0 0 5px #F7F2E8, inset 0 0 0 6px rgb(184 137 58 / 0.35); opacity: 0; }
+.babc-film .film-jaali { position: absolute; left: 12px; width: 616px; height: 14px; opacity: 0; }
+.babc-film .film-content { position: absolute; inset: 0; }
+
+.babc-film .film-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: rgb(8 44 41 / 0.7); }
+.babc-film .film-title { position: absolute; left: 56px; top: 96px; width: 420px; font-family: var(--font-serif); font-size: 38px; line-height: 1.12; }
+.babc-film .film-date { position: absolute; left: 50px; top: 236px; display: flex; align-items: flex-end; gap: 22px; }
+.babc-film .film-big { font-family: var(--font-serif); font-size: 184px; line-height: 0.86; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; }
+.babc-film .film-month { font-size: 24px; line-height: 32px; padding-bottom: 14px; }
+.babc-film .film-grid { position: absolute; left: 56px; right: 56px; top: 474px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.babc-film .film-grid > div { opacity: 0; }
+.babc-film .film-grid dt { font-size: 17px; color: rgb(8 44 41 / 0.7); }
+.babc-film .film-grid dd { margin-top: 6px; font-size: 23px; }
+.babc-film .film-rule { position: absolute; left: 56px; right: 56px; top: 680px; height: 1.5px; background: rgb(184 137 58 / 0.6); transform-origin: left center; transform: scaleX(0); }
+.babc-film .film-foot { position: absolute; left: 56px; right: 56px; top: 704px; display: flex; justify-content: space-between; align-items: baseline; opacity: 0; }
+.babc-film .film-theme { font-family: var(--font-serif); font-size: 24px; }
+.babc-film .film-time { font-family: var(--font-mono); font-size: 18px; color: rgb(8 44 41 / 0.7); }
+
+.babc-film .film-seal { position: absolute; left: 512px; top: 56px; width: 96px; height: 96px; opacity: 0; }
+.babc-film .film-dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--color-coral); opacity: 0; }
+
+/* Intro film: the full-screen stage, its headline and closing line */
+.babc-film .film-stage-intro { left: 50%; top: 50%; transform-origin: center; }
+.babc-film .film-headline { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-family: var(--font-serif); font-weight: 500; font-size: 64px; line-height: 1.12; letter-spacing: -0.02em; color: var(--color-fg); }
+.babc-film .film-gold { color: var(--color-gold-text); }
+.babc-film .film-cta { position: absolute; left: 0; right: 0; top: 1000px; text-align: center; font-family: var(--font-mono); font-size: 22px; color: var(--color-gold-text); opacity: 0; }
+
+/* ── Twin skyline (components/Skyline.jsx) ────────────── */
+
+.skyline { display: block; width: 100%; height: auto; overflow: visible; }
+.skyline .sky-draw { fill: none; stroke: var(--color-gold-foil); stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; opacity: 0.6; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
+.skyline .sky-faint { opacity: 0.3; }
+.skyline .burj-line { opacity: 0.95; stroke-width: 1.5; }
+.skyline .burj-body, .skyline .burj-band, .skyline .burj-tier, .skyline .burj-beacon { opacity: 0; }
+
+.skyline.is-playing .sky-draw { animation: sky-draw 1.4s var(--ease-out) var(--d, 0s) forwards; }
+.skyline.is-playing .burj-body { animation: fade-in 0.8s var(--ease-out) 1.8s forwards; }
+.skyline.is-playing .burj-band { animation: burj-climb 6s cubic-bezier(0.45, 0, 0.25, 1) 2.4s infinite; }
+.skyline.is-playing .burj-tier { animation: burj-tier 6s linear calc(2.5s + var(--i) * 0.36s) infinite; }
+.skyline.is-playing .burj-beacon { animation: burj-beacon 2s ease-in-out 2.4s infinite; }
+
+@keyframes sky-draw { to { stroke-dashoffset: 0; } }
+@keyframes burj-climb {
+  0%   { transform: translateY(0); opacity: 0; }
+  6%   { opacity: 1; }
+  48%  { transform: translateY(-580px); opacity: 1; }
+  52%, 100% { transform: translateY(-580px); opacity: 0; }
+}
+@keyframes burj-tier {
+  0%, 100% { opacity: 0; }
+  3%  { opacity: 0.5; }
+  14% { opacity: 0; }
+}
+@keyframes burj-beacon {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skyline .sky-draw { stroke-dashoffset: 0; animation: none !important; }
+  .skyline .burj-body { opacity: 1; animation: none !important; }
+  .skyline .burj-band, .skyline .burj-tier { animation: none !important; opacity: 0; }
+  .skyline .burj-beacon { opacity: 1; animation: none !important; }
+}
