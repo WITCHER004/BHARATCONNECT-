@@ -86,26 +86,16 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-8 min-h-[100svh] pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-gold-foil/10 border border-gold-foil/30 text-gold-text text-xs tracking-wider uppercase font-medium mb-4 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-[#FF6F5E] animate-pulse" />
-              <span>Host City: Dubai, UAE · Bharat-Arab Summit 2026</span>
-            </div>
-
-            <p className="ref-line text-gold-text">18–19 Dec 2026 · Dubai, United Arab Emirates · Connecting Bharat & 22 Arab Economies</p>
+            <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
 
             <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
               India and 22 Arab nations <span className="text-gold-text">at one table</span>
             </h1>
 
             <p className="mt-6 text-lg leading-[1.6] text-fg-2 max-w-xl">
-              Convening in <strong className="text-fg font-medium">Dubai, UAE</strong> — the global crossroads of trade and capital. Two days of ministerial plenaries, sovereign wealth deal rooms and 100+ exhibition stalls, driving a $500B bilateral trade target. Organised by IACCIA.
+              Two days of ministerial plenaries, sector deal rooms and 100+ exhibition stalls, working towards
+              a $500B bilateral trade target. Organised by IACCIA in New Delhi.
             </p>
-
-            <div className="mt-6 inline-flex flex-wrap items-center gap-2.5 px-3.5 py-2 rounded-xl bg-surface-2/80 border border-line text-xs text-fg-2 backdrop-blur-sm">
-              <span className="text-gold-text font-serif text-[13px] font-semibold">📍 Dubai Conclave</span>
-              <span className="w-px h-3.5 bg-line-strong hidden sm:inline" />
-              <span>Hosted in Dubai, UAE · Anchored under the UAE–India Comprehensive Economic Partnership (CEPA)</span>
-            </div>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3">
               <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-6 text-[15px]">
@@ -133,7 +123,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Startup registration: black card with a gold double frame */}
-            <article className="theme-dark lg:col-span-7 bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
+            <article className="theme-dark lg:col-span-7 bg-[#0b0b0b] border border-line-strong rounded-[20px] p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
               <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-10 flex flex-col">
                 <p className="ref-line text-gold-text">Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi</p>
                 <h3 className="mt-4 font-serif text-3xl sm:text-4xl font-medium text-fg leading-tight tracking-[-0.01em]">
@@ -158,7 +148,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             </article>
 
             {/* Event registration */}
-            <article className="theme-dark lg:col-span-5 bg-[#0b0b0b] border border-line-strong rounded-2xl p-6 sm:p-10 flex flex-col shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
+            <article className="theme-dark lg:col-span-5 bg-[#0b0b0b] border border-line-strong rounded-[20px] p-6 sm:p-10 flex flex-col shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
               <p className="ref-line text-gold-text">500 accreditations · 18–19 Dec 2026</p>
               <h3 className="mt-4 font-serif text-3xl font-medium text-fg leading-tight">Event registration</h3>
               <p className="mt-4 text-[15px] text-fg-2 leading-relaxed">

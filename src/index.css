@@ -135,9 +135,22 @@
     border-radius: 4px;
   }
 
-  h1, h2, h3, h4 {
+  h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
   }
+
+  p, li, dt, dd, blockquote {
+    text-wrap: pretty;
+  }
+
+  img {
+    outline: 1px solid rgb(255 255 255 / 0.1);
+    outline-offset: -1px;
+  }
+}
+
+.theme-ivory img, .theme-cream img {
+  outline: 1px solid rgb(0 0 0 / 0.08);
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -220,11 +233,19 @@
 .surface-card {
   background: var(--color-surface-2);
   border: 1px solid var(--color-line);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 16px -4px rgb(0 0 0 / 0.25);
+  transition-property: border-color, box-shadow, transform;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
+}
+.theme-ivory .surface-card, .theme-cream .surface-card {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.07);
 }
 
 .surface-raised {
   background: var(--color-surface-3);
   border: 1px solid var(--color-line);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
 }
 
 /* Printed jaali, used once as a static mark in the hero */
@@ -244,12 +265,18 @@
   color: var(--color-coral-ink);
   font-weight: 600;
   border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
-  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 2px 8px -2px rgb(255 111 94 / 0.35);
+  transition-property: background-color, transform, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
   cursor: pointer;
+  user-select: none;
 }
-.btn-primary:hover { background: var(--color-coral-hover); }
-.btn-primary:active { transform: scale(0.98); }
+.btn-primary:hover {
+  background: var(--color-coral-hover);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 4px 14px -2px rgb(255 111 94 / 0.45);
+}
+.btn-primary:active { transform: scale(0.975); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-secondary {
@@ -262,12 +289,18 @@
   font-weight: 500;
   border: 1px solid var(--color-line-strong);
   border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
-  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 3px rgb(0 0 0 / 0.2);
+  transition-property: background-color, border-color, transform, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: var(--ease-out);
   cursor: pointer;
+  user-select: none;
 }
-.btn-secondary:hover { background: var(--color-surface-4); }
-.btn-secondary:active { transform: scale(0.98); }
+.btn-secondary:hover {
+  background: var(--color-surface-4);
+  border-color: var(--color-gold-foil);
+}
+.btn-secondary:active { transform: scale(0.975); }
 
 /* Legacy aliases, kept so nothing renders unstyled */
 .btn-coral { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-coral); color: var(--color-coral-ink); font-weight: 600; border-radius: 10px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18); transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out); cursor: pointer; }
@@ -363,14 +396,8 @@
 .skyline { display: block; width: 100%; height: auto; overflow: visible; }
 .skyline .sky-draw { fill: none; stroke: var(--color-gold-foil); stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; opacity: 0.6; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
 .skyline .sky-faint { opacity: 0.3; }
-.skyline .burj-line {
-  opacity: 0.98;
-  stroke: #34D399;
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 6px rgb(16 185 129 / 0.5));
-}
+.skyline .burj-line { opacity: 0.95; stroke-width: 1.5; }
 .skyline .burj-body, .skyline .burj-band, .skyline .burj-tier, .skyline .burj-beacon { opacity: 0; }
-.skyline .burj-beacon { filter: drop-shadow(0 0 8px #34D399); }
 
 .skyline.is-playing .sky-draw { animation: sky-draw 1.4s var(--ease-out) var(--d, 0s) forwards; }
 .skyline.is-playing .burj-body { animation: fade-in 0.8s var(--ease-out) 1.8s forwards; }

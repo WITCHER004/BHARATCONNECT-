@@ -64,9 +64,9 @@ function AccountMenu({ onSignIn }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Account: ${user.name}`}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer"
+        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer"
       >
-        <Avatar user={user} />
+        <Avatar user={user} size={30} />
       </button>
       {open && (
         <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgb(0_0_0/0.5)] animate-fade-in">
@@ -106,7 +106,7 @@ const NAV_ITEMS = [
   { id: 'home', label: 'Overview' },
   { id: 'schedule', label: 'Programme' },
   { id: 'exhibition', label: 'Exhibition' },
-  { id: 'experience', label: 'Venue & Dubai' },
+  { id: 'experience', label: 'Venue & Delhi' },
   { id: 'startup', label: 'Startups' },
   { id: 'register', label: 'Event registration' },
 ];
@@ -142,10 +142,7 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
           >
             <BrandMark />
             <span className="flex flex-col">
-              <span className="text-[15px] font-semibold leading-5 flex items-center gap-2">
-                Bharat Connect 2026
-                <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-mono tracking-wider bg-gold-foil/15 text-gold-text border border-gold-foil/30">Dubai</span>
-              </span>
+              <span className="text-[15px] font-semibold leading-5">Bharat Connect 2026</span>
               <span className="text-xs text-fg-3 leading-4">Bharat-Arab Business Conclave</span>
             </span>
           </button>
@@ -182,11 +179,11 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+              className="xl:hidden w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-[18px] h-[18px]" strokeWidth={1.5} /> : <Menu className="w-[18px] h-[18px]" strokeWidth={1.5} />}
+              {mobileMenuOpen ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Menu className="w-5 h-5" strokeWidth={1.5} />}
             </button>
           </div>
         </div>

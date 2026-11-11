@@ -149,7 +149,7 @@ export function makeSeek(root, { full = false } = {}) {
 }
 
 function daysToOpen() {
-  const diff = new Date('2026-12-18T09:00:00+04:00').getTime() - Date.now();
+  const diff = new Date('2026-12-18T09:00:00+05:30').getTime() - Date.now();
   const d = Math.ceil(diff / 86400000);
   return d > 1 ? `Opens in ${d} days` : d === 1 ? 'Opens tomorrow' : 'Bharat Connect';
 }
@@ -192,16 +192,16 @@ export function FilmStage({ stageRef, titles = false, className = '' }) {
 
         <div className="film-content">
           <span className="film-mask film-small"><span data-k="small">IACCIA requests the pleasure of your company at</span></span>
-          <span className="film-mask film-title"><span data-k="title">Bharat-Arab Business Conclave · Dubai</span></span>
+          <span className="film-mask film-title"><span data-k="title">Bharat-Arab Business Conclave</span></span>
           <div className="film-date">
             <span className="film-mask"><span className="film-big" data-k="big">18–19</span></span>
             <span className="film-mask"><span className="film-month" data-k="month">December<br />2026</span></span>
           </div>
           <dl className="film-grid">
-            <div data-k="cell"><dt>Host City</dt><dd>Dubai, UAE</dd></div>
-            <div data-k="cell"><dt>Venue</dt><dd>Dubai Convention Hub</dd></div>
+            <div data-k="cell"><dt>Hall</dt><dd>Palash Hall, 6th floor</dd></div>
+            <div data-k="cell"><dt>Venue</dt><dd>Yashobhoomi, New Delhi</dd></div>
             <div data-k="cell"><dt>Delegations</dt><dd>India and 22 Arab nations</dd></div>
-            <div data-k="cell"><dt>Doors open</dt><dd>Friday, 09:00 GST</dd></div>
+            <div data-k="cell"><dt>Doors open</dt><dd>Friday, 09:00 IST</dd></div>
           </dl>
           <div className="film-rule" data-k="rule" />
           <div className="film-foot" data-k="foot">
@@ -255,7 +255,7 @@ export default function HeroCard({ viewRef, hidden = false }) {
       className="babc-film relative w-full max-w-[min(520px,calc((100svh-112px)*0.8))] mx-auto aspect-[4/5] overflow-hidden"
       style={{ visibility: hidden ? 'hidden' : 'visible' }}
       role="img"
-      aria-label="Invitation to the Bharat-Arab Business Conclave, 18–19 December 2026, Dubai, UAE"
+      aria-label="Invitation to the Bharat-Arab Business Conclave, 18–19 December 2026, Palash Hall, Yashobhoomi, New Delhi"
     >
       <FilmStage stageRef={stageRef} />
     </div>
