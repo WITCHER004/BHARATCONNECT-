@@ -126,14 +126,16 @@ export default function Skyline({ play = false, className = '' }) {
           <path d={BURJ} />
         </clipPath>
         <linearGradient id="burj-band" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#FF6F5E" stopOpacity="0" />
-          <stop offset="0.35" stopColor="#FF6F5E" stopOpacity="0.85" />
-          <stop offset="0.6" stopColor="#F3D48F" stopOpacity="1" />
-          <stop offset="1" stopColor="#F3D48F" stopOpacity="0" />
+          <stop offset="0" stopColor="#047857" stopOpacity="0" />
+          <stop offset="0.3" stopColor="#059669" stopOpacity="0.8" />
+          <stop offset="0.6" stopColor="#10B981" stopOpacity="1" />
+          <stop offset="0.85" stopColor="#34D399" stopOpacity="1" />
+          <stop offset="1" stopColor="#6EE7B7" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="burj-body" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#D9B36A" stopOpacity="0.22" />
-          <stop offset="1" stopColor="#D9B36A" stopOpacity="0.04" />
+          <stop offset="0" stopColor="#059669" stopOpacity="0.32" />
+          <stop offset="0.5" stopColor="#10B981" stopOpacity="0.14" />
+          <stop offset="1" stopColor="#34D399" stopOpacity="0.03" />
         </linearGradient>
       </defs>
 
@@ -160,13 +162,13 @@ export default function Skyline({ play = false, className = '' }) {
               y={y}
               width={w}
               height={i === 0 ? 68 : TIERS[i - 1][1] - y}
-              fill="#F3D48F"
+              fill="#34D399"
               style={{ '--i': i }}
             />
           ))}
         </g>
         <path className="sky-draw burj-line" d={BURJ} pathLength="1" style={{ '--d': '1.42s' }} />
-        <circle className="burj-beacon" cx="1790" cy="6" r="3" fill="#FF6F5E" />
+        <circle className="burj-beacon" cx="1790" cy="6" r="3" fill="#34D399" />
       </g>
     </svg>
   );

@@ -363,8 +363,14 @@
 .skyline { display: block; width: 100%; height: auto; overflow: visible; }
 .skyline .sky-draw { fill: none; stroke: var(--color-gold-foil); stroke-width: 1.25; stroke-linejoin: round; stroke-linecap: round; opacity: 0.6; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
 .skyline .sky-faint { opacity: 0.3; }
-.skyline .burj-line { opacity: 0.95; stroke-width: 1.5; }
+.skyline .burj-line {
+  opacity: 0.98;
+  stroke: #34D399;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 6px rgb(16 185 129 / 0.5));
+}
 .skyline .burj-body, .skyline .burj-band, .skyline .burj-tier, .skyline .burj-beacon { opacity: 0; }
+.skyline .burj-beacon { filter: drop-shadow(0 0 8px #34D399); }
 
 .skyline.is-playing .sky-draw { animation: sky-draw 1.4s var(--ease-out) var(--d, 0s) forwards; }
 .skyline.is-playing .burj-body { animation: fade-in 0.8s var(--ease-out) 1.8s forwards; }
