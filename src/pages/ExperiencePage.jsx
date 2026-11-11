@@ -6,58 +6,58 @@ const ITINERARY = [
   {
     day: 'Day 0',
     date: 'Thu 17 Dec',
-    title: 'Arrival, protocol reception and Aerocity check-in',
-    desc: 'Delegations arrive at Indira Gandhi International Airport (T3). IACCIA protocol officers handle fast-track immigration, baggage clearance and chauffeured transfers to partner hotels in Aerocity and Dwarka.',
-    highlights: ['Airport fast-track lounge', 'Welcome dates and coffee', 'Badge pick-up at partner hotels']
+    title: 'Arrival at DXB, protocol reception and VIP check-in',
+    desc: 'Delegations arrive at Dubai International Airport (DXB). IACCIA protocol officers handle fast-track VIP immigration, baggage clearance and chauffeured transfers to partner luxury hotels along Sheikh Zayed Road and Downtown Dubai.',
+    highlights: ['Airport fast-track Majlis lounge', 'Welcome dates and Arabian gahwa', 'Badge pick-up at partner hotels']
   },
   {
     day: 'Day 1',
     date: 'Fri 18 Dec',
     title: 'Inaugural plenary, sector roundtables and Gala Dinner',
-    desc: 'The conclave opens in Palash Hall (6th floor, Yashobhoomi) with keynotes by Cabinet Ministers, the exhibition opening and sector breakouts on clean energy, AI and infrastructure, followed by the black-tie Inaugural Gala Dinner in the Yashobhoomi Grand Ballroom.',
-    highlights: ['Ministerial lighting of the lamp', 'Palash exhibition floor opening', 'Sitar and oud performance', 'Leadership Awards banquet']
+    desc: 'The conclave opens in Dubai with ministerial keynotes, the bilateral exhibition opening, and sector breakouts on clean energy, AI and food security, followed by the black-tie Inaugural Gala Dinner overlooking the illuminated Dubai skyline.',
+    highlights: ['Ministerial ceremonial addresses', 'Exhibition floor opening', 'Oud and sitar symphony performance', 'Leadership Awards banquet']
   },
   {
     day: 'Day 2',
     date: 'Sat 19 Dec',
     title: 'Sovereign wealth roundtables, B2B matchmaking and declaration',
-    desc: 'Closed-door sovereign wealth dialogues (ADIA, PIF, QIA, KIA, NIIF), then 100+ concurrent deal-room sessions in the 7,000 sq ft lounge, bilateral MoU signings and the adoption of the New Delhi Declaration.',
-    highlights: ['Sovereign fund breakfast roundtable', '100+ pre-matched B2B meetings', 'MoU exchange on the dais', 'Farewell high tea']
+    desc: 'Closed-door sovereign wealth dialogues (ADIA, Mubadala, PIF, QIA, KIA, NIIF), 100+ concurrent deal-room sessions in the 7,000 sq ft lounge, bilateral MoU signings and the adoption of the Dubai Bharat-Arab Economic Declaration.',
+    highlights: ['Sovereign fund breakfast roundtable', '100+ pre-matched B2B meetings', 'Bilateral MoU exchange on the dais', 'Farewell high tea']
   },
   {
     day: 'Day 3',
     date: 'Sun 20 Dec',
-    title: 'Cultural heritage excursion',
-    desc: 'An optional excursion for international delegates and spouses: guided tours of Delhi’s UNESCO World Heritage sites, the Lutyens’ diplomatic avenue and a showcase of Indian crafts.',
-    highlights: ['Humayun’s Tomb and India Gate', 'Rashtrapati Bhavan circuit', 'National Crafts Museum']
+    title: 'Cultural & innovation excursion',
+    desc: 'An optional excursion for international delegates and spouses: curated private visits to the Museum of the Future, the DIFC Innovation Hub, and a heritage walking tour of Old Dubai and the Gold Souk.',
+    highlights: ['Museum of the Future private access', 'DIFC FinTech & Innovation Village', 'Dubai Creek heritage tour']
   }
 ];
 
 const ROUTES = [
-  { id: 't3', label: 'IGI Airport (T3)', time: '15 min', dist: '11.2 km', desc: '8-lane expressway and Airport Express Metro' },
-  { id: 'aerocity', label: 'Aerocity hotels', time: '12 min', dist: '9.5 km', desc: 'Conclave shuttle every 20 min' },
-  { id: 'chanakyapuri', label: 'Chanakyapuri embassies', time: '28 min', dist: '22.0 km', desc: 'Police-escorted corridors for visiting ministers' },
-  { id: 'gurugram', label: 'Gurugram CyberCity', time: '20 min', dist: '14.8 km', desc: 'Signal-free Dwarka Expressway' }
+  { id: 't3', label: 'Dubai Intl Airport (DXB)', time: '15 min', dist: '11.2 km', desc: 'Direct expressway and Dubai Metro Red Line' },
+  { id: 'downtown', label: 'Downtown & DIFC hotels', time: '12 min', dist: '9.5 km', desc: 'Conclave VIP shuttle every 15 min' },
+  { id: 'consulates', label: 'Consular & Diplomatic district', time: '18 min', dist: '14.0 km', desc: 'Police-escorted corridors for visiting ministers' },
+  { id: 'marina', label: 'Dubai Marina & Palm', time: '22 min', dist: '20.0 km', desc: 'Sheikh Zayed Road arterial corridor' }
 ];
 
 const HOTELS = [
   {
-    name: 'JW Marriott Hotel New Delhi Aerocity',
+    name: 'Armani Hotel Dubai (Burj Khalifa)',
+    minutes: '10 min',
+    rating: '5-star Luxury',
+    desc: 'Official residence for visiting heads of state and ministerial delegations, with private bilateral salons and protocol suites'
+  },
+  {
+    name: 'Jumeirah Emirates Towers (DIFC)',
     minutes: '12 min',
     rating: '5-star',
-    desc: 'Official accommodation for presidential delegations, with private bilateral salons and executive security suites'
+    desc: 'Preferred residence for visiting trade ministers, sovereign wealth fund executives and chamber chairpersons'
   },
   {
-    name: 'Andaz Delhi (Hyatt) Aerocity',
+    name: 'The Ritz-Carlton, DIFC',
     minutes: '14 min',
     rating: '5-star',
-    desc: 'Preferred residence for visiting trade ministers, chamber chairpersons and sovereign wealth fund executives'
-  },
-  {
-    name: 'Radisson Blu Hotel New Delhi Dwarka',
-    minutes: '8 min',
-    rating: '5-star',
-    desc: 'The closest partner property to Yashobhoomi, suited to corporate delegations, exhibitors and matchmaking teams'
+    desc: 'The corporate hub suited to family offices, startup founders, institutional investors and matchmaking teams'
   }
 ];
 
@@ -79,12 +79,16 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
       {/* Page header */}
       <section className="pt-32 pb-12 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line mb-4">Yashobhoomi (IICC) · Dwarka Sector 25 · New Delhi</p>
+          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-gold-foil/10 border border-gold-foil/30 text-gold-text text-xs tracking-wider uppercase font-medium mb-4 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-[#FF6F5E] animate-pulse" />
+            <span>Host Destination: Dubai, UAE</span>
+          </div>
+          <p className="ref-line mb-3 text-gold-text">Dubai, United Arab Emirates · 18–19 Dec 2026</p>
           <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em] mb-4">
-            Venue and Delhi
+            Venue & Dubai Concierge
           </h1>
           <p className="text-[15px] sm:text-lg text-fg-2 max-w-2xl leading-relaxed mb-8">
-            Getting to Yashobhoomi, where to stay, visa support and the four-day delegate itinerary
+            Navigating the Dubai conclave: arrival logistics at DXB, partner luxury hotels along Sheikh Zayed Road and Downtown, visa protocols, and the four-day diplomatic itinerary.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <button onClick={() => scrollTo('itinerary-section')} className="btn-primary h-11 px-5 text-sm">
@@ -106,24 +110,24 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
             <div className="lg:col-span-7">
               <h2 className="font-serif font-medium text-3xl sm:text-4xl text-fg mb-4">
-                Yashobhoomi, IICC New Delhi
+                Dubai Convention & Summit Hub
               </h2>
               <p className="text-[15px] text-fg-2 leading-relaxed max-w-2xl mb-8">
-                India’s international convention centre, with column-free halls, an underground climate-controlled metro link and IGBC Platinum green certification
+                The world’s central meeting point between India and the 22 Arab economies, offering world-class column-free plenary halls, direct Dubai Metro Red Line access, and global diplomatic security infrastructure.
               </p>
 
               <dl className="grid grid-cols-3 border-t border-line">
                 <div className="pt-4 pr-4">
-                  <dt className="text-sm text-fg-3 mb-1">From IGI Airport (T3)</dt>
+                  <dt className="text-sm text-fg-3 mb-1">From DXB Airport</dt>
                   <dd className="font-serif text-3xl text-coral-text figure">15 min</dd>
                 </div>
                 <div className="pt-4 px-4 border-l border-line">
-                  <dt className="text-sm text-fg-3 mb-1">IGBC rating</dt>
-                  <dd className="font-serif text-3xl text-fg">Platinum</dd>
+                  <dt className="text-sm text-fg-3 mb-1">Host Emirate</dt>
+                  <dd className="font-serif text-3xl text-fg">Dubai</dd>
                 </div>
                 <div className="pt-4 pl-4 border-l border-line">
-                  <dt className="text-sm text-fg-3 mb-1">Metro</dt>
-                  <dd className="font-serif text-3xl text-fg">Direct link</dd>
+                  <dt className="text-sm text-fg-3 mb-1">Transit</dt>
+                  <dd className="font-serif text-3xl text-fg">Metro Red</dd>
                 </div>
               </dl>
             </div>
@@ -159,7 +163,7 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
           <div className="rounded-2xl surface-card p-6 sm:p-8">
             <div className="mb-6 pb-6 border-b border-line">
               <h3 className="font-serif font-medium text-2xl text-fg mb-1">Travel times to the venue</h3>
-              <p className="text-sm text-fg-3">Choose where you are starting from in Delhi NCR</p>
+              <p className="text-sm text-fg-3">Choose where you are traveling from across Dubai</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -189,17 +193,17 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
               <div className="lg:col-span-6 p-6 rounded-xl bg-surface-3 border border-line flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-sm text-fg-3">
                   <Train className="w-4 h-4" strokeWidth={1.5} />
-                  Recommended: Airport Express (Orange Line)
+                  Recommended: Dubai Metro (Red Line)
                 </div>
                 <h4 className="font-serif font-medium text-xl text-fg">
-                  Underground access to Palash Hall
+                  Direct express access to the summit halls
                 </h4>
                 <p className="text-sm text-fg-2 leading-relaxed">
-                  From the Terminal 3 Airport station it is two stops to Yashobhoomi Dwarka Sector 25. Escalators lead straight to the registration foyer without leaving the climate-controlled security perimeter.
+                  From Dubai International Airport (DXB) Terminals 1 and 3, the Dubai Metro Red Line provides direct transit to the conclave district. Dedicated concierge desks assist visiting delegations at station exits.
                 </p>
                 <div className="pt-3 mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-line">
-                  <span className="ref-line">Every 8 min</span>
-                  <span className="text-sm text-fg-2">Free with your summit badge</span>
+                  <span className="ref-line">Every 4–6 min</span>
+                  <span className="text-sm text-fg-2">Complimentary with summit VIP badge</span>
                 </div>
               </div>
             </div>
@@ -274,7 +278,7 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
               Partner hotels and visas
             </h2>
             <p className="text-[15px] text-fg-2 leading-relaxed">
-              Negotiated rates at three 5-star hotels, each with a conclave shuttle to Yashobhoomi
+              Negotiated rates at partner 5-star hotels, each with a private VIP conclave shuttle to the summit halls
             </p>
           </div>
 

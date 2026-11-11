@@ -106,7 +106,7 @@ const NAV_ITEMS = [
   { id: 'home', label: 'Overview' },
   { id: 'schedule', label: 'Programme' },
   { id: 'exhibition', label: 'Exhibition' },
-  { id: 'experience', label: 'Venue & Delhi' },
+  { id: 'experience', label: 'Venue & Dubai' },
   { id: 'startup', label: 'Startups' },
   { id: 'register', label: 'Event registration' },
 ];
@@ -142,7 +142,10 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
           >
             <BrandMark />
             <span className="flex flex-col">
-              <span className="text-[15px] font-semibold leading-5">Bharat Connect 2026</span>
+              <span className="text-[15px] font-semibold leading-5 flex items-center gap-2">
+                Bharat Connect 2026
+                <span className="px-1.5 py-0.5 rounded text-[10px] uppercase font-mono tracking-wider bg-gold-foil/15 text-gold-text border border-gold-foil/30">Dubai</span>
+              </span>
               <span className="text-xs text-fg-3 leading-4">Bharat-Arab Business Conclave</span>
             </span>
           </button>

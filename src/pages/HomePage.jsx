@@ -86,16 +86,26 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-8 min-h-[100svh] pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7">
-            <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-gold-foil/10 border border-gold-foil/30 text-gold-text text-xs tracking-wider uppercase font-medium mb-4 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-[#FF6F5E] animate-pulse" />
+              <span>Host City: Dubai, UAE · Bharat-Arab Summit 2026</span>
+            </div>
+
+            <p className="ref-line text-gold-text">18–19 Dec 2026 · Dubai, United Arab Emirates · Connecting Bharat & 22 Arab Economies</p>
 
             <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
               India and 22 Arab nations <span className="text-gold-text">at one table</span>
             </h1>
 
             <p className="mt-6 text-lg leading-[1.6] text-fg-2 max-w-xl">
-              Two days of ministerial plenaries, sector deal rooms and 100+ exhibition stalls, working towards
-              a $500B bilateral trade target. Organised by IACCIA in New Delhi.
+              Convening in <strong className="text-fg font-medium">Dubai, UAE</strong> — the global crossroads of trade and capital. Two days of ministerial plenaries, sovereign wealth deal rooms and 100+ exhibition stalls, driving a $500B bilateral trade target. Organised by IACCIA.
             </p>
+
+            <div className="mt-6 inline-flex flex-wrap items-center gap-2.5 px-3.5 py-2 rounded-xl bg-surface-2/80 border border-line text-xs text-fg-2 backdrop-blur-sm">
+              <span className="text-gold-text font-serif text-[13px] font-semibold">📍 Dubai Conclave</span>
+              <span className="w-px h-3.5 bg-line-strong hidden sm:inline" />
+              <span>Hosted in Dubai, UAE · Anchored under the UAE–India Comprehensive Economic Partnership (CEPA)</span>
+            </div>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3">
               <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-6 text-[15px]">

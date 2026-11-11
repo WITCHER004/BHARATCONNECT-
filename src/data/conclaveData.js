@@ -1,19 +1,21 @@
 export const CONCLAVE_INFO = {
   name: "Bharat-Arab Business Conclave 2026",
   shortName: "Bharat Connect 2026",
+  edition: "Dubai Edition",
+  hostCity: "Dubai, United Arab Emirates",
   tagline: "People. Partnerships. Prosperity.",
-  subheading: "Advancing Strategic Partnerships for a Resilient & Sustainable Economic Future | India & 22 Arab Countries.",
+  subheading: "Advancing Strategic Partnerships for a Resilient & Sustainable Economic Future | India & 22 Arab Countries in Dubai.",
   date: "18–19 December 2026",
-  datesISO: "2026-12-18T09:00:00+05:30",
+  datesISO: "2026-12-18T09:00:00+04:00",
   venue: {
-    hall: "Palash Hall (6th Floor)",
-    centre: "Yashobhoomi Convention Centre (IICC)",
-    city: "New Delhi, India",
+    hall: "Grand Plenary & Exhibition Hall",
+    centre: "Dubai, United Arab Emirates",
+    city: "Dubai, UAE",
     totalArea: "34,065 sq. ft.",
-    loungeArea: "7,000 sq. ft. dedicated B2B Networking Lounge",
-    metroStation: "Yashobhoomi Dwarka Sector 25 Metro Station (Direct Sub-surface access)",
-    airportProximity: "15 minutes from Indira Gandhi International Airport (T3)",
-    certification: "IGBC Platinum Rated Eco-Friendly Facility"
+    loungeArea: "7,000 sq. ft. dedicated B2B Sovereign Wealth Lounge",
+    metroStation: "Dubai Metro Red Line (Direct Connectivity)",
+    airportProximity: "15 minutes from Dubai International Airport (DXB)",
+    certification: "Green Building & Sustainable Event Certified"
   },
   organizers: {
     lead: "India & Arab Countries Chamber of Commerce, Industry & Agriculture (IACCIA)",
