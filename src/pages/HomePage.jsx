@@ -131,7 +131,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                 </h3>
                 <p className="mt-4 text-[15px] text-fg-2 leading-relaxed max-w-xl">
                   Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
-                  receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-numbers</span>) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                  receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                 </p>
                 <dl className="mt-8 grid grid-cols-3 gap-4 text-sm border-t border-line pt-6">
                   <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure">₹5,900 incl. GST</dd></div>

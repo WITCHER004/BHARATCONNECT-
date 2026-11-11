@@ -47,6 +47,30 @@ function loadDraft() {
   }
 }
 
+const STARTUP_COUNTER_KEY = 'bc-startup-counter';
+
+export function generateStartupId() {
+  try {
+    const raw = localStorage.getItem(STARTUP_COUNTER_KEY);
+    let nextNum = 1;
+    if (raw) {
+      const parsed = parseInt(raw, 10);
+      if (!isNaN(parsed) && parsed >= 1) {
+        nextNum = parsed + 1;
+      }
+    } else {
+      const past = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
+      if (past.length > 0) {
+        nextNum = past.length + 1;
+      }
+    }
+    localStorage.setItem(STARTUP_COUNTER_KEY, String(nextNum));
+    return `BMF.BC-SU-${String(nextNum).padStart(5, '0')}`;
+  } catch {
+    return 'BMF.BC-SU-00001';
+  }
+}
+
 /* ── validation, per step ───────────────────────────── */
 
 function validateStep(step, v) {
@@ -390,8 +414,7 @@ export default function StartupPage({ onNavigate }) {
     setStatus('sending');
     try {
       await fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) });
-      const uniqueNum = Math.floor(100000 + Math.random() * 900000);
-      const uniqueId = `BMF.BC-SU-${uniqueNum}`;
+      const uniqueId = generateStartupId();
       setAssignedId(uniqueId);
       setStatus('sent');
       try {
@@ -819,8 +842,8 @@ export default function StartupPage({ onNavigate }) {
                     <h4 className="text-sm font-medium text-fg">Official Registration ID Allocation</h4>
                     <p className="mt-1 text-xs text-fg-2 leading-relaxed">
                       Upon submission, your venture will be instantly assigned a permanent alphanumeric Accreditation ID formatted as{' '}
-                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-SU-numbers]</span> (e.g.{' '}
-                      <span className="font-mono text-fg">BMF.BC-SU-849201</span>). This ID remains valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-SU-numbers]</span> (starting sequentially from{' '}
+                      <span className="font-mono text-fg font-semibold">BMF.BC-SU-00001</span>). This ID remains valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                     </p>
                   </div>
                 </div>
@@ -941,7 +964,7 @@ export default function StartupPage({ onNavigate }) {
                       </span>
                     </div>
                     <div className="mt-2 font-mono text-3xl sm:text-4xl font-semibold text-fg tracking-tight flex items-center gap-3">
-                      <span>{assignedId || 'BMF.BC-SU-849201'}</span>
+                      <span>{assignedId || 'BMF.BC-SU-00001'}</span>
                     </div>
                     <p className="mt-2 text-xs sm:text-sm text-fg-3">
                       Your unique alphanumeric identifier [BMF.BC-SU-numbers] for the Bharat Connect Startup Showcase.
@@ -951,7 +974,7 @@ export default function StartupPage({ onNavigate }) {
                   <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
                     <button
                       type="button"
-                      onClick={() => copyId(assignedId || 'BMF.BC-SU-849201')}
+                      onClick={() => copyId(assignedId || 'BMF.BC-SU-00001')}
                       className="btn-primary h-11 px-5 text-sm font-medium flex items-center gap-2 whitespace-nowrap cursor-pointer"
                     >
                       {copiedId ? (
@@ -1004,7 +1027,7 @@ export default function StartupPage({ onNavigate }) {
 
                 <p className="mt-6 text-[14px] text-fg-2 leading-relaxed">
                   Thank you, <span className="text-fg font-medium">{v.fullName}</span>. An official confirmation with your assigned registration ID{' '}
-                  <span className="font-mono font-semibold text-gold-text">{assignedId || 'BMF.BC-SU-849201'}</span> has been recorded and transmitted to{' '}
+                  <span className="font-mono font-semibold text-gold-text">{assignedId || 'BMF.BC-SU-00001'}</span> has been recorded and transmitted to{' '}
                   <span className="text-fg font-medium">{v.commEmail || v.email}</span>. Please quote this ID for stall allocations, bilateral deal room entry, and fast-track badge issuance at Yashobhoomi.
                 </p>
 
