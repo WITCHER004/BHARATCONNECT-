@@ -80,7 +80,7 @@ END:VCALENDAR`;
       <section className="pt-32 pb-12 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div>
-            <p className="ref-line mb-4">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
+            <p className="ref-line mb-4">18-19 Dec 2026 / Palash Hall, 6F / Yashobhoomi, New Delhi</p>
             <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em] mb-4">
               Programme
             </h1>
@@ -121,7 +121,7 @@ END:VCALENDAR`;
                   onClick={() => setActiveDay(day.id)}
                   className={`px-4 py-2 rounded-lg text-left transition-colors duration-150 cursor-pointer ${
                     isActive
-                      ? 'bg-surface-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]'
+                      ? 'bg-surface-3 shadow-sm'
                       : 'hover:bg-surface-2'
                   }`}
                 >
@@ -134,7 +134,7 @@ END:VCALENDAR`;
             })}
           </div>
 
-          <span className="hidden lg:block ref-line">08:30–22:30 IST · Palash Hall and Grand Ballroom</span>
+          <span className="hidden lg:block ref-line">08:30 to 22:30 IST / Palash Hall and Grand Ballroom</span>
         </div>
       </section>
 
@@ -251,18 +251,18 @@ END:VCALENDAR`;
           )}
 
           {/* Registration callout */}
-          <div className="mt-16 p-6 sm:p-8 rounded-2xl bg-[#111111] flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-[0_18px_48px_-16px_rgb(0_0_0/0.35)]">
+          <div className="mt-16 p-6 sm:p-8 rounded-2xl bg-surface-2 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-xl">
             <div>
-              <h2 className="font-serif font-medium text-xl sm:text-2xl text-white mb-2">
+              <h2 className="font-serif font-medium text-xl sm:text-2xl text-fg mb-2">
                 Attend every plenary and deal room
               </h2>
-              <p className="text-sm text-white/70 max-w-2xl">
+              <p className="text-sm text-fg-2 max-w-2xl">
                 Event registration covers both days, bilateral matchmaking, the official compendium and the Gala Dinner
               </p>
             </div>
             <button
               onClick={onOpenRegister}
-              className="h-11 px-5 rounded-[10px] bg-white text-[#111111] text-sm font-semibold shrink-0 whitespace-nowrap hover:bg-[#ECECEC] active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
+              className="h-11 px-5 rounded-[10px] bg-fg text-surface-0 text-sm font-semibold shrink-0 whitespace-nowrap hover:opacity-90 active:scale-[0.98] transition-[opacity,transform] duration-150 cursor-pointer"
             >
               Register for the event
             </button>

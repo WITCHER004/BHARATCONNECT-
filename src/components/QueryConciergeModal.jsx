@@ -87,19 +87,19 @@ export default function QueryConciergeModal({ onNavigate }) {
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open Secretariat Query Desk"
-          className="group relative flex items-center gap-2.5 h-12 px-4 rounded-full bg-surface-0 border border-gold-foil/40 text-fg shadow-[0_8px_30px_rgb(0_0_0/0.45)] hover:border-gold-foil transition-all duration-200 cursor-pointer active:scale-95"
+          className="group relative flex items-center gap-2.5 h-12 px-4 rounded-full bg-surface-0 border border-gold-foil/40 text-fg shadow-xl hover:border-gold-foil transition-colors duration-200 cursor-pointer motion-safe:active:scale-95"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-coral animate-pulse" />
           <MessageSquare className="w-4 h-4 text-gold-text" />
-          <span className="text-xs font-semibold tracking-wide uppercase font-mono pr-1">
-            Query Desk
+          <span className="text-xs font-semibold pr-1">
+            Query desk
           </span>
         </button>
       </div>
 
       {/* Floating Query Drawer */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-22 sm:right-6 z-50 sm:w-[420px] max-h-[90vh] flex flex-col surface-card bg-surface-0/98 backdrop-blur-2xl rounded-2xl border border-line-strong shadow-[0_24px_70px_rgba(0,0,0,0.85)] animate-slide-up overflow-hidden">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-22 sm:right-6 z-50 sm:w-[420px] max-h-[90vh] flex flex-col surface-card bg-surface-0/98 backdrop-blur-2xl rounded-2xl border border-line-strong shadow-2xl motion-safe:animate-slide-up overflow-hidden">
           {/* Drawer Header */}
           <div className="p-4 sm:p-5 border-b border-line flex items-center justify-between bg-surface-1">
             <div className="flex items-center gap-2.5">
@@ -108,7 +108,7 @@ export default function QueryConciergeModal({ onNavigate }) {
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-fg">Secretariat Helpdesk</h3>
-                <p className="text-[11px] text-fg-3 font-mono">BABC 2026 Concierge</p>
+                <p className="text-[11px] text-fg-3">BABC 2026 Concierge</p>
               </div>
             </div>
 
@@ -198,7 +198,7 @@ export default function QueryConciergeModal({ onNavigate }) {
 
                 <button
                   type="submit"
-                  className="w-full btn-primary h-10 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1"
+                  className="w-full btn-primary h-10 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1 whitespace-nowrap"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Submit Query (Issue Ticket)
@@ -284,7 +284,7 @@ export default function QueryConciergeModal({ onNavigate }) {
                 setIsOpen(false);
                 onNavigate?.('query');
               }}
-              className="text-gold-text hover:text-fg font-medium flex items-center gap-1 cursor-pointer"
+              className="text-gold-text hover:text-fg font-medium flex items-center gap-1 cursor-pointer whitespace-nowrap"
             >
               Open Full Secretariat Desk
               <ExternalLink className="w-3 h-3" />

@@ -77,7 +77,7 @@ export default function ExhibitionPage({ onOpenRegister, onSelectTier }) {
       {/* Header */}
       <section className="pt-32 pb-12 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <span className="ref-line">18–19 Dec 2026 · Palash Hall, 6th floor · Yashobhoomi, New Delhi</span>
+          <span className="ref-line">18-19 Dec 2026 / Palash Hall, 6th floor / Yashobhoomi, New Delhi</span>
           <h1 className="font-serif text-4xl sm:text-5xl font-medium text-fg tracking-[-0.02em] mt-4">
             Exhibition stalls and floorplan
           </h1>
@@ -299,7 +299,7 @@ export default function ExhibitionPage({ onOpenRegister, onSelectTier }) {
                         onClick={() => setCalcStallTier(t.id)}
                         className={`h-12 rounded-lg text-sm transition-colors cursor-pointer flex flex-col items-center justify-center ${
                           active
-                            ? 'bg-surface-4 text-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]'
+                            ? 'bg-surface-4 text-fg shadow-sm'
                             : 'text-fg-2 hover:text-fg'
                         }`}
                       >

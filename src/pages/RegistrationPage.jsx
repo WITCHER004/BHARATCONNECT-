@@ -113,7 +113,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
       {/* Page header */}
       <section className="pt-32 pb-12 sm:pt-40 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line mb-4">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
+          <p className="ref-line mb-4">18-19 Dec 2026 / Palash Hall, 6F / Yashobhoomi, New Delhi</p>
           <h1 className="font-serif font-medium text-4xl sm:text-5xl md:text-6xl leading-[1.08] tracking-[-0.02em] text-fg max-w-3xl">
             Event registration
           </h1>
@@ -181,7 +181,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                               key={r.id}
                               className={`p-4 rounded-xl border flex items-start gap-3 cursor-pointer transition-colors duration-150 ${
                                 selected
-                                  ? 'bg-surface-3 border-line-strong shadow-[inset_0_1px_0_rgb(255_255_255/0.05)]'
+                                  ? 'bg-surface-3 border-line-strong shadow-sm'
                                   : 'bg-surface-2 border-line hover:bg-surface-3'
                               }`}
                             >
@@ -190,7 +190,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                                 name="role"
                                 checked={selected}
                                 onChange={() => update({ role: r.id })}
-                                className="mt-0.5 w-4 h-4 accent-[#FF6F5E] cursor-pointer"
+                                className="mt-0.5 w-4 h-4 accent-coral cursor-pointer"
                               />
                               <span>
                                 <span className="block text-sm font-medium text-fg">{r.title}</span>
@@ -316,7 +316,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                                 name="vertical"
                                 checked={selected}
                                 onChange={() => update({ vertical: vert.title })}
-                                className="mt-0.5 w-4 h-4 accent-[#FF6F5E] cursor-pointer"
+                                className="mt-0.5 w-4 h-4 accent-coral cursor-pointer"
                               />
                               <span>
                                 <span className="block text-sm font-medium text-fg leading-5">{vert.title}</span>
@@ -333,7 +333,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                             type="checkbox"
                             checked={formData.interestedInB2B}
                             onChange={(e) => update({ interestedInB2B: e.target.checked })}
-                            className="mt-0.5 w-4 h-4 accent-[#FF6F5E]"
+                            className="mt-0.5 w-4 h-4 accent-coral"
                           />
                           <span>
                             <span className="block text-sm font-medium text-fg">Book pre-matched B2B and G2B deal rooms</span>
@@ -348,7 +348,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                             type="checkbox"
                             checked={formData.requiresVisaLetter}
                             onChange={(e) => update({ requiresVisaLetter: e.target.checked })}
-                            className="mt-0.5 w-4 h-4 accent-[#FF6F5E]"
+                            className="mt-0.5 w-4 h-4 accent-coral"
                           />
                           <span>
                             <span className="block text-sm font-medium text-fg">Request an Indian conference e-visa letter</span>

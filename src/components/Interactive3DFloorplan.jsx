@@ -138,7 +138,7 @@ export default function Interactive3DFloorplan({ onReserve }) {
               aria-selected={active}
               onClick={() => setActiveHotspot(h.id)}
               className={`h-9 px-3 rounded-lg text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                active ? 'bg-surface-3 text-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]' : 'text-fg-2 hover:text-fg hover:bg-surface-2'
+                active ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-2 hover:text-fg hover:bg-surface-2'
               }`}
             >
               {h.short}
@@ -150,7 +150,7 @@ export default function Interactive3DFloorplan({ onReserve }) {
       {/* Plan drawing */}
       <div className="surface-card rounded-2xl p-4 sm:p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
-          <span className="ref-line">Palash Hall · 6th floor · Yashobhoomi Convention Centre</span>
+          <span className="ref-line">Palash Hall / 6th floor / Yashobhoomi Convention Centre</span>
           <span className="ref-line">34,065 sq ft column-free</span>
         </div>
 

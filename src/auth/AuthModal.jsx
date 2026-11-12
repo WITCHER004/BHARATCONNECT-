@@ -62,7 +62,7 @@ export default function AuthModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-title"
-        className="relative w-full max-w-md bg-surface-2 border border-line-strong rounded-2xl p-6 sm:p-8 shadow-[0_32px_64px_-24px_rgb(0_0_0/0.7)] animate-slide-up focus:outline-none"
+        className="relative w-full max-w-md bg-surface-2 border border-line-strong rounded-2xl p-6 sm:p-8 shadow-2xl animate-slide-up focus:outline-none"
       >
         <button
           onClick={closeAuth}
@@ -89,7 +89,7 @@ export default function AuthModal() {
               aria-selected={mode === id}
               onClick={() => setAuthMode(id)}
               className={`h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                mode === id ? 'bg-surface-3 text-fg shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]' : 'text-fg-2 hover:text-fg'
+                mode === id ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-2 hover:text-fg'
               }`}
             >
               {label}

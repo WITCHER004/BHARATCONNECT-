@@ -1,0 +1,132 @@
+/* Hallmark · tokens · Bharat Connect */
+
+@theme {
+  /* Luxury Obsidian / Black ramp */
+  --color-surface-0: #060908;
+  --color-surface-1: #0a0d0c;
+  --color-surface-2: #121514;
+  --color-surface-3: #1a1e1d;
+  --color-surface-4: #242928;
+
+  --color-fg: #f7f2e8;
+  --color-fg-2: #c4d0cb;
+  --color-fg-3: #8a9e97;
+  --color-line: rgb(217 179 106 / 0.16);
+  --color-line-strong: rgb(217 179 106 / 0.3);
+
+  /* Gold foil */
+  --color-gold-foil: #D9B36A;
+  --color-gold-text: #e6c47f;
+
+  /* Brand */
+  --color-cream: #F1EEE8;
+  --color-cream-50: #FCFBF9;
+  --color-cream-100: #FAF8F5;
+  --color-cream-200: #F1EEE8;
+  --color-cream-300: #E6E1D7;
+  --color-cream-400: #D5CDBF;
+  --color-cream-500: #BAAF9B;
+
+  --color-teal: #0E4F4A;
+  --color-teal-deep: #082C29;
+  --color-teal-dark: #0A3B37;
+  --color-teal-brand: #0E4F4A;
+  --color-teal-light: #1B746D;
+  --color-teal-vibrant: #27968D;
+  --color-teal-soft: #E5EFEE;
+  --color-teal-muted: #8FB5B1;
+
+  --color-coral: #FF6F5E;
+  --color-coral-ink: #2a0d08;
+  --color-coral-text: #ff9384;
+  --color-coral-50: #FFF5F4;
+  --color-coral-100: #FFEBE8;
+  --color-coral-200: #FFD4CF;
+  --color-coral-brand: #FF6F5E;
+  --color-coral-hover: #ff8172;
+  --color-coral-dark: #CF4333;
+
+  --color-gold: #C89D52;
+  --color-gold-light: #E8C789;
+  --color-gold-dark: #A67C34;
+
+  --color-positive: #4cc38a;
+  --color-negative: #e5484d;
+
+  --color-obsidian: #060908;
+  --color-obsidian-teal: #081110;
+  --color-ink: #070a09;
+
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-scale-in: fade-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee-scroll 80s linear infinite;
+  --animate-marquee-reverse: marquee-scroll 80s linear infinite reverse;
+}
+
+:root {
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 16px -4px rgb(0 0 0 / 0.25);
+  --shadow-card-cream: 0 1px 3px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.07);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.15);
+  --shadow-btn-primary: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 2px 8px -2px rgb(255 111 94 / 0.35);
+  --shadow-btn-primary-hover: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 4px 14px -2px rgb(255 111 94 / 0.45);
+  --shadow-btn-secondary: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 3px rgb(0 0 0 / 0.2);
+  --shadow-film-card: 0 40px 80px -32px rgb(0 0 0 / 0.75);
+  --shadow-film-frame: inset 0 0 0 5px #F7F2E8, inset 0 0 0 6px rgb(184 137 58 / 0.35);
+}
+
+.theme-ivory {
+  --color-surface-1: #F7F2E8;
+  --color-surface-2: #FFFCF6;
+  --color-surface-3: #EFE6D6;
+  --color-surface-4: #E7DCC8;
+  --color-fg: #141414;
+  --color-fg-2: #3f3c37;
+  --color-fg-3: #66625b;
+  --color-line: rgb(20 20 20 / 0.1);
+  --color-line-strong: rgb(20 20 20 / 0.2);
+  --color-gold-foil: #B8893A;
+  --color-gold-text: #7d5c1d;
+  --color-coral-text: #b93d2c;
+  --color-negative: #b4232a;
+}
+
+.theme-cream {
+  --color-surface-0: #EFE7D8;
+  --color-surface-1: #F7F2E8;
+  --color-surface-2: #FFFCF6;
+  --color-surface-3: #EFE7D8;
+  --color-surface-4: #E6DCC9;
+  --color-fg: #141414;
+  --color-fg-2: #3f3c37;
+  --color-fg-3: #66625b;
+  --color-line: rgb(20 20 20 / 0.1);
+  --color-line-strong: rgb(20 20 20 / 0.2);
+  --color-gold-foil: #B8893A;
+  --color-gold-text: #7d5c1d;
+  --color-coral-text: #b93d2c;
+  --color-negative: #b4232a;
+  --color-positive: #16803c;
+}
+
+.theme-dark {
+  --color-surface-1: #070707;
+  --color-surface-2: #0f0f0f;
+  --color-surface-3: #171717;
+  --color-surface-4: #222222;
+  --color-fg: #f7f2e8;
+  --color-fg-2: #c4d0cb;
+  --color-fg-3: #8a9e97;
+  --color-line: rgb(217 179 106 / 0.16);
+  --color-line-strong: rgb(217 179 106 / 0.3);
+  --color-gold-foil: #D9B36A;
+  --color-gold-text: #e6c47f;
+  --color-coral-text: #ff9384;
+  --color-negative: #e5484d;
+}

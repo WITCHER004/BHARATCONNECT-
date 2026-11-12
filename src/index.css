@@ -1,4 +1,6 @@
+/* Hallmark · polish · theme: Bharat Connect · built: the project · redesign: polish */
 @import "tailwindcss";
+@import "./tokens.css";
 
 /*
   Bharat Connect 2026 design system
@@ -6,76 +8,6 @@
   Dark sections use a jewel-teal ramp; .theme-ivory sections swap the same tokens to ivory and ink.
   Coral marks the primary action. Gold carries ornament, key figures and the film.
 */
-
-@theme {
-  /* Luxury Obsidian / Black ramp */
-  --color-surface-0: #000000;   /* deepest pure black: hero, footer */
-  --color-surface-1: #070707;   /* page ground */
-  --color-surface-2: #0f0f0f;   /* card */
-  --color-surface-3: #171717;   /* raised: inputs, active rows */
-  --color-surface-4: #222222;   /* hover on raised */
-
-  --color-fg: #f7f2e8;          /* primary text, ivory */
-  --color-fg-2: #c4d0cb;        /* secondary text */
-  --color-fg-3: #8a9e97;        /* muted text, icons, meta */
-  --color-line: rgb(217 179 106 / 0.16);         /* gold hairline */
-  --color-line-strong: rgb(217 179 106 / 0.3);
-
-  /* Gold foil */
-  --color-gold-foil: #D9B36A;   /* ornament, rules, the film */
-  --color-gold-text: #e6c47f;   /* gold used as text */
-
-  /* Brand */
-  --color-cream: #F1EEE8;
-  --color-cream-50: #FCFBF9;
-  --color-cream-100: #FAF8F5;
-  --color-cream-200: #F1EEE8;
-  --color-cream-300: #E6E1D7;
-  --color-cream-400: #D5CDBF;
-  --color-cream-500: #BAAF9B;
-
-  --color-teal: #0E4F4A;
-  --color-teal-deep: #082C29;
-  --color-teal-dark: #0A3B37;
-  --color-teal-brand: #0E4F4A;
-  --color-teal-light: #1B746D;
-  --color-teal-vibrant: #27968D;
-  --color-teal-soft: #E5EFEE;
-  --color-teal-muted: #8FB5B1;
-
-  --color-coral: #FF6F5E;
-  --color-coral-ink: #2a0d08;   /* text on coral, 7:1 */
-  --color-coral-text: #ff9384;  /* coral used as text on dark */
-  --color-coral-50: #FFF5F4;
-  --color-coral-100: #FFEBE8;
-  --color-coral-200: #FFD4CF;
-  --color-coral-brand: #FF6F5E;
-  --color-coral-hover: #ff8172;
-  --color-coral-dark: #CF4333;
-
-  --color-gold: #C89D52;
-  --color-gold-light: #E8C789;
-  --color-gold-dark: #A67C34;
-
-  --color-positive: #4cc38a;
-  --color-negative: #e5484d;
-
-  --color-obsidian: #000000;
-  --color-obsidian-teal: #070707;
-  --color-ink: #000000;
-
-  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-
-  --animate-fade-in: fade-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-slide-up: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-scale-in: fade-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-marquee: marquee-scroll 80s linear infinite;
-  --animate-marquee-reverse: marquee-scroll 80s linear infinite reverse;
-}
 
 /* ── Motion ──────────────────────────────────────────── */
 
@@ -116,10 +48,11 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
   }
 
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     background-color: var(--color-surface-1);
     color: var(--color-fg);
   }
@@ -144,13 +77,13 @@
   }
 
   img {
-    outline: 1px solid rgb(255 255 255 / 0.1);
+    outline: 1px solid var(--color-line);
     outline-offset: -1px;
   }
 }
 
 .theme-ivory img, .theme-cream img {
-  outline: 1px solid rgb(0 0 0 / 0.08);
+  outline: 1px solid var(--color-line);
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -158,70 +91,11 @@
 ::-webkit-scrollbar-thumb { background: var(--color-surface-3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-surface-4); }
 
-/* ── Ivory sections: the same tokens, printed on card stock ── */
-
-.theme-ivory {
-  --color-surface-1: #F7F2E8;
-  --color-surface-2: #FFFCF6;
-  --color-surface-3: #EFE6D6;
-  --color-surface-4: #E7DCC8;
-  --color-fg: #141414;
-  --color-fg-2: #3f3c37;
-  --color-fg-3: #66625b;
-  --color-line: rgb(20 20 20 / 0.1);
-  --color-line-strong: rgb(20 20 20 / 0.2);
-  --color-gold-foil: #B8893A;
-  --color-gold-text: #7d5c1d;
-  --color-coral-text: #b93d2c;
-  --color-negative: #b4232a;
-  background-color: var(--color-surface-1);
-  color: var(--color-fg);
-}
-
-/* Cream sections with black ink (Programme sessions) */
-.theme-cream {
-  --color-surface-0: #EFE7D8;
-  --color-surface-1: #F7F2E8;
-  --color-surface-2: #FFFCF6;
-  --color-surface-3: #EFE7D8;
-  --color-surface-4: #E6DCC9;
-  --color-fg: #141414;
-  --color-fg-2: #3f3c37;
-  --color-fg-3: #66625b;
-  --color-line: rgb(20 20 20 / 0.1);
-  --color-line-strong: rgb(20 20 20 / 0.2);
-  --color-gold-foil: #B8893A;
-  --color-gold-text: #7d5c1d;
-  --color-coral-text: #b93d2c;
-  --color-negative: #b4232a;
-  --color-positive: #16803c;
-  background-color: var(--color-surface-1);
-  color: var(--color-fg);
-}
-
-/* Dark tokens restored inside a light section (e.g. black cards on a white band) */
-.theme-dark {
-  --color-surface-1: #070707;
-  --color-surface-2: #0f0f0f;
-  --color-surface-3: #171717;
-  --color-surface-4: #222222;
-  --color-fg: #f7f2e8;
-  --color-fg-2: #c4d0cb;
-  --color-fg-3: #8a9e97;
-  --color-line: rgb(217 179 106 / 0.16);
-  --color-line-strong: rgb(217 179 106 / 0.3);
-  --color-gold-foil: #D9B36A;
-  --color-gold-text: #e6c47f;
-  --color-coral-text: #ff9384;
-  --color-negative: #e5484d;
-  color: var(--color-fg);
-}
-
 /* Royal hero ground: deep obsidian black with subtle directional lighting */
 .bg-royal {
   background:
-    radial-gradient(120% 80% at 70% 0%, #1a1a1a 0%, rgb(0 0 0 / 0) 65%),
-    #000000;
+    radial-gradient(120% 80% at 70% 0%, var(--color-surface-4) 0%, transparent 65%),
+    var(--color-surface-0);
 }
 
 /* Section ornament: a gold diamond between two foil rules */
@@ -232,20 +106,22 @@
 
 .surface-card {
   background: var(--color-surface-2);
+  color: var(--color-fg);
   border: 1px solid var(--color-line);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 16px -4px rgb(0 0 0 / 0.25);
+  box-shadow: var(--shadow-card);
   transition-property: border-color, box-shadow, transform;
   transition-duration: 150ms;
   transition-timing-function: var(--ease-out);
 }
 .theme-ivory .surface-card, .theme-cream .surface-card {
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.07);
+  box-shadow: var(--shadow-card-cream);
 }
 
 .surface-raised {
   background: var(--color-surface-3);
+  color: var(--color-fg);
   border: 1px solid var(--color-line);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+  box-shadow: var(--shadow-raised);
 }
 
 /* Printed jaali, used once as a static mark in the hero */
@@ -265,7 +141,7 @@
   color: var(--color-coral-ink);
   font-weight: 600;
   border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 2px 8px -2px rgb(255 111 94 / 0.35);
+  box-shadow: var(--shadow-btn-primary);
   transition-property: background-color, transform, box-shadow;
   transition-duration: 150ms;
   transition-timing-function: var(--ease-out);
@@ -274,7 +150,7 @@
 }
 .btn-primary:hover {
   background: var(--color-coral-hover);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 4px 14px -2px rgb(255 111 94 / 0.45);
+  box-shadow: var(--shadow-btn-primary-hover);
 }
 .btn-primary:active { transform: scale(0.975); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -289,7 +165,7 @@
   font-weight: 500;
   border: 1px solid var(--color-line-strong);
   border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 3px rgb(0 0 0 / 0.2);
+  box-shadow: var(--shadow-btn-secondary);
   transition-property: background-color, border-color, transform, box-shadow;
   transition-duration: 150ms;
   transition-timing-function: var(--ease-out);
@@ -303,19 +179,19 @@
 .btn-secondary:active { transform: scale(0.975); }
 
 /* Legacy aliases, kept so nothing renders unstyled */
-.btn-coral { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-coral); color: var(--color-coral-ink); font-weight: 600; border-radius: 10px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18); transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out); cursor: pointer; }
+.btn-coral { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-coral); color: var(--color-coral-ink); font-weight: 600; border-radius: 10px; box-shadow: var(--shadow-btn-primary); transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out); cursor: pointer; }
 .btn-coral:hover { background: var(--color-coral-hover); }
 .btn-coral:active { transform: scale(0.98); }
 .btn-glass { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--color-surface-3); color: var(--color-fg); border: 1px solid var(--color-line-strong); border-radius: 10px; transition: background-color 150ms var(--ease-out); cursor: pointer; }
 .btn-glass:hover { background: var(--color-surface-4); }
-.glass-card, .glass-morphism, .glass-card-cream { background: var(--color-surface-2); border: 1px solid var(--color-line); }
+.glass-card, .glass-morphism, .glass-card-cream { background: var(--color-surface-2); color: var(--color-fg); border: 1px solid var(--color-line); }
 .hover-glow, .hover-glow-dark { transition: border-color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
 .hover-glow:hover, .hover-glow-dark:hover { border-color: var(--color-line-strong); }
 .orb-coral, .orb-teal, .orb-gold, .holographic-sheen { display: none; }
 .text-shimmer { color: var(--color-fg); }
-.bg-obsidian-hero, .bg-hero-gradient { background: var(--color-surface-0); }
-.bg-obsidian-surface, .bg-section-dark, .bg-section-teal { background: var(--color-surface-1); }
-.bg-section-cream { background: var(--color-surface-1); }
+.bg-obsidian-hero, .bg-hero-gradient { background: var(--color-surface-0); color: var(--color-fg); }
+.bg-obsidian-surface, .bg-section-dark, .bg-section-teal { background: var(--color-surface-1); color: var(--color-fg); }
+.bg-section-cream { background: var(--color-surface-1); color: var(--color-fg); }
 
 /* ── Type helpers ────────────────────────────────────── */
 
@@ -358,32 +234,32 @@
 
 .babc-film .film-stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1080px; transform-origin: 0 0; }
 .babc-film .film-routes { position: absolute; inset: 0; width: 1080px; height: 1080px; }
-.babc-film .film-label { position: absolute; font-family: var(--font-mono); font-size: 24px; color: var(--color-gold-text); white-space: nowrap; opacity: 0; }
+.babc-film .film-label { position: absolute; font-family: var(--font-sans); font-size: 24px; color: var(--color-gold-text); white-space: nowrap; opacity: 0; }
 .babc-film .film-mask { display: block; overflow: hidden; }
 .babc-film .film-mask > span { display: block; opacity: 0; }
 
-.babc-film .film-group { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; visibility: hidden; color: #141414; }
-.babc-film .film-card { position: absolute; inset: 0; border-radius: 24px; background: #F7F2E8; box-shadow: 0 40px 80px -32px rgb(0 0 0 / 0.75); opacity: 0; }
-.babc-film .film-frame { position: absolute; inset: 12px; border-radius: 16px; border: 1.5px solid rgb(184 137 58 / 0.7); box-shadow: inset 0 0 0 5px #F7F2E8, inset 0 0 0 6px rgb(184 137 58 / 0.35); opacity: 0; }
+.babc-film .film-group { position: absolute; left: 220px; top: 140px; width: 640px; height: 800px; transform-origin: 50% 55%; visibility: hidden; color: var(--color-fg); }
+.babc-film .film-card { position: absolute; inset: 0; border-radius: 24px; background: var(--color-cream); box-shadow: var(--shadow-film-card); opacity: 0; }
+.babc-film .film-frame { position: absolute; inset: 12px; border-radius: 16px; border: 1.5px solid var(--color-gold-foil); box-shadow: var(--shadow-film-frame); opacity: 0; }
 .babc-film .film-jaali { position: absolute; left: 12px; width: 616px; height: 14px; opacity: 0; }
 .babc-film .film-content { position: absolute; inset: 0; }
 
-.babc-film .film-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: rgb(20 20 20 / 0.7); }
+.babc-film .film-small { position: absolute; left: 56px; top: 64px; font-size: 18px; color: var(--color-fg-2); }
 .babc-film .film-title { position: absolute; left: 56px; top: 96px; width: 420px; font-family: var(--font-serif); font-size: 38px; line-height: 1.12; }
-.babc-film .film-date { position: absolute; left: 50px; top: 236px; display: flex; align-items: flex-end; gap: 22px; }
+.babc-film .film-date { position: absolute; left: 50px; top: 236px; display: flex; align-items: flex-end; gap: 24px; }
 .babc-film .film-big { font-family: var(--font-serif); font-size: 184px; line-height: 0.86; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; }
-.babc-film .film-month { font-size: 24px; line-height: 32px; padding-bottom: 14px; }
+.babc-film .film-month { font-size: 24px; line-height: 32px; padding-bottom: 16px; }
 .babc-film .film-grid { position: absolute; left: 56px; right: 56px; top: 474px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
 .babc-film .film-grid > div { opacity: 0; }
-.babc-film .film-grid dt { font-size: 17px; color: rgb(20 20 20 / 0.7); }
-.babc-film .film-grid dd { margin-top: 6px; font-size: 23px; }
-.babc-film .film-rule { position: absolute; left: 56px; right: 56px; top: 680px; height: 1.5px; background: rgb(184 137 58 / 0.6); transform-origin: left center; transform: scaleX(0); }
+.babc-film .film-grid dt { font-size: 17px; color: var(--color-fg-3); }
+.babc-film .film-grid dd { margin-top: 8px; font-size: 23px; }
+.babc-film .film-rule { position: absolute; left: 56px; right: 56px; top: 680px; height: 1.5px; background: var(--color-gold-foil); opacity: 0.6; transform-origin: left center; transform: scaleX(0); }
 .babc-film .film-foot { position: absolute; left: 56px; right: 56px; top: 704px; display: flex; justify-content: space-between; align-items: baseline; opacity: 0; }
 .babc-film .film-theme { font-family: var(--font-serif); font-size: 24px; }
-.babc-film .film-time { font-family: var(--font-mono); font-size: 18px; color: rgb(20 20 20 / 0.7); }
+.babc-film .film-time { font-family: var(--font-mono); font-size: 18px; color: var(--color-fg-2); }
 
 .babc-film .film-seal { position: absolute; left: 512px; top: 56px; width: 96px; height: 96px; opacity: 0; }
-.babc-film .film-dot { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--color-coral); opacity: 0; }
+.babc-film .film-dot { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--color-coral); opacity: 0; }
 
 /* Intro film: the full-screen stage, its headline and closing line */
 .babc-film .film-stage-intro { left: 50%; top: 50%; transform-origin: center; }

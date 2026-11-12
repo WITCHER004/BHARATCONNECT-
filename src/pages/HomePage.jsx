@@ -86,7 +86,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-8 min-h-[100svh] pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7">
-            <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
+            <p className="ref-line text-gold-text">18-19 Dec 2026 / Palash Hall, 6F / Yashobhoomi, New Delhi</p>
 
             <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
               India and 22 Arab nations <span className="text-gold-text">at one table</span>
@@ -123,9 +123,9 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             {/* Startup registration: black card with a gold double frame */}
-            <article className="theme-dark lg:col-span-7 bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
-              <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-10 flex flex-col">
-                <p className="ref-line text-gold-text">Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi</p>
+            <article className="theme-dark lg:col-span-7 bg-surface-1 border border-line-strong rounded-2xl p-2 shadow-xl">
+              <div className="h-full rounded-xl border border-gold-foil/50 p-6 sm:p-10 flex flex-col">
+                <p className="ref-line text-gold-text">Startup Pavilion / 18-19 Dec 2026 / Yashobhoomi</p>
                 <h3 className="mt-4 font-serif text-3xl sm:text-4xl font-medium text-fg leading-tight tracking-[-0.01em]">
                   Want to register a startup?
                 </h3>
@@ -148,8 +148,8 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             </article>
 
             {/* Event registration */}
-            <article className="theme-dark lg:col-span-5 bg-[#0b0b0b] border border-line-strong rounded-2xl p-6 sm:p-10 flex flex-col shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)]">
-              <p className="ref-line text-gold-text">500 accreditations · 18–19 Dec 2026</p>
+            <article className="theme-dark lg:col-span-5 bg-surface-1 border border-line-strong rounded-2xl p-6 sm:p-10 flex flex-col shadow-xl">
+              <p className="ref-line text-gold-text">500 accreditations / 18-19 Dec 2026</p>
               <h3 className="mt-4 font-serif text-3xl font-medium text-fg leading-tight">Event registration</h3>
               <p className="mt-4 text-[15px] text-fg-2 leading-relaxed">
                 Attend the plenary keynotes, private B2B deal rooms, the 7,000 sq ft Yashobhoomi lounge, the bilateral

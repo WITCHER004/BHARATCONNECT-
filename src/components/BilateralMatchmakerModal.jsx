@@ -69,7 +69,7 @@ export default function BilateralMatchmakerModal({ isOpen, onClose }) {
             <h3 id="matchmaker-title" className="text-base font-medium text-fg leading-5">
               Book a private deal room
             </h3>
-            <span className="ref-line">Zone D · B2B lounge · Palash Hall, 6F</span>
+            <span className="ref-line">Zone D / B2B lounge / Palash Hall, 6F</span>
           </div>
           <button
             onClick={handleReset}
@@ -154,7 +154,7 @@ export default function BilateralMatchmakerModal({ isOpen, onClose }) {
               </div>
 
               <p className="text-sm text-fg-3 leading-5">
-                Each room is sound-isolated with a 6-seat table, Wi-Fi and beverage service. An Arabic–English interpreter is available on request.
+                Each room is sound-isolated with a 6-seat table, Wi-Fi and beverage service. An Arabic-English interpreter is available on request.
               </p>
 
               <button type="submit" className="w-full btn-primary h-11 text-sm">
@@ -162,7 +162,7 @@ export default function BilateralMatchmakerModal({ isOpen, onClose }) {
               </button>
             </form>
           ) : (
-            <div className="animate-fade-in">
+            <div className="motion-safe:animate-fade-in">
               <div className="flex items-center gap-2 text-sm text-positive">
                 <Check className="w-4 h-4" strokeWidth={1.5} />
                 <span>Room requested</span>

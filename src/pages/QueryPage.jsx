@@ -239,8 +239,12 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
       {/* Header Banner */}
       <section className="pt-32 pb-12 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line text-gold-text">
-            BABC 2026 Secretariat · Helpdesk &amp; Inquiry Portal · Yashobhoomi, New Delhi
+          <p className="ref-line text-gold-text flex flex-wrap items-center gap-x-2">
+            <span>BABC 2026 Secretariat</span>
+            <span className="text-line-strong">/</span>
+            <span>Helpdesk &amp; Inquiry Portal</span>
+            <span className="text-line-strong">/</span>
+            <span>Yashobhoomi, New Delhi</span>
           </p>
           <h1 className="mt-4 font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em] max-w-3xl">
             Conclave Secretariat <span className="text-gold-text">&amp; Inquiries</span>
@@ -254,7 +258,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
           <div className="mt-8 flex flex-wrap items-center gap-2">
             <button
               onClick={() => { setTab('submit'); setStatus('idle'); }}
-              className={`h-11 px-5 rounded-xl text-sm font-medium transition-all duration-150 flex items-center gap-2 cursor-pointer ${
+              className={`h-11 px-5 rounded-xl text-sm font-medium transition-colors duration-150 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 tab === 'submit'
                   ? 'bg-fg text-surface-0 font-semibold shadow-sm'
                   : 'bg-surface-2 text-fg-2 hover:text-fg border border-line'
@@ -266,7 +270,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
 
             <button
               onClick={() => setTab('track')}
-              className={`h-11 px-5 rounded-xl text-sm font-medium transition-all duration-150 flex items-center gap-2 cursor-pointer ${
+              className={`h-11 px-5 rounded-xl text-sm font-medium transition-colors duration-150 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 tab === 'track'
                   ? 'bg-fg text-surface-0 font-semibold shadow-sm'
                   : 'bg-surface-2 text-fg-2 hover:text-fg border border-line'
@@ -278,7 +282,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
 
             <button
               onClick={() => setTab('faq')}
-              className={`h-11 px-5 rounded-xl text-sm font-medium transition-all duration-150 flex items-center gap-2 cursor-pointer ${
+              className={`h-11 px-5 rounded-xl text-sm font-medium transition-colors duration-150 flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                 tab === 'faq'
                   ? 'bg-fg text-surface-0 font-semibold shadow-sm'
                   : 'bg-surface-2 text-fg-2 hover:text-fg border border-line'
@@ -300,7 +304,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
               <div className="lg:col-span-8">
                 {status === 'submitted' && assignedTicket ? (
-                  <div className="surface-card rounded-2xl p-8 sm:p-10 border border-line-strong shadow-xl animate-fade-in">
+                  <div className="surface-card rounded-2xl p-8 sm:p-10 border border-line-strong shadow-md motion-safe:animate-fade-in">
                     <div className="w-12 h-12 rounded-xl bg-fg text-surface-1 flex items-center justify-center mb-6">
                       <Check className="w-6 h-6" strokeWidth={2.5} />
                     </div>
@@ -316,10 +320,10 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                     </p>
 
                     {/* Official Ticket Card */}
-                    <div className="my-8 p-6 rounded-2xl bg-surface-2 border-2 border-gold-foil/50 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-[0_4px_24px_rgba(184,137,58,0.12)]">
+                    <div className="my-8 p-6 rounded-2xl bg-surface-2 border-2 border-gold-foil/50 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-md">
                       <div>
-                        <span className="text-xs font-mono uppercase tracking-widest text-gold-text block">
-                          Official Query Tracking Ticket
+                        <span className="text-xs text-gold-text block font-medium">
+                          Official query tracking ticket
                         </span>
                         <span className="mt-1 font-mono text-2xl sm:text-3xl font-semibold text-fg tracking-tight block">
                           {assignedTicket.id}
@@ -583,8 +587,8 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                           {status === 'submitting' ? 'Logging Ticket…' : 'Submit Official Inquiry'}
                         </button>
 
-                        <span className="text-xs text-fg-3 font-mono">
-                          Generates [BMF.BC-QRY-00001]
+                        <span className="text-xs text-fg-3">
+                          Generates <span className="font-mono text-fg">BMF.BC-QRY-00001</span>
                         </span>
                       </div>
                     </div>
@@ -635,7 +639,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                 <div className="surface-card rounded-2xl p-6 border border-line bg-surface-2/40">
                   <div className="flex items-center gap-2 mb-2 text-gold-text">
                     <ShieldCheck className="w-4 h-4" />
-                    <span className="text-xs font-mono uppercase tracking-wider">Protocol SLA Commitment</span>
+                    <span className="text-xs text-gold-text font-medium">Protocol SLA commitment</span>
                   </div>
                   <p className="text-xs text-fg-2 leading-relaxed">
                     All formal inquiries are registered in the IACCIA diplomatic log and routed to the corresponding department. Delegates receive an official reference ticket starting sequentially from <span className="font-mono text-fg font-semibold">BMF.BC-QRY-00001</span>.
@@ -668,7 +672,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 h-12 px-4 rounded-xl bg-surface-2 border border-line text-[15px] font-mono text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil"
                   />
-                  <button type="submit" className="btn-primary h-12 px-6 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer">
+                  <button type="submit" className="btn-primary h-12 px-6 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
                     <Search className="w-4 h-4" />
                     Search Record
                   </button>
@@ -697,11 +701,11 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                 {searched && (
                   <div className="mt-8 pt-8 border-t border-line">
                     {searchResult ? (
-                      <div className="surface-card rounded-2xl p-6 sm:p-8 border border-line-strong shadow-sm animate-fade-in">
+                      <div className="surface-raised rounded-2xl p-6 sm:p-8 border border-line shadow-sm motion-safe:animate-fade-in">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-line">
                           <div>
-                            <span className="text-xs font-mono uppercase tracking-widest text-gold-text block">
-                              Verified Conclave Record Found
+                            <span className="text-xs text-gold-text block font-medium">
+                              Verified conclave record found
                             </span>
                             <span className="mt-1 font-mono text-2xl font-semibold text-fg block">
                               {searchResult.data.id}
@@ -838,7 +842,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   return (
                     <div
                       key={idx}
-                      className="surface-card rounded-xl border border-line overflow-hidden transition-all duration-150"
+                      className="surface-card rounded-xl border border-line overflow-hidden transition-colors duration-150"
                     >
                       <button
                         onClick={() => setOpenFaq(isOpen ? null : idx)}
@@ -855,7 +859,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                       </button>
 
                       {isOpen && (
-                        <div className="px-5 pb-5 pt-1 text-sm text-fg-2 leading-relaxed border-t border-line/60 bg-surface-2/20 animate-slide-up">
+                        <div className="px-5 pb-5 pt-1 text-sm text-fg-2 leading-relaxed border-t border-line/60 bg-surface-2/20 motion-safe:animate-slide-up">
                           {faq.a}
                         </div>
                       )}
@@ -865,7 +869,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
 
                 {filteredFaqs.length === 0 && (
                   <div className="p-8 text-center rounded-xl bg-surface-2/40 border border-line text-sm text-fg-2">
-                    No FAQs match your search. Use the "Submit an Inquiry" tab to ask the Secretariat directly.
+                    No FAQs match your search. Use the “Submit an Inquiry” tab to ask the Secretariat directly.
                   </div>
                 )}
               </div>

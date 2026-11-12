@@ -194,7 +194,7 @@ export function FilmStage({ stageRef, titles = false, className = '' }) {
           <span className="film-mask film-small"><span data-k="small">IACCIA requests the pleasure of your company at</span></span>
           <span className="film-mask film-title"><span data-k="title">Bharat-Arab Business Conclave</span></span>
           <div className="film-date">
-            <span className="film-mask"><span className="film-big" data-k="big">18–19</span></span>
+            <span className="film-mask"><span className="film-big" data-k="big">18-19</span></span>
             <span className="film-mask"><span className="film-month" data-k="month">December<br />2026</span></span>
           </div>
           <dl className="film-grid">

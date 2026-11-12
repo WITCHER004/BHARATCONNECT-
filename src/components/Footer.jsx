@@ -97,7 +97,7 @@ SECRETARIAT & ACCREDITATION:
             <p className="mt-6 text-sm leading-[22px] text-fg-2 max-w-sm">
               Strategic partnerships between India and 22 Arab countries. Organised by the India &amp; Arab Countries Chamber of Commerce, Industry &amp; Agriculture (IACCIA) with Eventz Unlimited.
             </p>
-            <p className="mt-6 ref-line">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi</p>
+            <p className="mt-6 ref-line">18 to 19 Dec 2026 / Palash Hall, 6F / Yashobhoomi</p>
           </div>
 
           {/* Pages */}

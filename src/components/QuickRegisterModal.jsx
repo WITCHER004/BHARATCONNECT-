@@ -51,14 +51,14 @@ export default function QuickRegisterModal({ isOpen, onClose, onNavigateToFullRe
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-register-title"
-        className="w-full max-w-lg bg-surface-2 border border-line rounded-2xl shadow-[0_24px_48px_-16px_rgb(0_0_0/0.6)] animate-slide-up"
+        className="w-full max-w-lg bg-surface-2 border border-line rounded-2xl shadow-2xl animate-slide-up"
       >
         <div className="px-6 h-16 flex items-center justify-between border-b border-line">
           <div>
             <h3 id="quick-register-title" className="text-base font-medium text-fg leading-5">
               Quick delegate registration
             </h3>
-            <p className="ref-line mt-1">18–19 Dec 2026 · Palash Hall, 6F</p>
+            <p className="ref-line mt-1">18-19 Dec 2026 / Palash Hall, 6F</p>
           </div>
           <button
             onClick={handleClose}

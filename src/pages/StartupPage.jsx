@@ -292,7 +292,7 @@ function Choice({ id, label, hint, required, options, value, onChange, error, co
                 on ? 'bg-surface-3 border-fg text-fg' : 'bg-surface-2 border-line-strong text-fg hover:border-fg-3'
               }`}
             >
-              <input type="radio" name={id} value={val} checked={on} onChange={() => onChange(val)} className="accent-[#082C29] w-4 h-4" />
+              <input type="radio" name={id} value={val} checked={on} onChange={() => onChange(val)} className="accent-teal-deep w-4 h-4" />
               {text}
             </label>
           );
@@ -313,7 +313,7 @@ function Agree({ id, label, checked, onChange, error, children }) {
           checked ? 'bg-surface-3 border-fg' : error ? 'bg-surface-2 border-negative' : 'bg-surface-2 border-line-strong hover:border-fg-3'
         }`}
       >
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="accent-[#082C29] w-4 h-4 mt-1 shrink-0" />
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="accent-teal-deep w-4 h-4 mt-1 shrink-0" />
         <span className="text-[15px] text-fg leading-relaxed">{children}</span>
       </label>
       {error && <p className="mt-2 text-sm text-negative" role="alert">{error}</p>}
@@ -583,7 +583,7 @@ export default function StartupPage({ onNavigate }) {
                     return (
                       <label key={s.value} className={`min-h-11 px-3 py-2 rounded-[10px] border flex items-start gap-3 cursor-pointer transition-colors ${
                         on ? 'bg-surface-3 border-fg' : 'bg-surface-2 border-line-strong hover:border-fg-3'}`}>
-                        <input type="checkbox" checked={on} className="accent-[#082C29] w-4 h-4 mt-1 shrink-0"
+                        <input type="checkbox" checked={on} className="accent-teal-deep w-4 h-4 mt-1 shrink-0"
                           onChange={() => set('sectors')(on ? v.sectors.filter((x) => x !== s.value) : [...v.sectors, s.value])} />
                         <span>
                           <span className="block text-[15px] text-fg">{s.label}</span>
@@ -649,7 +649,7 @@ export default function StartupPage({ onNavigate }) {
               <Choice id="dpiitStatus" label="Startup India / DPIIT recognition" required columns={3} options={DPIIT_STATUS}
                 value={v.dpiitStatus} onChange={set('dpiitStatus')} error={errors.dpiitStatus} />
               {v.dpiitStatus && v.dpiitStatus !== 'Not applied' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 motion-safe:animate-fade-in">
                   <Text id="dpiitNumber" label="Startup India / DPIIT recognition number"
                     hint="Leave blank if you are not yet recognised"
                     className={`${inputCls(errors.dpiitNumber)} font-mono`}
@@ -869,7 +869,13 @@ export default function StartupPage({ onNavigate }) {
     <div className="page-enter">
       <section className="pt-32 pb-12 bg-royal border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line text-gold-text">18–19 Dec 2026 · Startup Pavilion · Yashobhoomi, New Delhi</p>
+          <p className="ref-line text-gold-text flex flex-wrap items-center gap-x-2">
+            <span>18 to 19 Dec 2026</span>
+            <span className="text-line-strong">/</span>
+            <span>Startup Pavilion</span>
+            <span className="text-line-strong">/</span>
+            <span>Yashobhoomi, New Delhi</span>
+          </p>
           <h1 className="mt-4 font-serif text-4xl sm:text-5xl font-medium text-fg tracking-[-0.02em] max-w-3xl">
             Register your startup for the <span className="text-gold-text">Bharat Connect Startup Showcase</span>
           </h1>
@@ -897,7 +903,7 @@ export default function StartupPage({ onNavigate }) {
               Step {step + 1} of {STEPS.length} · <span className="text-fg">{STEPS[step].label}</span>
             </p>
             <div className="lg:hidden h-1 rounded-full bg-surface-3 overflow-hidden">
-              <div className="h-full bg-fg transition-[width] duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+              <div className="h-full bg-fg" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
             </div>
             <ol className="hidden lg:flex flex-col gap-1">
               {STEPS.map((s, i) => {
@@ -935,7 +941,7 @@ export default function StartupPage({ onNavigate }) {
           {/* form */}
           <div ref={panelRef} className="scroll-mt-24 min-w-0">
             {status === 'sent' ? (
-              <div className="surface-card rounded-2xl p-8 sm:p-12 animate-fade-in border border-line-strong shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
+              <div className="surface-card rounded-2xl p-8 sm:p-12 motion-safe:animate-fade-in border border-line-strong shadow-2xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-line">
                   <div className="flex items-center gap-3">
                     <span className="w-12 h-12 rounded-xl bg-fg text-surface-1 flex items-center justify-center">
@@ -949,18 +955,18 @@ export default function StartupPage({ onNavigate }) {
                     </div>
                   </div>
                   <div className="sm:text-right">
-                    <span className="text-xs text-fg-3 uppercase tracking-wider block">Organiser</span>
+                    <span className="text-xs text-fg-3 block">Organiser</span>
                     <span className="text-sm font-medium text-fg">{ORGANISER.name}</span>
                   </div>
                 </div>
 
                 {/* Unique Registration ID Highlight Badge */}
-                <div className="my-8 p-6 sm:p-8 rounded-2xl bg-surface-0 border-2 border-gold-foil/50 shadow-[0_0_35px_rgba(217,179,106,0.15)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="my-8 p-6 sm:p-8 rounded-2xl bg-surface-0 border-2 border-gold-foil/50 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-positive animate-pulse" />
-                      <span className="text-xs font-mono uppercase tracking-widest text-gold-text">
-                        Startup Accreditation ID
+                      <span className="text-xs text-gold-text font-medium">
+                        Startup accreditation ID
                       </span>
                     </div>
                     <div className="mt-2 font-mono text-3xl sm:text-4xl font-semibold text-fg tracking-tight flex items-center gap-3">
