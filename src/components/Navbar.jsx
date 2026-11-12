@@ -69,7 +69,7 @@ function AccountMenu({ onSignIn }) {
         <Avatar user={user} />
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-2xl animate-fade-in">
+        <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgb(0_0_0/0.5)] animate-fade-in">
           <div className="px-3 py-2 flex items-center gap-3">
             <Avatar user={user} size={32} />
             <div className="min-w-0">
@@ -108,6 +108,7 @@ const NAV_ITEMS = [
   { id: 'exhibition', label: 'Exhibition' },
   { id: 'experience', label: 'Venue & Delhi' },
   { id: 'startup', label: 'Startups' },
+  { id: 'collaborate', label: 'Collaboration' },
   { id: 'register', label: 'Event registration' },
   { id: 'query', label: 'Inquiries' },
 ];
@@ -158,7 +159,7 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
                   aria-current={isActive ? 'page' : undefined}
                   className={`h-9 px-3 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer ${
                     isActive
-                      ? 'text-fg bg-surface-3 shadow-sm'
+                      ? 'text-fg bg-surface-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]'
                       : 'text-fg-2 hover:text-fg hover:bg-surface-2'
                   }`}
                 >

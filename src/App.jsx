@@ -7,16 +7,17 @@ import ExhibitionPage from './pages/ExhibitionPage';
 import ExperiencePage from './pages/ExperiencePage';
 import RegistrationPage from './pages/RegistrationPage';
 import StartupPage from './pages/StartupPage';
+import CollaborationPage from './pages/CollaborationPage';
 import QueryPage from './pages/QueryPage';
 import QueryConciergeModal from './components/QueryConciergeModal';
 import AuthModal from './auth/AuthModal';
 import { useAuth } from './auth/AuthContext';
 
 export default function App() {
-  // Sync with URL hash if present (#home, #schedule, #exhibition, #experience, #register, #startup, #query)
+  // Sync with URL hash if present (#home, #schedule, #exhibition, #experience, #register, #startup, #collaborate, #query)
   const getInitialPage = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'query'];
+    const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query'];
     return validPages.includes(hash) ? hash : 'home';
   };
 
@@ -26,7 +27,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
-      const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'query'];
+      const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query'];
       if (validPages.includes(hash)) {
         setActivePage(hash);
       }
@@ -109,6 +110,8 @@ export default function App() {
         )}
 
         {activePage === 'startup' && <StartupPage onNavigate={navigate} />}
+
+        {activePage === 'collaborate' && <CollaborationPage onNavigate={navigate} />}
 
         {activePage === 'register' && (
           <RegistrationPage

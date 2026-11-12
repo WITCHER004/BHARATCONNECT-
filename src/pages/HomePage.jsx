@@ -86,7 +86,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-8 min-h-[100svh] pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7">
-            <p className="ref-line text-gold-text">18-19 Dec 2026 / Palash Hall, 6F / Yashobhoomi, New Delhi</p>
+            <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
 
             <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
               India and 22 Arab nations <span className="text-gold-text">at one table</span>
@@ -113,61 +113,136 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         </div>
       </section>
 
-      {/* Registration: startups and the event */}
+      {/* Registration: startups, event and business summit collaboration */}
       <section id="registration" className="theme-ivory !bg-white py-20 sm:py-24 scroll-mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader
-            title="Registration"
-            intro="Bring your startup to the Startup Pavilion, or register to attend the conclave."
+            title="Registration & Summit Collaboration"
+            intro="Bring your startup to the Startup Pavilion, register to attend the conclave, or partner directly with the business summit."
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            {/* Startup registration: black card with a gold double frame */}
-            <article className="theme-dark lg:col-span-7 bg-surface-1 border border-line-strong rounded-2xl p-2 shadow-xl">
-              <div className="h-full rounded-xl border border-gold-foil/50 p-6 sm:p-10 flex flex-col">
-                <p className="ref-line text-gold-text">Startup Pavilion / 18-19 Dec 2026 / Yashobhoomi</p>
-                <h3 className="mt-4 font-serif text-3xl sm:text-4xl font-medium text-fg leading-tight tracking-[-0.01em]">
-                  Want to register a startup?
-                </h3>
-                <p className="mt-4 text-[15px] text-fg-2 leading-relaxed max-w-xl">
-                  Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
-                  receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
-                </p>
-                <dl className="mt-8 grid grid-cols-3 gap-4 text-sm border-t border-line pt-6">
-                  <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure">₹5,900 incl. GST</dd></div>
-                  <div><dt className="text-fg-3">Valid for</dt><dd className="mt-1 text-fg">2 years or 5 events</dd></div>
-                  <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg">10 minutes</dd></div>
-                </dl>
-                <div className="mt-8 lg:mt-auto lg:pt-8">
-                  <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-6 text-[15px]">
-                    Register now
-                    <ArrowRight {...ICON} />
-                  </button>
-                </div>
-              </div>
-            </article>
+          <div className="relative">
+            {/* Fine minimalistic vertical divider lines between columns on desktop */}
+            <div
+              className="hidden lg:block absolute left-1/3 top-6 bottom-6 w-px bg-gradient-to-b from-transparent via-[#B8893A]/40 to-transparent -translate-x-1/2 pointer-events-none z-10"
+              aria-hidden="true"
+            />
+            <div
+              className="hidden lg:block absolute left-2/3 top-6 bottom-6 w-px bg-gradient-to-b from-transparent via-[#B8893A]/40 to-transparent -translate-x-1/2 pointer-events-none z-10"
+              aria-hidden="true"
+            />
 
-            {/* Event registration */}
-            <article className="theme-dark lg:col-span-5 bg-surface-1 border border-line-strong rounded-2xl p-6 sm:p-10 flex flex-col shadow-xl">
-              <p className="ref-line text-gold-text">500 accreditations / 18-19 Dec 2026</p>
-              <h3 className="mt-4 font-serif text-3xl font-medium text-fg leading-tight">Event registration</h3>
-              <p className="mt-4 text-[15px] text-fg-2 leading-relaxed">
-                Attend the plenary keynotes, private B2B deal rooms, the 7,000 sq ft Yashobhoomi lounge, the bilateral
-                networking lunches, and the inaugural gala dinner and leadership awards.
-              </p>
-              <div className="mt-8 lg:mt-auto lg:pt-8 flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3">
-                <button onClick={() => onNavigate('register')} className="btn-primary h-12 px-6 text-[15px] whitespace-nowrap">
-                  Register for the event
-                  <ArrowRight {...ICON} />
-                </button>
-                <button
-                  onClick={() => onNavigate('exhibition')}
-                  className="h-12 px-5 rounded-[10px] border border-gold-foil text-gold-text text-[15px] font-medium whitespace-nowrap hover:bg-gold-foil/10 active:scale-[0.98] transition-[background-color,transform] duration-150 cursor-pointer"
-                >
-                  Book an exhibition stall
-                </button>
-              </div>
-            </article>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+              {/* Box 1: Startup Registration */}
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                  <div>
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                      Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi
+                    </p>
+                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                      Want to register a startup?
+                    </h3>
+                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                      Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
+                      receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                    </p>
+                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                      <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure font-medium">₹5,900 incl.</dd></div>
+                      <div><dt className="text-fg-3">Valid for</dt><dd className="mt-1 text-fg font-medium">2 yrs / 5 evts</dd></div>
+                      <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg font-medium">10 minutes</dd></div>
+                    </dl>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                      Register now
+                      <ArrowRight {...ICON} />
+                    </button>
+                    <button
+                      onClick={() => onNavigate('query')}
+                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                    >
+                      Startup Showcase FAQ
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              {/* Minimalist horizontal separator on mobile between card 1 and 2 */}
+              <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
+
+              {/* Box 2: Event Registration */}
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                  <div>
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                      500 Accreditations · 18–19 Dec 2026 · Yashobhoomi
+                    </p>
+                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                      Event &amp; delegate registration
+                    </h3>
+                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                      Attend plenary keynotes, private B2B deal rooms, the 7,000 sq ft Yashobhoomi lounge, bilateral
+                      networking lunches, and the inaugural gala dinner and leadership awards with 22 Arab delegations.
+                    </p>
+                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                      <div><dt className="text-fg-3">Access</dt><dd className="mt-1 text-fg font-medium">Plenary &amp; B2B</dd></div>
+                      <div><dt className="text-fg-3">Capacity</dt><dd className="mt-1 text-fg font-mono figure font-medium">500 Passes</dd></div>
+                      <div><dt className="text-fg-3">Accreditation</dt><dd className="mt-1 text-fg font-medium">Instant E-Badge</dd></div>
+                    </dl>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('register')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                      Register for the event
+                      <ArrowRight {...ICON} />
+                    </button>
+                    <button
+                      onClick={() => onNavigate('exhibition')}
+                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                    >
+                      Book an exhibition stall
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              {/* Minimalist horizontal separator on mobile between card 2 and 3 */}
+              <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
+
+              {/* Box 3: Collaboration for Business Summit (New Portal) */}
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                  <div>
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                      Bilateral Directorate · Strategic Partnerships · 2026
+                    </p>
+                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                      Collaboration for business summit
+                    </h3>
+                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                      Partner with the conclave as a country pavilion, industry co-host, sovereign deal-room sponsor, or knowledge think-tank. Dedicated portal for institutions seeking strategic bilateral collaboration.
+                    </p>
+                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                      <div><dt className="text-fg-3">Track</dt><dd className="mt-1 text-fg font-medium">Country / Sponsor</dd></div>
+                      <div><dt className="text-fg-3">Fast-track</dt><dd className="mt-1 text-fg font-medium">Direct Desk</dd></div>
+                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-COL</dd></div>
+                    </dl>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('collaborate')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                      Collaborate with summit
+                      <ArrowRight {...ICON} />
+                    </button>
+                    <button
+                      onClick={() => onNavigate('query')}
+                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                    >
+                      Partnership Prospectus
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </div>
           </div>
         </div>
       </section>
