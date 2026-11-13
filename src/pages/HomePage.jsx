@@ -139,7 +139,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
               {/* Box 1: Startup Registration */}
-              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                 <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
@@ -177,7 +177,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
               <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
 
               {/* Box 2: Event Registration */}
-              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                 <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
@@ -215,7 +215,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
               <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
 
               {/* Box 3: Collaboration for Business Summit (New Portal) */}
-              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_2px_6px_rgb(0_0_0/0.06),0_18px_48px_-8px_rgb(0_0_0/0.18),0_0_0_6px_rgb(184_137_58/0.06)] flex flex-col h-full">
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                 <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
