@@ -174,8 +174,8 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
                         onClick={() => setSelectedRoute(route.id)}
                         aria-pressed={isActive}
                         className={`p-4 rounded-xl border text-left transition-[background-color,border-color,transform] duration-150 cursor-pointer active:scale-[0.98] ${isActive
-                            ? 'bg-surface-3 border-line-strong shadow-sm'
-                            : 'border-line hover:bg-surface-3'
+                          ? 'bg-surface-3 border-line-strong shadow-sm'
+                          : 'border-line hover:bg-surface-3'
                           }`}
                       >
                         <div className="text-sm font-medium text-fg">{route.label}</div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Download, ArrowUp, ArrowRight } from 'lucide-react';
-import { BrandMark } from './Navbar';
+import { BrandLogo } from './BrandLogo';
 
 const PAGES = [
   { id: 'home', label: 'Overview' },
@@ -89,9 +89,9 @@ SECRETARIAT & ACCREDITATION:
           {/* Brand */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-3">
-              <BrandMark />
+              <BrandLogo variant="badge" className="py-1 px-3" />
               <span className="flex flex-col">
-                <span className="text-[15px] font-semibold leading-5">Bharat Connect 2026</span>
+                <span className="text-[15px] font-semibold leading-5 text-fg">Bharat Connect 2026</span>
                 <span className="text-xs text-fg-3 leading-4">Bharat-Arab Business Conclave</span>
               </span>
             </div>

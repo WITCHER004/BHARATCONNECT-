@@ -20,13 +20,22 @@ export default function SummitSpotlightHUD({ onReplay, onNavigate }) {
 
         {/* Central Overview */}
         <div className="mt-5">
-          <p className="text-xs font-mono text-fg-3 uppercase tracking-wider">
-            Diplomatic &amp; Commercial Convergence
-          </p>
-          <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg leading-tight">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="bg-white/95 px-2.5 py-1 rounded-md border border-gold-foil/40 shadow-sm flex items-center justify-center">
+              <img
+                src={`${import.meta.env.BASE_URL}brand/logo.png`}
+                alt="Bharat Connect Official Logo"
+                className="h-6 w-auto object-contain"
+              />
+            </div>
+            <p className="text-[11px] font-mono text-gold-text uppercase tracking-wider">
+              Official Conclave Emblem
+            </p>
+          </div>
+          <h2 className="font-serif text-2xl sm:text-3xl font-medium text-fg leading-tight">
             India &amp; 22 Arab Corridors
           </h2>
-          <p className="mt-3 text-xs sm:text-sm text-fg-2 leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-fg-2 leading-relaxed">
             The launch film visualizes bilateral trade routes linking New Delhi, Abu Dhabi, Riyadh, Cairo, and London under the CEPA &amp; IMEC frameworks.
           </p>
         </div>
@@ -71,3 +80,4 @@ export default function SummitSpotlightHUD({ onReplay, onNavigate }) {
     </div>
   );
 }
+

@@ -92,15 +92,8 @@ function AccountMenu({ onSignIn }) {
   );
 }
 
-export function BrandMark({ className = 'w-7 h-7' }) {
-  return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-      <path d="M16 3 L29 16 L16 29 L3 16 Z" fill="none" style={{ stroke: 'var(--color-gold-foil)' }} strokeWidth="1.5" />
-      <path d="M16 9 L23 16 L16 23 L9 16 Z" fill="none" style={{ stroke: 'var(--color-gold-foil)' }} strokeWidth="1" opacity="0.6" />
-      <circle cx="16" cy="16" r="3" fill="#FF6F5E" />
-    </svg>
-  );
-}
+import { BrandLogo, BrandMark } from './BrandLogo';
+export { BrandMark };
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Overview' },
@@ -140,11 +133,12 @@ export default function Navbar({ activePage, onNavigate, onOpenRegister }) {
         <div className="h-16 flex items-center justify-between gap-6">
           <button
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-3 text-left cursor-pointer text-fg"
+            className="flex items-center gap-3 text-left cursor-pointer text-fg group"
+            aria-label="Bharat Connect 2026 Homepage"
           >
-            <BrandMark />
+            <BrandLogo variant="badge" className="group-hover:border-gold-foil/60" />
             <span className="flex flex-col">
-              <span className="text-[15px] font-semibold leading-5">Bharat Connect 2026</span>
+              <span className="text-[15px] font-semibold leading-5 text-fg">Bharat Connect 2026</span>
               <span className="text-xs text-fg-3 leading-4">Bharat-Arab Business Conclave</span>
             </span>
           </button>
