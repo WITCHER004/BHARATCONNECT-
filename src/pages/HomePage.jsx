@@ -260,7 +260,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       </section>
 
       {/* Scale and impact */}
-      <section className="theme-ivory py-20 sm:py-24">
+      <section className="py-20 sm:py-24 border-t border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader
             title="The conclave in figures"
@@ -374,7 +374,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       </section>
 
       {/* Nations and chambers */}
-      <section className="theme-ivory py-20 sm:py-24">
+      <section className="py-20 sm:py-24 border-t border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader title="22 Arab nations and their chambers" />
 

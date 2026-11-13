@@ -82,6 +82,8 @@
 }
 
 .theme-ivory {
+  background-color: var(--color-surface-1, #F7F2E8);
+  color: var(--color-fg, #141414);
   --color-surface-1: #F7F2E8;
   --color-surface-2: #FFFCF6;
   --color-surface-3: #EFE6D6;
@@ -98,6 +100,8 @@
 }
 
 .theme-cream {
+  background-color: var(--color-surface-1, #F7F2E8);
+  color: var(--color-fg, #141414);
   --color-surface-0: #EFE7D8;
   --color-surface-1: #F7F2E8;
   --color-surface-2: #FFFCF6;
