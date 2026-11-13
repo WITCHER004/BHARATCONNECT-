@@ -83,3 +83,4 @@ export function BrandMark({ className = 'w-7 h-7' }) {
     </div>
   );
 }
+
