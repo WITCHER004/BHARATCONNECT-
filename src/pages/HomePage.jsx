@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import HeroCard from '../components/HeroFilm';
 import IntroSplash from '../components/IntroSplash';
+import HeroBackgroundFilm from '../components/HeroBackgroundFilm';
+import SummitSpotlightHUD from '../components/SummitSpotlightHUD';
 import Skyline from '../components/Skyline';
 import AnimatedCounter from '../components/AnimatedCounter';
 import DealMatchmakerSimulator from '../components/DealMatchmakerSimulator';
@@ -63,8 +64,8 @@ function shouldPlayIntro() {
 }
 
 export default function HomePage({ onNavigate, onOpenRegister }) {
-  const cardRef = useRef(null);
   const [introActive, setIntroActive] = useState(shouldPlayIntro);
+  const replayFilmRef = useRef(null);
 
   const finishIntro = () => {
     try { sessionStorage.setItem(INTRO_KEY, '1'); } catch { /* storage unavailable */ }
@@ -79,12 +80,20 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
   return (
     <div className="page-enter flex flex-col">
-      {introActive && <IntroSplash targetRef={cardRef} onDone={finishIntro} />}
+      {introActive && <IntroSplash onDone={finishIntro} />}
 
-      {/* Hero: the invitation card the opening film settles into, over the twin skyline */}
-      <section className="relative bg-royal border-b border-line overflow-hidden">
-        <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-8 min-h-[100svh] pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+      {/* Hero: the launch film plays here as the overall backdrop, over the twin skyline */}
+      <section className="relative bg-royal border-b border-line overflow-hidden min-h-[100svh] flex flex-col justify-center">
+        {/* Overall Homepage Film Canvas (Full-Bleed Background Animation) */}
+        <HeroBackgroundFilm
+          active={!introActive}
+          onReplayReady={(fn) => { replayFilmRef.current = fn; }}
+        />
+
+        {/* Skyline line art at the bottom horizon */}
+        <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 opacity-70" />
+
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           <div className="lg:col-span-7">
             <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
 
@@ -108,7 +117,10 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
           </div>
 
           <div className="lg:col-span-5">
-            <HeroCard viewRef={cardRef} hidden={introActive} />
+            <SummitSpotlightHUD
+              onReplay={() => replayFilmRef.current?.()}
+              onNavigate={onNavigate}
+            />
           </div>
         </div>
       </section>

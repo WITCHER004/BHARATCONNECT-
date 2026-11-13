@@ -1,0 +1,73 @@
+import { RotateCcw, ArrowRight, Globe2, Building2, TrendingUp, Sparkles } from 'lucide-react';
+
+export default function SummitSpotlightHUD({ onReplay, onNavigate }) {
+  return (
+    <div className="relative rounded-2xl p-6 sm:p-8 bg-black/35 backdrop-blur-md border border-gold-foil/35 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(217,179,106,0.15)] flex flex-col justify-between transition-all duration-200 hover:border-gold-foil/50">
+      <div>
+        {/* Top Tag & Live Indicator */}
+        <div className="flex items-center justify-between gap-3 pb-4 border-b border-line/60">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-coral animate-ping" />
+            <span className="font-mono text-[11px] uppercase tracking-wider text-gold-text">
+              Live Corridor Visualizer
+            </span>
+          </div>
+
+          <span className="text-[11px] font-mono text-fg-3 border border-line px-2.5 py-0.5 rounded-full bg-surface-2/40">
+            Yashobhoomi 2026
+          </span>
+        </div>
+
+        {/* Central Overview */}
+        <div className="mt-5">
+          <p className="text-xs font-mono text-fg-3 uppercase tracking-wider">
+            Diplomatic &amp; Commercial Convergence
+          </p>
+          <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg leading-tight">
+            India &amp; 22 Arab Corridors
+          </h2>
+          <p className="mt-3 text-xs sm:text-sm text-fg-2 leading-relaxed">
+            The launch film visualizes bilateral trade routes linking New Delhi, Abu Dhabi, Riyadh, Cairo, and London under the CEPA &amp; IMEC frameworks.
+          </p>
+        </div>
+
+        {/* 3 Metric Pills */}
+        <div className="mt-6 grid grid-cols-3 gap-2 text-center border-y border-line/60 py-4">
+          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+            <span className="font-serif text-xl sm:text-2xl font-medium text-gold-text figure block">22</span>
+            <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Arab Nations</span>
+          </div>
+          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+            <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">$500B</span>
+            <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Bilateral Goal</span>
+          </div>
+          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+            <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">24</span>
+            <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Deal Suites</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-6 pt-2 flex flex-col sm:flex-row gap-2.5">
+        <button
+          type="button"
+          onClick={onReplay}
+          className="btn-primary h-11 px-4 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 flex-1 cursor-pointer whitespace-nowrap"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          <span>Replay Launch Film</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onNavigate?.('collaborate')}
+          className="h-11 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-sm font-medium hover:bg-gold-foil/15 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
+        >
+          <span>Summit Collaboration</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
