@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, Pause, Sparkles } from 'lucide-react';
+import { Play, Pause, Sparkles } from 'lucide-react';
 import { loadFrames, FRAME_COUNT, POSTER_SRC } from './LaunchFilm';
 
 const FPS = 30;
@@ -55,7 +55,6 @@ class AmbientParticle {
 
 export default function HeroBackgroundFilm({
   active = true,
-  onReplayReady,
   className = '',
 }) {
   const canvasRef = useRef(null);
@@ -66,8 +65,6 @@ export default function HeroBackgroundFilm({
 
   const isPlayingRef = useRef(isPlaying);
   isPlayingRef.current = isPlaying;
-
-  const replayTriggerRef = useRef(null);
 
   // Main film canvas animation loop
   useEffect(() => {
@@ -123,9 +120,6 @@ export default function HeroBackgroundFilm({
       clearTimeout(holdTimer);
       setIsPlaying(true);
     };
-
-    replayTriggerRef.current = restartFilm;
-    if (onReplayReady) onReplayReady(restartFilm);
 
     size();
     window.addEventListener('resize', size);
@@ -233,10 +227,6 @@ export default function HeroBackgroundFilm({
     setIsPlaying((prev) => !prev);
   };
 
-  const handleReplay = () => {
-    replayTriggerRef.current?.();
-  };
-
   return (
     <div className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none ${className}`}>
       {/* 1. Underlying Cinematic 300-Frame Movie Canvas */}
@@ -278,22 +268,13 @@ export default function HeroBackgroundFilm({
         aria-hidden="true"
       />
 
-      {/* 4. Interactive Film Control Pill (Positioned discreetly in bottom right) */}
-      <div className="absolute right-4 bottom-6 sm:right-8 sm:bottom-8 z-30 pointer-events-auto flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleReplay}
-          title="Replay 10s Launch Film"
-          className="inline-flex items-center gap-2 h-9 px-3.5 rounded-full text-xs font-mono text-white/80 hover:text-white bg-black/60 hover:bg-black/80 border border-gold-foil/30 hover:border-gold-foil/60 backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg active:scale-95"
-        >
-          <RotateCcw className="w-3.5 h-3.5 text-gold-text" />
-          <span>Replay Film</span>
-        </button>
-
+      {/* 4. Interactive Film Control Pill (Discreet Play/Pause Toggle) */}
+      <div className="absolute right-4 bottom-6 sm:right-8 sm:bottom-8 z-30 pointer-events-auto flex items-center">
         <button
           type="button"
           onClick={handleTogglePlay}
           title={isPlaying ? 'Pause Animation' : 'Play Animation'}
+          aria-label={isPlaying ? 'Pause Animation' : 'Play Animation'}
           className="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:text-white bg-black/60 hover:bg-black/80 border border-gold-foil/30 hover:border-gold-foil/60 backdrop-blur-md transition-all duration-150 cursor-pointer shadow-lg active:scale-95"
         >
           {isPlaying ? (

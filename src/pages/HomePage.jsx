@@ -65,7 +65,6 @@ function shouldPlayIntro() {
 
 export default function HomePage({ onNavigate, onOpenRegister }) {
   const [introActive, setIntroActive] = useState(shouldPlayIntro);
-  const replayFilmRef = useRef(null);
 
   const finishIntro = () => {
     try { sessionStorage.setItem(INTRO_KEY, '1'); } catch { /* storage unavailable */ }
@@ -85,10 +84,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       {/* Hero: the launch film plays here as the overall backdrop, over the twin skyline */}
       <section className="relative bg-royal border-b border-line overflow-hidden min-h-[100svh] flex flex-col justify-center">
         {/* Overall Homepage Film Canvas (Full-Bleed Background Animation) */}
-        <HeroBackgroundFilm
-          active={!introActive}
-          onReplayReady={(fn) => { replayFilmRef.current = fn; }}
-        />
+        <HeroBackgroundFilm active={!introActive} />
 
         {/* Skyline line art at the bottom horizon */}
         <Skyline play={!introActive} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 opacity-70" />
@@ -117,10 +113,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
           </div>
 
           <div className="lg:col-span-5">
-            <SummitSpotlightHUD
-              onReplay={() => replayFilmRef.current?.()}
-              onNavigate={onNavigate}
-            />
+            <SummitSpotlightHUD onNavigate={onNavigate} />
           </div>
         </div>
       </section>

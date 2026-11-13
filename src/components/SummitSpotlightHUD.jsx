@@ -1,6 +1,6 @@
-import { RotateCcw, ArrowRight, Globe2, Building2, TrendingUp, Sparkles } from 'lucide-react';
+import { ArrowRight, Globe2, Building2, TrendingUp, Sparkles } from 'lucide-react';
 
-export default function SummitSpotlightHUD({ onReplay, onNavigate }) {
+export default function SummitSpotlightHUD({ onNavigate }) {
   return (
     <div className="relative rounded-2xl p-6 sm:p-8 bg-black/35 backdrop-blur-md border border-gold-foil/35 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(217,179,106,0.15)] flex flex-col justify-between transition-all duration-200 hover:border-gold-foil/50">
       <div>
@@ -61,20 +61,19 @@ export default function SummitSpotlightHUD({ onReplay, onNavigate }) {
       <div className="mt-6 pt-2 flex flex-col sm:flex-row gap-2.5">
         <button
           type="button"
-          onClick={onReplay}
-          className="btn-primary h-11 px-4 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 flex-1 cursor-pointer whitespace-nowrap"
+          onClick={() => onNavigate?.('collaborate')}
+          className="btn-primary h-11 px-5 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 flex-1 cursor-pointer whitespace-nowrap shadow-md"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Replay Launch Film</span>
+          <span>Summit Collaboration</span>
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
 
         <button
           type="button"
-          onClick={() => onNavigate?.('collaborate')}
+          onClick={() => onNavigate?.('schedule')}
           className="h-11 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-sm font-medium hover:bg-gold-foil/15 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
-          <span>Summit Collaboration</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>Explore 6 Tracks</span>
         </button>
       </div>
     </div>
