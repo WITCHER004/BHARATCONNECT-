@@ -113,7 +113,7 @@ const LANDMARKS = [
   },
 ];
 
-export default function Skyline({ play = false, className = '' }) {
+export default function Skyline({ play = true, className = '' }) {
   return (
     <svg
       className={`skyline ${play ? 'is-playing' : ''} ${className}`}

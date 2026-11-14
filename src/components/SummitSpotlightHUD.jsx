@@ -36,7 +36,7 @@ export default function SummitSpotlightHUD({ onNavigate }) {
             India &amp; 22 Arab Corridors
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-fg-2 leading-relaxed">
-            The launch film visualizes bilateral trade routes linking New Delhi, Abu Dhabi, Riyadh, Cairo, and London under the CEPA &amp; IMEC frameworks.
+            Connecting bilateral trade routes linking New Delhi, Abu Dhabi, Riyadh, Cairo, and London under the CEPA &amp; IMEC frameworks.
           </p>
         </div>
 
