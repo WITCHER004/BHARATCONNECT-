@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import IntroSplash from './components/IntroSplash';
 import HomePage from './pages/HomePage';
 import SchedulePage from './pages/SchedulePage';
 import ExhibitionPage from './pages/ExhibitionPage';
@@ -23,6 +24,15 @@ export default function App() {
 
   const [activePage, setActivePage] = useState(getInitialPage);
   const [selectedStallTier, setSelectedStallTier] = useState(null);
+  const [introActive, setIntroActive] = useState(() => {
+    try {
+      if (new URLSearchParams(window.location.search).has('no-intro')) return false;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -70,6 +80,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-surface-1 text-fg flex flex-col font-sans">
+      {/* Opening Teaser / Launch Film Splash on Site Load */}
+      {introActive && <IntroSplash onDone={() => setIntroActive(false)} />}
       
       {/* Navigation */}
       <Navbar
