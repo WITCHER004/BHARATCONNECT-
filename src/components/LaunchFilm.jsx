@@ -21,8 +21,17 @@ export function loadFrames() {
     const img = new Image();
     img.decoding = 'async';
     const entry = { img, ready: false };
-    img.onload = () => { entry.ready = true; };
+    img.onload = () => {
+      entry.ready = true;
+    };
+    img.onerror = () => {
+      // Mark ready on error so playback never deadlocks
+      entry.ready = true;
+    };
     img.src = frameSrc(i);
+    if (img.complete && img.naturalWidth > 0) {
+      entry.ready = true;
+    }
     return entry;
   });
   return cache;
