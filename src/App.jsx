@@ -27,7 +27,6 @@ export default function App() {
   const [introActive, setIntroActive] = useState(() => {
     try {
       if (new URLSearchParams(window.location.search).has('no-intro')) return false;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
       return true;
     } catch {
       return true;
