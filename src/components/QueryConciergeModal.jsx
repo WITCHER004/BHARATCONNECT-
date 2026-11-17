@@ -83,15 +83,18 @@ export default function QueryConciergeModal({ onNavigate }) {
   return (
     <>
       {/* Floating Trigger Button */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div
+        className="fixed right-4 sm:right-6 z-40"
+        style={{ bottom: 'max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))' }}
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open Secretariat Query Desk"
-          className="group relative flex items-center gap-2.5 h-12 px-4 rounded-full bg-surface-0 border border-gold-foil/40 text-fg shadow-xl hover:border-gold-foil transition-colors duration-200 cursor-pointer motion-safe:active:scale-95"
+          className="group relative flex items-center justify-center gap-2.5 w-12 sm:w-auto h-12 sm:px-4 rounded-full bg-surface-0/95 backdrop-blur-md border border-gold-foil/40 text-fg shadow-xl hover:border-gold-foil transition-colors duration-200 cursor-pointer motion-safe:active:scale-95 [-webkit-tap-highlight-color:transparent]"
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-coral animate-pulse" />
-          <MessageSquare className="w-4 h-4 text-gold-text" />
-          <span className="text-xs font-semibold pr-1">
+          <span className="absolute top-2 right-2 sm:static w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-coral animate-pulse" />
+          <MessageSquare className="w-[18px] h-[18px] sm:w-4 sm:h-4 text-gold-text" />
+          <span className="hidden sm:inline text-xs font-semibold pr-1">
             Query desk
           </span>
         </button>
@@ -99,7 +102,9 @@ export default function QueryConciergeModal({ onNavigate }) {
 
       {/* Floating Query Drawer */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-22 sm:right-6 z-50 sm:w-[420px] max-h-[90vh] flex flex-col surface-card bg-surface-0/98 backdrop-blur-2xl rounded-2xl border border-line-strong shadow-2xl motion-safe:animate-slide-up overflow-hidden">
+        <div
+          className="fixed inset-0 sm:inset-auto sm:bottom-22 sm:right-6 z-50 sm:w-[420px] sm:max-h-[90vh] flex flex-col surface-card bg-surface-0/98 backdrop-blur-2xl rounded-none sm:rounded-2xl border-0 sm:border border-line-strong shadow-2xl motion-safe:animate-slide-up overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:p-0"
+        >
           {/* Drawer Header */}
           <div className="p-4 sm:p-5 border-b border-line flex items-center justify-between bg-surface-1">
             <div className="flex items-center gap-2.5">

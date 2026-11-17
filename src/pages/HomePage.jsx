@@ -114,8 +114,9 @@ function CorridorMap({ regions, active, setActive, visible }) {
           style={{ transition: 'stroke 300ms, stroke-width 300ms' }}
           stroke={on(g.region) ? '#D9B36A' : 'rgb(217 179 106 / 0.18)'}
           strokeWidth={focus && focus.region === g.region ? 4 : 2}
-          onMouseEnter={() => setActive(g.region)}
-          onMouseLeave={() => setActive(null)}
+          onPointerEnter={(e) => { if (e.pointerType === 'mouse') setActive(g.region); }}
+          onClick={() => setActive((a) => (a === g.region ? null : g.region))}
+          onPointerLeave={(e) => { if (e.pointerType === 'mouse') setActive(null); }}
         />
       ))}
 
@@ -148,8 +149,9 @@ function CorridorMap({ regions, active, setActive, visible }) {
           <g
             key={n.code}
             className="cursor-pointer"
-            onMouseEnter={() => setHoverNation(n)}
-            onMouseLeave={() => setHoverNation(null)}
+            onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHoverNation(n); }}
+            onClick={() => setHoverNation((h) => (h?.code === n.code ? null : n))}
+            onPointerLeave={(e) => { if (e.pointerType === 'mouse') setHoverNation(null); }}
             style={{ opacity: visible ? 1 : 0, transition: `opacity 500ms ${600 + i * 45}ms` }}
           >
             <circle cx={x} cy={y} r={14} fill="transparent" />
@@ -242,7 +244,7 @@ function NationsAndChambers({ regions }) {
           </div>
           <p className="lg:col-span-5 text-[15px] text-fg-2 leading-relaxed lg:pb-3 max-w-md">
             {regionList.length} regions, {national.length} national chambers and {joint.length} joint chambers, each a
-            route from New Delhi. Hover a region to trace its corridor.
+            route from New Delhi. Tap or hover a region to trace its corridor.
           </p>
         </div>
 
@@ -259,11 +261,11 @@ function NationsAndChambers({ regions }) {
                 <li key={region}>
                   <button
                     type="button"
-                    onMouseEnter={() => setActive(region)}
-                    onMouseLeave={() => setActive(null)}
-                    onFocus={() => setActive(region)}
-                    onBlur={() => setActive(null)}
-                    className={`relative w-full text-left grid grid-cols-[2.25rem_1fr_auto] gap-x-4 items-baseline py-4 pl-3 pr-2 border-b border-line transition-colors duration-300 cursor-default ${
+                    onPointerEnter={(e) => { if (e.pointerType === 'mouse') setActive(region); }}
+                    onClick={() => setActive((a) => (a === region ? null : region))}
+                    onPointerLeave={(e) => { if (e.pointerType === 'mouse') setActive(null); }}
+                    aria-pressed={isOn}
+                    className={`relative w-full text-left grid grid-cols-[2.25rem_1fr_auto] gap-x-4 items-baseline py-4 pl-3 pr-2 border-b border-line transition-colors duration-300 cursor-pointer [-webkit-tap-highlight-color:transparent] ${
                       isOn ? 'bg-surface-2' : ''
                     }`}
                   >

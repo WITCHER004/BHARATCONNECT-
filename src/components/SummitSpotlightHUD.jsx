@@ -62,7 +62,7 @@ export default function SummitSpotlightHUD({ onNavigate }) {
         <button
           type="button"
           onClick={() => onNavigate?.('collaborate')}
-          className="btn-primary h-11 px-5 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 flex-1 cursor-pointer whitespace-nowrap shadow-md"
+          className="btn-primary h-11 px-5 text-xs sm:text-sm font-medium flex items-center justify-center gap-2 w-full sm:w-auto sm:flex-1 cursor-pointer whitespace-nowrap shadow-md"
         >
           <span>Summit Collaboration</span>
           <ArrowRight className="w-3.5 h-3.5" />

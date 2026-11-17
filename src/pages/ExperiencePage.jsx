@@ -114,17 +114,17 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
                 </p>
 
                 <dl className="grid grid-cols-3 border-t border-line">
-                  <div className="pt-4 pr-4">
-                    <dt className="text-sm text-fg-3 mb-1">From IGI Airport (T3)</dt>
-                    <dd className="font-serif text-3xl text-coral-text figure">15 min</dd>
+                  <div className="pt-4 pr-3 sm:pr-4 min-w-0">
+                    <dt className="text-xs sm:text-sm text-fg-3 mb-1">From IGI Airport (T3)</dt>
+                    <dd className="font-serif text-2xl sm:text-3xl text-coral-text figure">15 min</dd>
                   </div>
-                  <div className="pt-4 px-4 border-l border-line">
-                    <dt className="text-sm text-fg-3 mb-1">IGBC rating</dt>
-                    <dd className="font-serif text-3xl text-fg">Platinum</dd>
+                  <div className="pt-4 px-3 sm:px-4 border-l border-line min-w-0">
+                    <dt className="text-xs sm:text-sm text-fg-3 mb-1">IGBC rating</dt>
+                    <dd className="font-serif text-2xl sm:text-3xl text-fg">Platinum</dd>
                   </div>
-                  <div className="pt-4 pl-4 border-l border-line">
-                    <dt className="text-sm text-fg-3 mb-1">Metro</dt>
-                    <dd className="font-serif text-3xl text-fg">Direct link</dd>
+                  <div className="pt-4 pl-3 sm:pl-4 border-l border-line min-w-0">
+                    <dt className="text-xs sm:text-sm text-fg-3 mb-1">Metro</dt>
+                    <dd className="font-serif text-2xl sm:text-3xl text-fg">Direct link</dd>
                   </div>
                 </dl>
               </div>

@@ -65,6 +65,9 @@
   }
 
   html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
     color: var(--color-fg);
     background-color: var(--color-surface-1);
@@ -188,6 +191,25 @@
 .jaali-print {
   background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23efeae1' stroke-width='1'%3E%3Cpath d='M24 4 L44 24 L24 44 L4 24 Z'/%3E%3Ccircle cx='24' cy='24' r='8'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 48px 48px;
+}
+
+/* ── Phones ──────────────────────────────────────────────
+   iOS Safari zooms the page when a field under 16px is focused; keep fields at 16px on
+   phones. Buttons respond to taps without the 300ms double-tap delay. */
+
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+button,
+a,
+[role="button"],
+[role="tab"] {
+  touch-action: manipulation;
 }
 
 /* ── Glass edge ──────────────────────────────────────────

@@ -613,17 +613,17 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                       </label>
 
                       {/* Submit CTA */}
-                      <div className="pt-4 flex items-center justify-between">
+                      <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <button
                           type="submit"
                           disabled={status === 'submitting'}
-                          className="btn-primary h-12 px-8 text-sm font-semibold flex items-center gap-2 cursor-pointer"
+                          className="btn-primary h-12 px-8 text-sm font-semibold flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
                         >
                           <Send className="w-4 h-4" />
                           {status === 'submitting' ? 'Logging Ticket…' : 'Submit Official Inquiry'}
                         </button>
 
-                        <span className="text-xs text-fg-3 font-mono">
+                        <span className="text-xs text-fg-3 font-mono text-center sm:text-right">
                           Generates [BMF.BC-QRY-00001]
                         </span>
                       </div>

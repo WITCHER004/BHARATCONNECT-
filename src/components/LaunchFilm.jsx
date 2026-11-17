@@ -10,35 +10,68 @@ import { Play } from 'lucide-react';
 export const FRAME_COUNT = 300;
 const FPS = 30;
 const BUFFER_AHEAD = 45; // frames that must be decoded before playback starts
-const frameSrc = (i) => `${import.meta.env.BASE_URL}film/${String(i).padStart(3, '0')}.webp`;
+/*
+  Phones (and data-saver connections) get a lighter 960×540 set (~7.7 MB instead of ~21 MB):
+  a portrait phone shows the frame at under 1200 device pixels wide, so nothing visible is lost.
+*/
+const useLightFrames = () => {
+  try {
+    const conn = navigator.connection;
+    if (conn && (conn.saveData || /2g|3g/.test(conn.effectiveType || ''))) return true;
+    return Math.min(window.screen.width, window.screen.height) < 768;
+  } catch {
+    return false;
+  }
+};
+const FILM_DIR = typeof window !== 'undefined' && useLightFrames() ? 'film-m' : 'film';
+const frameSrc = (i) => `${import.meta.env.BASE_URL}${FILM_DIR}/${String(i).padStart(3, '0')}.webp`;
 export const POSTER_SRC = frameSrc(FRAME_COUNT - 1);
 
-// one shared cache, so the hero and the opening never download a frame twice
+/*
+  One shared cache, so the hero and the opening never download a frame twice.
+  Frames load in playback order a few at a time (so the opening seconds arrive first instead
+  of competing with all 300 requests), and a frame only counts as ready once the browser has
+  decoded it, so drawing it never stalls the animation.
+*/
+const PARALLEL = 6;
 let cache = null;
 export function loadFrames() {
   if (cache) return cache;
-  cache = Array.from({ length: FRAME_COUNT }, (_, i) => {
+  cache = Array.from({ length: FRAME_COUNT }, () => {
     const img = new Image();
     img.decoding = 'async';
-    const entry = { img, ready: false };
-    img.onload = () => {
-      entry.ready = true;
-    };
-    img.onerror = () => {
-      // Mark ready on error so playback never deadlocks
-      entry.ready = true;
-    };
-    img.src = frameSrc(i);
-    if (img.complete && img.naturalWidth > 0) {
-      entry.ready = true;
-    }
-    return entry;
+    return { img, ready: false, failed: false };
   });
+
+  let next = 0;
+  const pump = () => {
+    if (next >= FRAME_COUNT) return;
+    const i = next++;
+    const entry = cache[i];
+    entry.img.src = frameSrc(i);
+    const settle = () => { entry.ready = true; pump(); };
+    entry.img
+      .decode()
+      .then(settle, () => {
+        // decode() can reject on some browsers even when the image loaded; fall back to onload
+        if (entry.img.complete && entry.img.naturalWidth > 0) settle();
+        else { entry.failed = true; settle(); } // never deadlock playback on a missing frame
+      });
+  };
+  for (let k = 0; k < PARALLEL; k++) pump();
   return cache;
+}
+
+/* How many frames from the start are ready, contiguously. */
+export function bufferedCount(frames) {
+  let n = 0;
+  while (n < frames.length && frames[n].ready) n++;
+  return n;
 }
 
 // draws an image into the canvas, filling it ("cover") or fitting it ("contain")
 function draw(ctx, canvas, img, fit) {
+  if (!img.naturalWidth) return; // a frame that failed to load: keep the previous one on screen
   const cw = canvas.width;
   const ch = canvas.height;
   const s = fit === 'cover'
