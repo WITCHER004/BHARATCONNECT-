@@ -105,12 +105,12 @@ export default function HolographicSummitPass({
   return (
     <div className="w-full max-w-[min(320px,calc((100svh-128px)*0.56))]">
       {/* phone */}
-      <div className="rounded-[48px] bg-surface-0 p-2.5 shadow-2xl">
+      <div className="rounded-[48px] bg-[#0a0a0a] p-2.5 ring-1 ring-white/10 shadow-[inset_0_0_0_2px_#1c1c1c,0_25px_50px_-12px_rgb(0_0_0/0.45)]">
         <div className="relative rounded-[40px] overflow-hidden" style={{ background: PAPER, color: INK }}>
           {/* status bar */}
           <div className="h-12 px-7 flex items-center justify-between font-mono text-[13px]">
             <span>9:41</span>
-            <span className="absolute left-1/2 top-2.5 -translate-x-1/2 w-28 h-7 rounded-full bg-surface-0" aria-hidden="true" />
+            <span className="absolute left-1/2 top-2.5 -translate-x-1/2 w-28 h-7 rounded-full bg-[#0a0a0a]" aria-hidden="true" />
             <span>5G</span>
           </div>
 
