@@ -53,7 +53,7 @@ function AccountMenu({ onSignIn }) {
     return (
       <button
         onClick={() => { onSignIn?.(); openAuth({ mode: 'signin' }); }}
-        className="h-9 px-3 rounded-lg text-sm font-medium text-fg-2 hover:text-fg hover:bg-surface-2 transition-colors cursor-pointer"
+        className="h-10 px-4 rounded-xl text-sm font-medium text-fg-2 hover:text-fg border border-transparent hover:border-gold-foil/40 transition-colors cursor-pointer"
       >
         Sign in
       </button>
@@ -116,7 +116,7 @@ function RegisterDropdown({ onNavigate }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="btn-primary h-9 px-3.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
+        className="btn-primary !rounded-xl h-10 px-4 text-xs sm:text-sm font-medium flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -212,37 +212,52 @@ export default function Navbar({ activePage, onNavigate }) {
     setMobileMenuOpen(false);
   };
 
+  const solid = isScrolled || mobileMenuOpen;
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-200 ${
-        isScrolled || mobileMenuOpen
-          ? 'bg-surface-0/95 backdrop-blur-md border-line'
-          : 'bg-transparent border-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="h-16 flex items-center justify-between gap-4 lg:gap-8">
-          {/* Brand Logo & Conclave Edition */}
+    <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3">
+      <div
+        className={`relative max-w-7xl mx-auto rounded-2xl border transition-all duration-300 ${
+          solid
+            ? 'bg-surface-0/80 backdrop-blur-xl backdrop-saturate-150 border-gold-foil/20 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.8),inset_0_1px_0_rgb(255_255_255/0.05)]'
+            : 'bg-black/20 backdrop-blur-sm border-white/[0.06]'
+        }`}
+      >
+        {/* gold hairline along the bottom edge */}
+        <span
+          className={`pointer-events-none absolute inset-x-10 -bottom-px h-px bg-gradient-to-r from-transparent via-gold-foil/70 to-transparent transition-opacity duration-300 ${
+            solid ? 'opacity-100' : 'opacity-40'
+          }`}
+          aria-hidden="true"
+        />
+
+        <div className="h-[60px] pl-2.5 pr-2.5 sm:pl-3 flex items-center justify-between gap-4 lg:gap-6">
+          {/* Brand */}
           <button
             onClick={() => handleNavClick('home')}
-            className="flex items-center gap-2.5 sm:gap-3 text-left cursor-pointer group shrink-0"
-            aria-label="Bharat Connect 2026 Homepage"
+            className="flex items-center gap-3 text-left cursor-pointer group shrink-0"
+            aria-label="Bharat Connect homepage"
           >
-            <div className="bg-white/95 group-hover:bg-white px-2 py-0.5 rounded-md border border-gold-foil/30 group-hover:border-gold-foil/60 shadow-sm flex items-center justify-center transition-all duration-150">
+            <div className="h-10 px-2 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 group-hover:ring-gold-foil shadow-[0_4px_14px_-6px_rgb(217_179_106/0.5)] flex items-center justify-center transition-all duration-200">
               <img
                 src={`${import.meta.env.BASE_URL}brand/logo.png`}
                 alt="Bharat Connect"
-                className="h-6 sm:h-7 w-auto object-contain"
+                className="h-7 w-auto object-contain"
               />
             </div>
-            <div className="hidden sm:flex flex-col border-l border-line/70 pl-2.5">
-              <span className="text-[13px] font-semibold text-fg tracking-tight leading-4">Conclave 2026</span>
-              <span className="text-[10px] font-mono text-gold-text tracking-wider uppercase leading-3 mt-0.5">18–19 Dec · New Delhi</span>
+            <div className="hidden sm:flex flex-col">
+              <span className="font-serif text-[15px] font-medium text-fg tracking-[0.16em] leading-4 uppercase">
+                Bharat Connect
+              </span>
+              <span className="mt-1 flex items-center gap-1.5 text-[10px] font-mono text-gold-text tracking-[0.14em] uppercase leading-3">
+                <span className="w-1 h-1 rotate-45 bg-gold-foil" aria-hidden="true" />
+                18–19 Dec · New Delhi
+              </span>
             </div>
           </button>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Desktop navigation */}
+          <nav className="hidden lg:flex items-center" aria-label="Main">
             {NAV_ITEMS.map((item) => {
               const isActive = activePage === item.id;
               return (
@@ -250,20 +265,29 @@ export default function Navbar({ activePage, onNavigate }) {
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`h-9 px-3 rounded-lg text-[13.5px] font-medium transition-colors duration-150 cursor-pointer ${
-                    isActive
-                      ? 'text-fg bg-surface-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)]'
-                      : 'text-fg-2 hover:text-fg hover:bg-surface-2'
+                  className={`group relative h-10 px-3.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors duration-200 cursor-pointer ${
+                    isActive ? 'text-gold-text' : 'text-fg-2 hover:text-fg'
                   }`}
                 >
                   {item.label}
+                  {/* hover underline */}
+                  <span
+                    className={`absolute left-3.5 right-3.5 bottom-1.5 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent origin-center transition-transform duration-300 ${
+                      isActive ? 'scale-x-0' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  {/* active marker */}
+                  {isActive && (
+                    <span className="absolute left-1/2 -translate-x-1/2 bottom-0.5 w-1.5 h-1.5 rotate-45 bg-gold-foil shadow-[0_0_8px_rgb(217_179_106/0.8)]" aria-hidden="true" />
+                  )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Right Action Area */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Right action area */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <RegisterDropdown onNavigate={handleNavClick} />
 
             <AccountMenu onSignIn={() => setMobileMenuOpen(false)} />
@@ -286,7 +310,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden pb-5 pt-3 border-t border-line animate-slide-up">
+          <div className="lg:hidden px-3 pb-5 pt-3 border-t border-line animate-slide-up">
             <div className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;

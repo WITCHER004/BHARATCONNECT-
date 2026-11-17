@@ -46,6 +46,8 @@ function draw(ctx, canvas, img, fit) {
     : Math.min(cw / img.naturalWidth, ch / img.naturalHeight);
   const w = img.naturalWidth * s;
   const h = img.naturalHeight * s;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.fillStyle = '#0b0b0b';
   ctx.fillRect(0, 0, cw, ch);
   ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);

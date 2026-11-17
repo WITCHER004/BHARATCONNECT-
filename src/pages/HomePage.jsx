@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import SummitSpotlightHUD from '../components/SummitSpotlightHUD';
 import Skyline from '../components/Skyline';
 import AnimatedCounter from '../components/AnimatedCounter';
@@ -19,6 +19,332 @@ function Ornament() {
     <span className="ornament" aria-hidden="true">
       <svg viewBox="0 0 12 12" className="w-3 h-3"><path d="M6 0.8 L11.2 6 L6 11.2 L0.8 6 Z" fill="currentColor" /></svg>
     </span>
+  );
+}
+
+/* Hairline between the registration cards: vertical on desktop, horizontal on mobile,
+   fading out at both ends with a small gold diamond at its centre. */
+function CardDivider() {
+  return (
+    <div className="relative flex items-center justify-center lg:py-10" aria-hidden="true">
+      <span className="block w-full h-[2px] lg:w-[2px] lg:h-full rounded-full bg-gradient-to-r lg:bg-gradient-to-b from-transparent via-[#B8893A]/80 to-transparent" />
+      <span className="absolute w-2 h-2 rotate-45 bg-[#B8893A] ring-4 ring-surface-1" />
+    </div>
+  );
+}
+
+/*
+  "22 Arab nations and their chambers"
+  A gold corridor map (India at the centre, a route to every nation, grouped by region)
+  beside an editorial index of the regions. Hovering a region, or a nation on the map,
+  lights its routes. The chambers follow as a grid of gold-ruled cards.
+*/
+const MAP = { size: 560, c: 280, dot: 196, label: 222, arc: 244 };
+
+function layoutNations(regions) {
+  const entries = Object.entries(regions);
+  const GAP = 1.3; // empty slots between regions
+  const slots = entries.reduce((s, [, list]) => s + list.length, 0) + entries.length * GAP;
+  const step = (Math.PI * 2) / slots;
+  let a = -Math.PI / 2 + (GAP / 2) * step;
+  const nodes = [];
+  const arcs = [];
+  entries.forEach(([region, list]) => {
+    const start = a - step * 0.45;
+    list.forEach((n) => {
+      nodes.push({ ...n, region, angle: a });
+      a += step;
+    });
+    arcs.push({ region, start, end: a - step + step * 0.45 });
+    a += GAP * step;
+  });
+  return { nodes, arcs };
+}
+
+const polar = (r, ang) => [MAP.c + r * Math.cos(ang), MAP.c + r * Math.sin(ang)];
+
+function arcPath(r, start, end) {
+  const [x1, y1] = polar(r, start);
+  const [x2, y2] = polar(r, end);
+  const large = end - start > Math.PI ? 1 : 0;
+  return `M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+}
+
+function routePath(ang) {
+  const [x0, y0] = polar(52, ang);
+  const [x1, y1] = polar(MAP.dot - 8, ang);
+  const [cx, cy] = polar(MAP.dot * 0.55, ang + 0.22);
+  return `M${x0.toFixed(1)} ${y0.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+}
+
+function CorridorMap({ regions, active, setActive, visible }) {
+  const { nodes, arcs } = useMemo(() => layoutNations(regions), [regions]);
+  const [hoverNation, setHoverNation] = useState(null);
+  const focus = hoverNation || (active ? { region: active } : null);
+  const on = (region) => !focus || focus.region === region;
+
+  return (
+    <svg
+      viewBox={`0 0 ${MAP.size} ${MAP.size}`}
+      className="w-full h-auto select-none"
+      role="img"
+      aria-label="Map of routes from India to the 22 Arab nations, grouped by region"
+    >
+      <defs>
+        <radialGradient id="cm-core" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#D9B36A" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#D9B36A" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* guide rings */}
+      {[MAP.dot, MAP.dot * 0.66, MAP.dot * 0.33].map((r) => (
+        <circle key={r} cx={MAP.c} cy={MAP.c} r={r} fill="none" stroke="rgb(217 179 106 / 0.12)" strokeDasharray="2 6" />
+      ))}
+      <circle cx={MAP.c} cy={MAP.c} r={150} fill="url(#cm-core)" />
+
+      {/* region arcs */}
+      {arcs.map((g) => (
+        <path
+          key={g.region}
+          d={arcPath(MAP.arc, g.start, g.end)}
+          fill="none"
+          strokeLinecap="round"
+          className="cursor-pointer"
+          style={{ transition: 'stroke 300ms, stroke-width 300ms' }}
+          stroke={on(g.region) ? '#D9B36A' : 'rgb(217 179 106 / 0.18)'}
+          strokeWidth={focus && focus.region === g.region ? 4 : 2}
+          onMouseEnter={() => setActive(g.region)}
+          onMouseLeave={() => setActive(null)}
+        />
+      ))}
+
+      {/* routes */}
+      {nodes.map((n, i) => (
+        <path
+          key={`r-${n.code}`}
+          d={routePath(n.angle)}
+          fill="none"
+          stroke="#D9B36A"
+          strokeLinecap="round"
+          strokeWidth={hoverNation?.code === n.code ? 2 : 1.1}
+          pathLength="1"
+          style={{
+            opacity: on(n.region) ? 0.85 : 0.1,
+            strokeDasharray: 1,
+            strokeDashoffset: visible ? 0 : 1,
+            transition: `stroke-dashoffset 1100ms cubic-bezier(.2,.7,.2,1) ${visible ? i * 45 : 0}ms, opacity 300ms`,
+          }}
+        />
+      ))}
+
+      {/* nations */}
+      {nodes.map((n, i) => {
+        const [x, y] = polar(MAP.dot, n.angle);
+        const [lx, ly] = polar(MAP.label, n.angle);
+        const lit = on(n.region);
+        const hot = hoverNation?.code === n.code;
+        return (
+          <g
+            key={n.code}
+            className="cursor-pointer"
+            onMouseEnter={() => setHoverNation(n)}
+            onMouseLeave={() => setHoverNation(null)}
+            style={{ opacity: visible ? 1 : 0, transition: `opacity 500ms ${600 + i * 45}ms` }}
+          >
+            <circle cx={x} cy={y} r={14} fill="transparent" />
+            {hot && <circle cx={x} cy={y} r={9} fill="none" stroke="#E8C789" strokeOpacity="0.6" />}
+            <circle
+              cx={x}
+              cy={y}
+              r={hot ? 5 : 3.5}
+              style={{ transition: 'fill 300ms' }}
+              fill={lit ? '#E8C789' : 'rgb(217 179 106 / 0.25)'}
+            />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontFamily="IBM Plex Mono, monospace"
+              fontSize="10.5"
+              letterSpacing="0.06em"
+              style={{ transition: 'fill 300ms' }}
+              fill={hot ? '#F7F2E8' : lit ? '#c4d0cb' : 'rgb(196 208 203 / 0.3)'}
+            >
+              {n.code}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* India hub */}
+      <circle cx={MAP.c} cy={MAP.c} r={56} fill="none" stroke="#D9B36A" strokeOpacity="0.2" />
+      <circle cx={MAP.c} cy={MAP.c} r={50} fill="#0a0d0c" stroke="#D9B36A" strokeOpacity="0.7" />
+      {hoverNation ? (
+        <>
+          <text x={MAP.c} y={MAP.c - 5} textAnchor="middle" fill="#F7F2E8" fontSize={hoverNation.name.length > 11 ? 10.5 : 14} fontFamily="Playfair Display, serif">
+            {hoverNation.name}
+          </text>
+          <text x={MAP.c} y={MAP.c + 14} textAnchor="middle" fill="#e6c47f" fontSize="8.5" letterSpacing="0.12em" fontFamily="IBM Plex Mono, monospace">
+            {hoverNation.capital.split(' / ')[0].toUpperCase()}
+          </text>
+        </>
+      ) : (
+        <>
+          <text x={MAP.c} y={MAP.c - 3} textAnchor="middle" fill="#F7F2E8" fontSize="17" fontFamily="Playfair Display, serif">India</text>
+          <text x={MAP.c} y={MAP.c + 15} textAnchor="middle" fill="#e6c47f" fontSize="8.5" letterSpacing="0.16em" fontFamily="IBM Plex Mono, monospace">NEW DELHI</text>
+        </>
+      )}
+    </svg>
+  );
+}
+
+function NationsAndChambers({ regions }) {
+  const [active, setActive] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const mapRef = useRef(null);
+  const national = PARTNERS_CHAMBERS.nationalArabChambers;
+  const joint = PARTNERS_CHAMBERS.bilateralJointChambers;
+  const regionList = Object.entries(regions);
+  const nationCount = regionList.reduce((s, [, list]) => s + list.length, 0);
+
+  // draw the routes when the map scrolls into view
+  useEffect(() => {
+    const el = mapRef.current;
+    if (!el || !('IntersectionObserver' in window)) { setVisible(true); return undefined; }
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setVisible(true); io.disconnect(); }
+    }, { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <section id="nations" className="relative overflow-hidden py-20 sm:py-28 border-t border-line bg-surface-1 scroll-mt-16">
+      <div
+        className="absolute left-1/2 top-24 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(217,179,106,0.07),transparent_60%)] pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-8">
+        {/* header */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-14">
+          <div className="lg:col-span-7">
+            <Ornament />
+            <h2 className="mt-5 font-serif font-medium text-fg tracking-[-0.02em]">
+              <span className="block text-[96px] sm:text-[132px] leading-[0.85] bg-[linear-gradient(180deg,#F3DDA6_0%,#D9B36A_55%,#9c7330_100%)] bg-clip-text text-transparent">
+                {nationCount}
+              </span>
+              <span className="block mt-3 text-4xl sm:text-5xl leading-[1.05]">Arab nations,</span>
+              <span className="block text-4xl sm:text-5xl leading-[1.1] italic text-fg-2">one corridor.</span>
+            </h2>
+          </div>
+          <p className="lg:col-span-5 text-[15px] text-fg-2 leading-relaxed lg:pb-3 max-w-md">
+            {regionList.length} regions, {national.length} national chambers and {joint.length} joint chambers, each a
+            route from New Delhi. Hover a region to trace its corridor.
+          </p>
+        </div>
+
+        {/* map + region index */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div ref={mapRef} className="lg:col-span-6 max-w-[560px] mx-auto w-full">
+            <CorridorMap regions={regions} active={active} setActive={setActive} visible={visible} />
+          </div>
+
+          <ol className="lg:col-span-6 border-t border-line-strong">
+            {regionList.map(([region, nations], i) => {
+              const isOn = active === region;
+              return (
+                <li key={region}>
+                  <button
+                    type="button"
+                    onMouseEnter={() => setActive(region)}
+                    onMouseLeave={() => setActive(null)}
+                    onFocus={() => setActive(region)}
+                    onBlur={() => setActive(null)}
+                    className={`relative w-full text-left grid grid-cols-[2.25rem_1fr_auto] gap-x-4 items-baseline py-4 pl-3 pr-2 border-b border-line transition-colors duration-300 cursor-default ${
+                      isOn ? 'bg-surface-2' : ''
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-0 top-0 bottom-0 w-[2px] bg-gold-foil transition-opacity duration-300 ${isOn ? 'opacity-100' : 'opacity-0'}`}
+                      aria-hidden="true"
+                    />
+                    <span className="font-mono text-[11px] text-gold-text/70">{String(i + 1).padStart(2, '0')}</span>
+                    <span>
+                      <span className={`block font-serif text-xl sm:text-[22px] transition-colors duration-300 ${isOn ? 'text-gold-text' : 'text-fg'}`}>
+                        {region}
+                      </span>
+                      <span className="block mt-1 text-[13px] text-fg-3 leading-relaxed">
+                        {nations.map((n) => n.name).join('  ·  ')}
+                      </span>
+                    </span>
+                    <span className={`font-serif text-3xl leading-none transition-colors duration-300 ${isOn ? 'text-gold-text' : 'text-fg/25'}`}>
+                      {String(nations.length).padStart(2, '0')}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        {/* chambers */}
+        <div className="mt-24">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-5 border-b border-line-strong">
+            <h3 className="font-serif text-3xl sm:text-4xl font-medium text-fg whitespace-nowrap">The chambers</h3>
+            <p className="ref-line text-gold-text">{national.length} national · {joint.length} joint</p>
+          </div>
+
+          <p className="mt-8 ref-line">National chambers</p>
+          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line rounded-2xl overflow-hidden border border-line">
+            {national.map((c, i) => (
+              <li key={c.name} className="group relative bg-surface-1 hover:bg-surface-2 transition-colors duration-300 p-6">
+                <span
+                  className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  aria-hidden="true"
+                />
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold-text">{c.role}</span>
+                  <span className="font-serif text-lg text-fg/20 group-hover:text-gold-foil transition-colors duration-300">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <p className="mt-4 font-serif text-[19px] leading-snug text-fg">{c.name}</p>
+                <p className="mt-1.5 text-[13px] text-fg-3">{c.country}</p>
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-12 ref-line">Joint chambers</p>
+          <ul className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {joint.map((c) => {
+              const host = /host/i.test(c.focus);
+              return (
+                <li
+                  key={c.name}
+                  className={`relative rounded-2xl p-5 flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+                    host
+                      ? 'bg-[linear-gradient(160deg,#1f1a10,#0f0d09)] border border-gold-foil/70 shadow-[0_20px_40px_-20px_rgba(217,179,106,0.35)]'
+                      : 'bg-surface-2 border border-line hover:border-line-strong'
+                  }`}
+                >
+                  <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold-text">{c.base.split(',')[0]}</span>
+                  <p className="mt-3 font-serif text-[17px] leading-snug text-fg flex-1">{c.name}</p>
+                  <p className="mt-4 pt-3 min-h-[3.25rem] border-t border-line text-[12px] leading-[1.5] text-fg-3">{c.focus}</p>
+                  {host && (
+                    <span className="absolute -top-2.5 right-4 px-2 h-5 inline-flex items-center rounded-full bg-gold-foil text-[10px] font-medium uppercase tracking-[0.12em] text-[#1a1408]">
+                      Host
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -109,17 +435,8 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
           />
 
           <div className="relative">
-            {/* Fine minimalistic vertical divider lines between columns on desktop */}
-            <div
-              className="hidden lg:block absolute left-1/3 top-6 bottom-6 w-px bg-gradient-to-b from-transparent via-[#B8893A]/40 to-transparent -translate-x-1/2 pointer-events-none z-10"
-              aria-hidden="true"
-            />
-            <div
-              className="hidden lg:block absolute left-2/3 top-6 bottom-6 w-px bg-gradient-to-b from-transparent via-[#B8893A]/40 to-transparent -translate-x-1/2 pointer-events-none z-10"
-              aria-hidden="true"
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+            {/* cards and their dividers share one grid: card | line | card | line | card */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-8 lg:gap-x-5 xl:gap-x-6 lg:-mx-4 xl:-mx-8 items-stretch">
               {/* Box 1: Startup Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                 <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
@@ -155,8 +472,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                 </div>
               </article>
 
-              {/* Minimalist horizontal separator on mobile between card 1 and 2 */}
-              <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
+              <CardDivider />
 
               {/* Box 2: Event Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
@@ -193,8 +509,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                 </div>
               </article>
 
-              {/* Minimalist horizontal separator on mobile between card 2 and 3 */}
-              <div className="lg:hidden w-full h-px bg-gradient-to-r from-transparent via-[#B8893A]/30 to-transparent -my-2" aria-hidden="true" />
+              <CardDivider />
 
               {/* Box 3: Collaboration for Business Summit (New Portal) */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
@@ -255,29 +570,103 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             ))}
           </dl>
 
-          <div className="mt-12 surface-card rounded-2xl p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8">
-              <p className="text-sm text-fg-3">CEPA and bilateral investment treaty framework</p>
-              <h3 className="mt-2 font-serif text-2xl sm:text-[28px] font-medium text-fg leading-tight">
-                From diplomatic accords to bankable deals
-              </h3>
-              <p className="mt-4 text-[15px] text-fg-2 leading-relaxed">
-                The India-UAE CEPA has taken bilateral commerce past $85B. Bharat Connect 2026 extends that platform to the
-                wider GCC, North Africa and the Levant: cross-border supply chains, critical mineral offtakes and
-                infrastructure co-investment.
-              </p>
-            </div>
-            <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
-              <button onClick={() => onNavigate('schedule')} className="btn-secondary h-11 px-5 text-sm">
-                View the two-day programme
-              </button>
-              <button
-                onClick={() => onNavigate('exhibition')}
-                className="h-11 px-5 text-sm font-medium text-fg-2 hover:text-fg transition-colors cursor-pointer"
-              >
-                Exhibition stall packages
-              </button>
-            </div>
+          {/* Newspaper clipping */}
+          <div className="mt-12 news-clip-shadow relative">
+            {/* push pin holding the clipping to the board */}
+            <svg
+              className="absolute z-10 left-4 sm:left-7 -top-4 w-11 h-12 pointer-events-none"
+              viewBox="0 0 44 48"
+              aria-hidden="true"
+            >
+              <defs>
+                <radialGradient id="pin-head" cx="35%" cy="30%" r="70%">
+                  <stop offset="0%" stopColor="#ff8a7a" />
+                  <stop offset="45%" stopColor="#d7261b" />
+                  <stop offset="100%" stopColor="#7a0f0a" />
+                </radialGradient>
+                <linearGradient id="pin-needle" x1="0" x2="1">
+                  <stop offset="0%" stopColor="#8d8d8d" />
+                  <stop offset="50%" stopColor="#e6e6e6" />
+                  <stop offset="100%" stopColor="#6d6d6d" />
+                </linearGradient>
+              </defs>
+              {/* pin's shadow on the paper */}
+              <ellipse cx="27" cy="36" rx="11" ry="4" fill="rgba(0,0,0,0.28)" />
+              {/* needle going into the paper */}
+              <path d="M20.5 26 L22 39 L23.5 26 Z" fill="url(#pin-needle)" />
+              {/* collar */}
+              <ellipse cx="22" cy="25" rx="7" ry="2.6" fill="#8e140d" />
+              <path d="M16 18 Q22 21 28 18 L27 25 Q22 27.5 17 25 Z" fill="#b51d14" />
+              {/* head */}
+              <circle cx="22" cy="13" r="11" fill="url(#pin-head)" />
+              <ellipse cx="18" cy="8.5" rx="3.6" ry="2.4" fill="rgba(255,255,255,0.55)" transform="rotate(-25 18 8.5)" />
+            </svg>
+            <article className="news-clip px-5 py-7 sm:px-9 sm:py-9">
+              {/* masthead */}
+              <header>
+                <div className="flex items-end justify-between gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+                  <span className="hidden sm:block w-40">Summit Edition</span>
+                  <p className="news-masthead flex-1 text-center text-[30px] sm:text-[46px] normal-case tracking-normal text-[var(--ink)]">
+                    The Bharat Connect Chronicle
+                  </p>
+                  <span className="hidden sm:block w-40 text-right">Vol. I · No. 2026</span>
+                </div>
+                <div className="mt-3 news-rule-double" />
+                <div className="py-1.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[10px] sm:text-[11px] uppercase tracking-[0.14em] text-[var(--ink-2)] border-b border-[var(--rule)]">
+                  <span>New Delhi · Yashobhoomi</span>
+                  <span className="hidden md:inline">CEPA and Bilateral Investment Treaty Framework</span>
+                  <span>December 2026</span>
+                </div>
+              </header>
+
+              <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-0">
+                {/* lead story */}
+                <div className="lg:col-span-8 lg:pr-8">
+                  <p className="text-[11px] uppercase tracking-[0.16em] font-bold">Trade &amp; Diplomacy</p>
+                  <h3 className="mt-2 text-[30px] sm:text-[42px] font-bold leading-[1.05] tracking-[-0.01em]">
+                    From Diplomatic Accords to Bankable Deals
+                  </h3>
+                  <p className="mt-3 text-[17px] sm:text-[19px] italic leading-snug text-[var(--ink-2)]">
+                    With India-UAE commerce past $85 billion, the summit widens the corridor to the Gulf, North Africa
+                    and the Levant.
+                  </p>
+                  <p className="mt-4 pb-3 text-[11px] uppercase tracking-[0.14em] border-b border-[var(--rule)]/30">
+                    By the Bharat Connect Desk
+                  </p>
+                  <p className="news-columns news-dropcap mt-4 sm:columns-2 text-[15px] leading-[1.55]">
+                    The India-UAE CEPA has taken bilateral commerce past $85B. Bharat Connect 2026 extends that platform
+                    to the wider GCC, North Africa and the Levant: cross-border supply chains, critical mineral offtakes
+                    and infrastructure co-investment.
+                  </p>
+                </div>
+
+                {/* sidebar */}
+                <aside className="lg:col-span-4 lg:pl-8 lg:border-l border-t lg:border-t-0 border-[var(--rule)]/40 pt-6 lg:pt-0 flex flex-col">
+                  <div className="text-center border-y-2 border-[var(--rule)] py-4">
+                    <p className="text-[56px] font-bold leading-none tracking-[-0.02em]">$85B</p>
+                    <p className="mt-2 text-[13px] italic text-[var(--ink-2)]">India-UAE bilateral commerce under CEPA</p>
+                  </div>
+
+                  <p className="mt-5 text-[11px] uppercase tracking-[0.16em] font-bold">Inside</p>
+                  <ul className="mt-2 text-[15px] divide-y divide-[var(--rule)]/25">
+                    <li>
+                      <button onClick={() => onNavigate('schedule')} className="news-link w-full flex items-baseline gap-2 py-2.5 text-left">
+                        <span>The two-day programme</span>
+                        <span className="flex-1 border-b border-dotted border-[var(--rule)]/50 translate-y-[-3px]" aria-hidden="true" />
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button onClick={() => onNavigate('exhibition')} className="news-link w-full flex items-baseline gap-2 py-2.5 text-left">
+                        <span>Exhibition stall packages</span>
+                        <span className="flex-1 border-b border-dotted border-[var(--rule)]/50 translate-y-[-3px]" aria-hidden="true" />
+                        <span aria-hidden="true">→</span>
+                      </button>
+                    </li>
+                  </ul>
+                </aside>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -349,57 +738,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       </section>
 
       {/* Nations and chambers */}
-      <section className="py-20 sm:py-24 border-t border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <SectionHeader title="22 Arab nations and their chambers" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
-              {Object.entries(regions).map(([region, nations]) => (
-                <div key={region}>
-                  <h3 className="text-sm font-medium text-fg pb-3 border-b border-line flex justify-between">
-                    {region}
-                    <span className="ref-line">{nations.length}</span>
-                  </h3>
-                  <ul className="mt-2">
-                    {nations.map((n) => (
-                      <li key={n.code} className="h-8 flex items-center justify-between text-sm text-fg-2">
-                        {n.name}
-                        <span className="ref-line">{n.code}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-
-            <div className="lg:col-span-5 flex flex-col gap-8">
-              <div>
-                <h3 className="text-sm font-medium text-fg pb-3 border-b border-line">National chambers</h3>
-                <ul>
-                  {PARTNERS_CHAMBERS.nationalArabChambers.map((c) => (
-                    <li key={c.name} className="py-3 border-b border-line">
-                      <span className="block text-sm text-fg">{c.name}</span>
-                      <span className="block mt-1 ref-line">{c.role}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-fg pb-3 border-b border-line">Joint chambers</h3>
-                <ul>
-                  {PARTNERS_CHAMBERS.bilateralJointChambers.map((c) => (
-                    <li key={c.name} className="py-3 border-b border-line">
-                      <span className="block text-sm text-fg">{c.name}</span>
-                      <span className="block mt-1 ref-line">{c.base} · {c.focus}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <NationsAndChambers regions={regions} />
 
       {/* Speakers */}
       <section className="py-20 sm:py-24 border-t border-line">

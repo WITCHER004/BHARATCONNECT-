@@ -100,6 +100,12 @@ export default function DealMatchmakerSimulator({ onOpenBooking }) {
       {/* top bar */}
       <div className="h-16 px-4 sm:px-5 flex items-center justify-between gap-4 border-b border-line bg-surface-2">
         <div className="flex items-center gap-4 sm:gap-6">
+        {/* window controls */}
+        <div className="flex items-center gap-2 shrink-0" aria-hidden="true">
+          <span className="w-3 h-3 rounded-full bg-[#FF5F57] border border-black/10" />
+          <span className="w-3 h-3 rounded-full bg-[#FEBC2E] border border-black/10" />
+          <span className="w-3 h-3 rounded-full bg-[#28C840] border border-black/10" />
+        </div>
         <div role="tablist" aria-label="Your organisation is based in" className="p-1 rounded-full bg-surface-3 border border-line flex">
           {[
             ['India', 'India'],

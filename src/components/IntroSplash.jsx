@@ -12,6 +12,7 @@ export default function IntroSplash({ onDone }) {
   const progressRef = useRef(null);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
+  const finishRef = useRef(null);
 
   const [fading, setFading] = useState(false);
 
@@ -20,6 +21,10 @@ export default function IntroSplash({ onDone }) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const frames = loadFrames();
+    const blurCanvas = document.createElement('canvas');
+    blurCanvas.width = 48;
+    blurCanvas.height = 27;
+    const blurCtx = blurCanvas.getContext('2d');
 
     const html = document.documentElement;
     const prevOverflow = html.style.overflow;
@@ -31,6 +36,10 @@ export default function IntroSplash({ onDone }) {
     let startTime = null;
     let alive = true;
     let finished = false;
+    let holdTimer = 0;
+    let doneTimer = 0;
+    // Safety net: never leave the visitor stuck behind the overlay (e.g. a backgrounded tab)
+    const failsafe = setTimeout(() => finish(), (FRAME_COUNT / FPS) * 1000 + 5000);
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -54,14 +63,33 @@ export default function IntroSplash({ onDone }) {
 
       const natW = img.naturalWidth || 1280;
       const natH = img.naturalHeight || 720;
-      const s = Math.max(cw / natW, ch / natH);
-      const w = natW * s;
-      const h = natH * s;
+      const cover = Math.max(cw / natW, ch / natH);
+      const contain = Math.min(cw / natW, ch / natH);
 
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.fillStyle = '#050706';
       ctx.fillRect(0, 0, cw, ch);
       try {
-        ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+        // Near 16:9, fill the screen. On phones / ultra-wide screens "cover" would blow the
+        // 1280×720 frame up and crop it, which pixelates badly: show the whole frame sharp
+        // over a soft blurred fill instead.
+        if (cover / contain <= 1.3) {
+          const w = natW * cover;
+          const h = natH * cover;
+          ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+        } else {
+          const bw = natW * cover;
+          const bh = natH * cover;
+          // cheap, cross-browser blur: shrink to a tiny canvas, then stretch it back up
+          blurCtx.drawImage(img, 0, 0, blurCanvas.width, blurCanvas.height);
+          ctx.drawImage(blurCanvas, (cw - bw) / 2, (ch - bh) / 2, bw, bh);
+          ctx.fillStyle = 'rgba(0,0,0,0.45)';
+          ctx.fillRect(0, 0, cw, ch);
+          const w = natW * contain;
+          const h = natH * contain;
+          ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+        }
       } catch {
         /* frame not ready to draw yet */
       }
@@ -70,11 +98,13 @@ export default function IntroSplash({ onDone }) {
     const finish = () => {
       if (finished) return;
       finished = true;
+      cancelAnimationFrame(raf);
       setFading(true);
-      setTimeout(() => {
+      doneTimer = setTimeout(() => {
         doneRef.current?.();
-      }, 600);
+      }, 700);
     };
+    finishRef.current = finish;
 
     resize();
     // Immediate draw frame 0
@@ -125,13 +155,10 @@ export default function IntroSplash({ onDone }) {
         progressRef.current.style.width = `${pct}%`;
       }
 
-      // Check if finished (300 frames at 30fps = 10s)
+      // Film is over (300 frames at 30fps = 10s): hold on the closing emblem, then fade out.
+      // Stop the loop here; `finish` sets `finished` itself, so it must not be set first.
       if (elapsed >= (FRAME_COUNT / FPS)) {
-        if (!finished) {
-          finished = true;
-          // Hold on the final Bharat Connect emblem for 1.2s before smooth fade
-          setTimeout(finish, 1200);
-        }
+        holdTimer = setTimeout(finish, 1200);
         return;
       }
 
@@ -143,19 +170,16 @@ export default function IntroSplash({ onDone }) {
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
+      clearTimeout(holdTimer);
+      clearTimeout(doneTimer);
+      clearTimeout(failsafe);
       window.removeEventListener('resize', resize);
       window.removeEventListener('keydown', onKeyDown);
       html.style.overflow = prevOverflow;
     };
   }, []);
 
-  const handleSkip = () => {
-    if (fading) return;
-    setFading(true);
-    setTimeout(() => {
-      doneRef.current?.();
-    }, 500);
-  };
+  const handleSkip = () => finishRef.current?.();
 
   return createPortal(
     <div

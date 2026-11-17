@@ -2,7 +2,7 @@ import { ArrowRight, Globe2, Building2, TrendingUp, Sparkles } from 'lucide-reac
 
 export default function SummitSpotlightHUD({ onNavigate }) {
   return (
-    <div className="relative rounded-2xl p-6 sm:p-8 bg-black/35 backdrop-blur-md border border-gold-foil/35 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(217,179,106,0.15)] flex flex-col justify-between transition-all duration-200 hover:border-gold-foil/50">
+    <div className="glass-edge rounded-2xl p-6 sm:p-8 bg-black/30 backdrop-blur-xl backdrop-saturate-150 border flex flex-col justify-between">
       <div>
         {/* Top Tag & Live Indicator */}
         <div className="flex items-center justify-between gap-3 pb-4 border-b border-line/60">
@@ -42,15 +42,15 @@ export default function SummitSpotlightHUD({ onNavigate }) {
 
         {/* 3 Metric Pills */}
         <div className="mt-6 grid grid-cols-3 gap-2 text-center border-y border-line/60 py-4">
-          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+          <div className="glass-edge glass-edge-sm p-2 rounded-lg bg-white/[0.03] border">
             <span className="font-serif text-xl sm:text-2xl font-medium text-gold-text figure block">22</span>
             <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Arab Nations</span>
           </div>
-          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+          <div className="glass-edge glass-edge-sm p-2 rounded-lg bg-white/[0.03] border">
             <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">$500B</span>
             <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Bilateral Goal</span>
           </div>
-          <div className="p-2 rounded-lg bg-surface-2/30 border border-line/40">
+          <div className="glass-edge glass-edge-sm p-2 rounded-lg bg-white/[0.03] border">
             <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">24</span>
             <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Deal Suites</span>
           </div>
