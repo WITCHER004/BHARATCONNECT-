@@ -36,6 +36,12 @@ const TIERS = [
   [1772, 195, 36],
 ];
 
+// Indian national flag colours for India Gate's lighting
+const FLAG = { saffron: '#FF9933', white: '#FFFFFF', green: '#138808' };
+
+// Level flash colours, bottom to top: green base, white middle, saffron crown
+const TIER_COLORS = [FLAG.green, FLAG.green, FLAG.white, FLAG.saffron, FLAG.saffron];
+
 const LANDMARKS = [
   // ── Baseline Ground & Low City Silhouette ──────────────────────────
   { d: 'M0 399.5 H1920', delay: 0, w: 1 },
@@ -130,15 +136,21 @@ export default function Skyline({ play = true, className = '' }) {
         <clipPath id="gate-clip">
           <path d={GATE} />
         </clipPath>
+        {/* Tricolour: green at the base, white in the middle, saffron on top */}
         <linearGradient id="gate-band" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#FF6F5E" stopOpacity="0" />
-          <stop offset="0.35" stopColor="#FF6F5E" stopOpacity="0.85" />
-          <stop offset="0.6" stopColor="#F3D48F" stopOpacity="1" />
-          <stop offset="1" stopColor="#F3D48F" stopOpacity="0" />
+          <stop offset="0" stopColor={FLAG.green} stopOpacity="0" />
+          <stop offset="0.25" stopColor={FLAG.green} stopOpacity="0.95" />
+          <stop offset="0.5" stopColor={FLAG.white} stopOpacity="1" />
+          <stop offset="0.75" stopColor={FLAG.saffron} stopOpacity="0.95" />
+          <stop offset="1" stopColor={FLAG.saffron} stopOpacity="0" />
         </linearGradient>
         <linearGradient id="gate-body" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#D9B36A" stopOpacity="0.22" />
-          <stop offset="1" stopColor="#D9B36A" stopOpacity="0.04" />
+          <stop offset="0" stopColor={FLAG.green} stopOpacity="0.3" />
+          <stop offset="0.333" stopColor={FLAG.green} stopOpacity="0.3" />
+          <stop offset="0.333" stopColor={FLAG.white} stopOpacity="0.2" />
+          <stop offset="0.667" stopColor={FLAG.white} stopOpacity="0.2" />
+          <stop offset="0.667" stopColor={FLAG.saffron} stopOpacity="0.3" />
+          <stop offset="1" stopColor={FLAG.saffron} stopOpacity="0.3" />
         </linearGradient>
       </defs>
 
@@ -165,13 +177,13 @@ export default function Skyline({ play = true, className = '' }) {
               y={y}
               width={w}
               height={(i === 0 ? 400 : TIERS[i - 1][1]) - y}
-              fill="#F3D48F"
+              fill={TIER_COLORS[i]}
               style={{ '--i': i }}
             />
           ))}
         </g>
         <path className="sky-draw lit-line" d={GATE_LINES} pathLength="1" style={{ '--d': '1.42s' }} />
-        <circle className="lit-beacon" cx="1790" cy="192" r="3" fill="#FF6F5E" />
+        <circle className="lit-beacon" cx="1790" cy="192" r="3" fill={FLAG.saffron} />
       </g>
     </svg>
   );
