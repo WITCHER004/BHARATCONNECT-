@@ -50,7 +50,7 @@ const FAQS = [
   {
     q: 'What is included in the ₹5,900 Startup Showcase registration?',
     cat: 'startup',
-    a: 'Registration grants a unique Accreditation ID (BMF.BC-SU-00001 onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP. It includes eligibility for the Startup Pavilion, investor deal-room matching, and bilateral showcase opportunities.',
+    a: 'Registration grants a unique Accreditation ID (BMF.BC-SEO-00001 onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP. It includes eligibility for the Startup Pavilion, investor deal-room matching, and bilateral showcase opportunities.',
   },
   {
     q: 'How are the 100+ private B2B deal rooms scheduled?',
@@ -210,11 +210,11 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
       return;
     }
 
-    if (q === 'BMF.BC-COL-00001') {
+    if (q === 'BMF.BC-CBC-00001') {
       setSearchResult({
         type: 'collaboration',
         data: {
-          id: 'BMF.BC-COL-00001',
+          id: 'BMF.BC-CBC-00001',
           orgName: 'Apex Gulf-India Bilateral Chamber',
           liaisonName: 'Ambassador H.E. Delegate',
           trackTitle: 'Country & State Sovereign Pavilion',
@@ -227,25 +227,8 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
       return;
     }
 
-    // 3. Fallback demo match for BMF.BC-SU-00001 or BMF.BC-QRY-00001 or BC-849201
-    if (q === 'BMF.BC-SU-00001' || q.includes('00001')) {
-      setSearchResult({
-        type: 'startup',
-        data: {
-          id: 'BMF.BC-SU-00001',
-          entityName: 'Bharat Connect Pioneer Innovations',
-          founderName: 'Delegate Founder',
-          email: 'founder@startup.com',
-          status: 'Verified & Confirmed · Priority Matchmaking',
-          hall: 'Startup Pavilion Pod #01, Palash Hall 6F',
-          timestamp: new Date().toISOString(),
-          utr: 'HDFC98421094',
-        },
-      });
-      return;
-    }
-
-    if (q.startsWith('BC-')) {
+    // 3. Delegate passes: BMF.BC-DGO-… (older passes used BC-…)
+    if (q.startsWith('BMF.BC-DGO-') || q.startsWith('BC-')) {
       setSearchResult({
         type: 'delegate',
         data: {
@@ -255,6 +238,24 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
           status: 'Badge Ready for Yashobhoomi Fast-Track',
           hall: 'Main Plenary & B2B Deal Lounge',
           dates: '18–19 December 2026',
+        },
+      });
+      return;
+    }
+
+    // 4. Fallback demo match for BMF.BC-SEO-00001 or BMF.BC-QRY-00001
+    if (q === 'BMF.BC-SEO-00001' || q.includes('00001')) {
+      setSearchResult({
+        type: 'startup',
+        data: {
+          id: 'BMF.BC-SEO-00001',
+          entityName: 'Bharat Connect Pioneer Innovations',
+          founderName: 'Delegate Founder',
+          email: 'founder@startup.com',
+          status: 'Verified & Confirmed · Priority Matchmaking',
+          hall: 'Startup Pavilion Pod #01, Palash Hall 6F',
+          timestamp: new Date().toISOString(),
+          utr: 'HDFC98421094',
         },
       });
       return;
@@ -287,7 +288,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
           </h1>
           <p className="mt-4 text-[16px] sm:text-lg text-fg-2 max-w-2xl leading-relaxed">
             Submit formal inquiries, track your Registration ID status (
-            <span className="font-mono text-gold-text">BMF.BC-SU-00001</span>), request bilateral deal-room assistance, or access diplomatic support.
+            <span className="font-mono text-gold-text">BMF.BC-SEO-00001</span>), request bilateral deal-room assistance, or access diplomatic support.
           </p>
 
           {/* Navigation Pill Tabs */}
@@ -553,7 +554,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. BMF.BC-SU-00001 or BC-849201"
+                          placeholder="e.g. BMF.BC-SEO-00001 or BMF.BC-DGO-00001"
                           value={form.regId}
                           onChange={(e) => setForm({ ...form, regId: e.target.value })}
                           className="w-full h-11 px-3 rounded-[10px] bg-surface-2 border border-line text-[15px] font-mono text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil"
@@ -694,7 +695,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   <div>
                     <h2 className="text-xl font-medium text-fg">Live Status &amp; Ticket Lookup</h2>
                     <p className="text-xs text-fg-3 mt-0.5">
-                      Verify your Startup ID (BMF.BC-SU-00001), Query Ticket (BMF.BC-QRY-00001), or Delegate Pass
+                      Verify your Startup ID (BMF.BC-SEO-00001), Query Ticket (BMF.BC-QRY-00001), Collaboration (BMF.BC-CBC-00001) or Delegate Pass (BMF.BC-DGO-00001)
                     </p>
                   </div>
                 </div>
@@ -703,7 +704,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   <input
                     type="text"
                     required
-                    placeholder="Enter ID e.g. BMF.BC-SU-00001 or BMF.BC-QRY-00001 or email"
+                    placeholder="Enter ID e.g. BMF.BC-SEO-00001 or BMF.BC-QRY-00001 or email"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 h-12 px-4 rounded-xl bg-surface-2 border border-line text-[15px] font-mono text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil"
@@ -719,10 +720,10 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   <span>Try sample:</span>
                   <button
                     type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-SU-00001'); }}
+                    onClick={() => { setSearchQuery('BMF.BC-SEO-00001'); }}
                     className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
                   >
-                    BMF.BC-SU-00001
+                    BMF.BC-SEO-00001
                   </button>
                   <button
                     type="button"
@@ -733,10 +734,17 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-COL-00001'); }}
+                    onClick={() => { setSearchQuery('BMF.BC-CBC-00001'); }}
                     className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
                   >
-                    BMF.BC-COL-00001
+                    BMF.BC-CBC-00001
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSearchQuery('BMF.BC-DGO-00001'); }}
+                    className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
+                  >
+                    BMF.BC-DGO-00001
                   </button>
                 </div>
 

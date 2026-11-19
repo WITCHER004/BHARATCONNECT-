@@ -66,8 +66,18 @@ export default function QueryConciergeModal({ onNavigate }) {
       return;
     }
 
-    if (q === 'BMF.BC-SU-00001' || q.includes('00001')) {
-      setLookupResult({ title: 'BMF.BC-SU-00001', subtitle: 'Startup Pavilion Pioneer', status: 'Verified & Confirmed' });
+    if (q.startsWith('BMF.BC-DGO-')) {
+      setLookupResult({ title: q, subtitle: 'Accredited Conclave Delegate', status: 'Badge Ready for Fast-Track Entry' });
+      return;
+    }
+
+    if (q.startsWith('BMF.BC-CBC-')) {
+      setLookupResult({ title: q, subtitle: 'Summit Collaboration Docket', status: 'Under Review by Partnerships Directorate' });
+      return;
+    }
+
+    if (q === 'BMF.BC-SEO-00001' || q.includes('00001')) {
+      setLookupResult({ title: 'BMF.BC-SEO-00001', subtitle: 'Startup Pavilion Pioneer', status: 'Verified & Confirmed' });
       return;
     }
 
@@ -156,7 +166,7 @@ export default function QueryConciergeModal({ onNavigate }) {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full h-9 px-2.5 rounded-lg bg-surface-2 border border-line text-xs text-fg focus:outline-none focus:border-gold-foil cursor-pointer"
                   >
-                    <option value="Startup Showcase">Startup Showcase (BMF.BC-SU)</option>
+                    <option value="Startup Showcase">Startup Showcase (BMF.BC-SEO)</option>
                     <option value="B2B Matchmaking">B2B Deal Rooms & Matchmaking</option>
                     <option value="Exhibition Stalls">Exhibition Stalls & Pavilions</option>
                     <option value="Diplomatic Protocol">Diplomatic Protocol & Visas</option>
@@ -217,7 +227,7 @@ export default function QueryConciergeModal({ onNavigate }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. BMF.BC-SU-00001 or BMF.BC-QRY-00001"
+                    placeholder="e.g. BMF.BC-SEO-00001 or BMF.BC-QRY-00001"
                     value={lookupId}
                     onChange={(e) => setLookupId(e.target.value)}
                     className="flex-1 h-9 px-3 rounded-lg bg-surface-2 border border-line text-xs font-mono text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil"
@@ -246,7 +256,7 @@ export default function QueryConciergeModal({ onNavigate }) {
                 )}
 
                 <div className="pt-2 border-t border-line text-xs text-fg-3">
-                  <p>Tip: Enter your Startup Registration ID (<span className="font-mono text-gold-text">BMF.BC-SU-00001</span>) or ticket reference.</p>
+                  <p>Tip: Enter your Startup Registration ID (<span className="font-mono text-gold-text">BMF.BC-SEO-00001</span>) or ticket reference.</p>
                 </div>
               </div>
             )}

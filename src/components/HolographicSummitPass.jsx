@@ -80,7 +80,7 @@ export default function HolographicSummitPass({
   country = 'United Arab Emirates',
   flag = 'AE',
   vertical = 'Clean Energy & Sustainability',
-  passId = 'BC-849201',
+  passId = 'BMF.BC-DGO-00001',
   role = 'Corporate Delegate',
 }) {
   const [showQr, setShowQr] = useState(false);

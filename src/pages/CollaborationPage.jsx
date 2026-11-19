@@ -38,9 +38,9 @@ function getNextCollabId() {
       }
     }
     localStorage.setItem(COLLAB_COUNTER_KEY, String(nextNum));
-    return `BMF.BC-COL-${String(nextNum).padStart(5, '0')}`;
+    return `BMF.BC-CBC-${String(nextNum).padStart(5, '0')}`;
   } catch {
-    return 'BMF.BC-COL-00001';
+    return 'BMF.BC-CBC-00001';
   }
 }
 
@@ -254,7 +254,7 @@ PARTNERSHIP DIRECTORATE:
             </div>
             <div>
               <span className="text-xs text-fg-3 block font-mono">Reference Format</span>
-              <span className="text-base sm:text-lg font-mono text-gold-text mt-0.5 block font-semibold">BMF.BC-COL</span>
+              <span className="text-base sm:text-lg font-mono text-gold-text mt-0.5 block font-semibold">BMF.BC-CBC</span>
             </div>
           </div>
         </div>
@@ -392,7 +392,7 @@ PARTNERSHIP DIRECTORATE:
                     </div>
 
                     <span className="hidden sm:inline-flex text-xs font-mono text-gold-text border border-gold-foil/40 px-3 py-1 rounded-full bg-gold-foil/5">
-                      Accreditation: [BMF.BC-COL]
+                      Accreditation: [BMF.BC-CBC]
                     </span>
                   </div>
 
@@ -649,7 +649,7 @@ PARTNERSHIP DIRECTORATE:
 
                       <div className="text-xs text-fg-3 font-mono text-center sm:text-right">
                         <span>Generates verified ID: </span>
-                        <span className="text-gold-text font-semibold">[BMF.BC-COL-00001]</span>
+                        <span className="text-gold-text font-semibold">[BMF.BC-CBC-00001]</span>
                       </div>
                     </div>
                   </div>

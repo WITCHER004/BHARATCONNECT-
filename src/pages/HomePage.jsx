@@ -451,7 +451,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                     </h3>
                     <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
                       Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
-                      receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SU-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                      receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SEO-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                     </p>
                     <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
                       <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure font-medium">₹5,900 incl.</dd></div>
@@ -521,7 +521,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                       Bilateral Directorate · Strategic Partnerships · 2026
                     </p>
                     <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
-                      Collaboration for business summit
+                      Collaboration to Bharat Connect
                     </h3>
                     <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
                       Partner with the conclave as a country pavilion, industry co-host, sovereign deal-room sponsor, or knowledge think-tank. Dedicated portal for institutions seeking strategic bilateral collaboration.
@@ -529,7 +529,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                     <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
                       <div><dt className="text-fg-3">Track</dt><dd className="mt-1 text-fg font-medium">Country / Sponsor</dd></div>
                       <div><dt className="text-fg-3">Fast-track</dt><dd className="mt-1 text-fg font-medium">Direct Desk</dd></div>
-                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-COL</dd></div>
+                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-CBC</dd></div>
                     </dl>
                   </div>
                   <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">

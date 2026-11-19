@@ -3,6 +3,7 @@ import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
 import HolographicSummitPass from '../components/HolographicSummitPass';
 import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw } from 'lucide-react';
 import SignInGate from '../auth/SignInGate';
+import { getNextDelegateId } from '../data/delegateId';
 
 const INITIAL_FORM = {
   role: 'Corporate Delegate',
@@ -76,7 +77,7 @@ function Field({ label, children }) {
 export default function RegistrationPage({ defaultRole = 'Corporate Delegate' }) {
   const [step, setStep] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [generatedPassId, setGeneratedPassId] = useState('BC-849201');
+  const [generatedPassId, setGeneratedPassId] = useState('BMF.BC-DGO-00001');
   const [formData, setFormData] = useState({ ...INITIAL_FORM, role: defaultRole });
 
   const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
@@ -94,8 +95,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
     if (step < 3) {
       setStep(step + 1);
     } else {
-      const randomNum = Math.floor(100000 + Math.random() * 900000);
-      setGeneratedPassId(`BC-${randomNum}`);
+      setGeneratedPassId(getNextDelegateId());
       setIsCompleted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

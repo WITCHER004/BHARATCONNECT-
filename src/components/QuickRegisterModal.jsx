@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
+import { getNextDelegateId } from '../data/delegateId';
 
 const inputClass =
   'w-full h-11 px-3 rounded-[10px] bg-surface-3 border border-line text-sm text-fg placeholder:text-fg-3 transition-colors duration-150 focus:border-line-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/60';
@@ -38,7 +39,7 @@ export default function QuickRegisterModal({ isOpen, onClose, onNavigateToFullRe
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setPassId(`BC-FT-${Math.floor(1000 + Math.random() * 9000)}`);
+    setPassId(getNextDelegateId());
     setSubmitted(true);
   };
 

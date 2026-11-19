@@ -65,9 +65,9 @@ export function generateStartupId() {
       }
     }
     localStorage.setItem(STARTUP_COUNTER_KEY, String(nextNum));
-    return `BMF.BC-SU-${String(nextNum).padStart(5, '0')}`;
+    return `BMF.BC-SEO-${String(nextNum).padStart(5, '0')}`;
   } catch {
-    return 'BMF.BC-SU-00001';
+    return 'BMF.BC-SEO-00001';
   }
 }
 
@@ -537,7 +537,7 @@ export default function StartupPage({ onNavigate }) {
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Text id="commEmail" label="Email address for communication" required type="email" autoComplete="email"
-                  hint="Your unique Registration ID (BMF.BC-SU-numbers) and all official communications will be sent to this address"
+                  hint="Your unique Registration ID (BMF.BC-SEO-numbers) and all official communications will be sent to this address"
                   value={v.commEmail} onChange={set('commEmail')} error={errors.commEmail} />
                 <Text id="phone" label="Phone / WhatsApp number" required type="tel" autoComplete="tel" placeholder="+91 98765 43210"
                   hint="Include the country code if outside India" value={v.phone} onChange={set('phone')} error={errors.phone} />
@@ -842,8 +842,8 @@ export default function StartupPage({ onNavigate }) {
                     <h4 className="text-sm font-medium text-fg">Official Registration ID Allocation</h4>
                     <p className="mt-1 text-xs text-fg-2 leading-relaxed">
                       Upon submission, your venture will be instantly assigned a permanent alphanumeric Accreditation ID formatted as{' '}
-                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-SU-numbers]</span> (starting sequentially from{' '}
-                      <span className="font-mono text-fg font-semibold">BMF.BC-SU-00001</span>). This ID remains valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
+                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-SEO-numbers]</span> (starting sequentially from{' '}
+                      <span className="font-mono text-fg font-semibold">BMF.BC-SEO-00001</span>). This ID remains valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                     </p>
                   </div>
                 </div>
@@ -894,7 +894,7 @@ export default function StartupPage({ onNavigate }) {
       <section className="theme-ivory py-12 sm:py-16">
         <SignInGate
           title="Sign in to register your startup"
-          reason="Startup registration needs a Google account, so your application, payment details and unique Registration ID [BMF.BC-SU-numbers] stay tied to you."
+          reason="Startup registration needs a Google account, so your application, payment details and unique Registration ID [BMF.BC-SEO-numbers] stay tied to you."
         >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
@@ -970,17 +970,17 @@ export default function StartupPage({ onNavigate }) {
                       </span>
                     </div>
                     <div className="mt-2 font-mono text-3xl sm:text-4xl font-semibold text-fg tracking-tight flex items-center gap-3">
-                      <span>{assignedId || 'BMF.BC-SU-00001'}</span>
+                      <span>{assignedId || 'BMF.BC-SEO-00001'}</span>
                     </div>
                     <p className="mt-2 text-xs sm:text-sm text-fg-3">
-                      Your unique alphanumeric identifier [BMF.BC-SU-numbers] for the Bharat Connect Startup Showcase.
+                      Your unique alphanumeric identifier [BMF.BC-SEO-numbers] for the Bharat Connect Startup Showcase.
                     </p>
                   </div>
 
                   <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
                     <button
                       type="button"
-                      onClick={() => copyId(assignedId || 'BMF.BC-SU-00001')}
+                      onClick={() => copyId(assignedId || 'BMF.BC-SEO-00001')}
                       className="btn-primary h-11 px-5 text-sm font-medium flex items-center gap-2 whitespace-nowrap cursor-pointer"
                     >
                       {copiedId ? (
@@ -1033,7 +1033,7 @@ export default function StartupPage({ onNavigate }) {
 
                 <p className="mt-6 text-[14px] text-fg-2 leading-relaxed">
                   Thank you, <span className="text-fg font-medium">{v.fullName}</span>. An official confirmation with your assigned registration ID{' '}
-                  <span className="font-mono font-semibold text-gold-text">{assignedId || 'BMF.BC-SU-00001'}</span> has been recorded and transmitted to{' '}
+                  <span className="font-mono font-semibold text-gold-text">{assignedId || 'BMF.BC-SEO-00001'}</span> has been recorded and transmitted to{' '}
                   <span className="text-fg font-medium">{v.commEmail || v.email}</span>. Please quote this ID for stall allocations, bilateral deal room entry, and fast-track badge issuance at Yashobhoomi.
                 </p>
 
