@@ -1,7 +1,7 @@
 /*
   World Skyline in gold line art for Bharat Connect 2026.
   A grand panoramic horizon uniting Bharat, the Arab world, and global capitals:
-  - New Delhi: India Gate, Qutub Minar, Lotus Temple
+  - New Delhi: India Gate (lit up: climbing glow, level flashes, flame), Qutub Minar, Lotus Temple
   - Kyoto: Kiyomizu-dera (Pagoda & Timber Stage)
   - Singapore: Marina Bay Sands (Towers & SkyPark)
   - The Gulf: Burj Al Arab, Kingdom Centre Riyadh, Grand Mosque
@@ -9,7 +9,7 @@
   - Paris: Eiffel Tower (Parabolic base, platforms & lattice spire)
   - New York: Statue of Liberty (Star pedestal, robed figure, radiate crown & torch)
   - Toronto: CN Tower (Flared base, slender shaft, SkyPod radome & mast)
-  - Dubai: Burj Khalifa (Setback tiers, climbing light show, flashing beacon)
+  - Dubai: Burj Khalifa (Setback tiers to the spire)
 
   Every path uses pathLength="1" for seamless CSS drawing animation (see .skyline in index.css).
 */
@@ -19,15 +19,20 @@ const BURJ =
   'M1750 400 V332 H1757 V266 H1764 V206 H1770 V156 H1775 V116 H1779 V86 H1783 V64 H1786 L1789.4 6 H1790.6 ' +
   'L1794 64 H1797 V86 H1801 V116 H1805 V156 H1810 V206 H1816 V266 H1823 V332 H1830 V400 Z';
 
-// Setback levels, bottom to top, for the tier flashes (centered on x = 1790)
+// India Gate: line drawing, plus a closed silhouette (arch cut out) for the light show; centred on x = 110
+const GATE_LINES =
+  'M18 400 V235 H202 V400 M9 235 H211 M27 235 V210 H193 V235 M64 400 V299 A46 46 0 0 1 156 299 V400 M92 210 V195 H128 V210';
+const GATE =
+  'M18 400 V237 H9 V233 H27 V210 H92 V195 H128 V210 H193 V233 H211 V237 H202 V400 H156 V299 ' +
+  'A46 46 0 0 0 64 299 V400 Z';
+
+// Gate levels, bottom to top, for the tier flashes: [x, top y, width]
 const TIERS = [
-  [1750, 332, 80],
-  [1757, 266, 66],
-  [1764, 206, 52],
-  [1770, 156, 40],
-  [1775, 116, 30],
-  [1779, 86, 22],
-  [1783, 64, 14],
+  [18, 299, 184],
+  [18, 237, 184],
+  [9, 233, 202],
+  [27, 210, 166],
+  [92, 195, 36],
 ];
 
 const LANDMARKS = [
@@ -40,12 +45,7 @@ const LANDMARKS = [
     faint: true,
   },
 
-  // ── 1. New Delhi: India Gate ────────────────────────────────────────
-  {
-    // Scaled to Tower Bridge's height (top at y = 195)
-    d: 'M18 400 V235 H202 V400 M9 235 H211 M27 235 V210 H193 V235 M64 400 V299 A46 46 0 0 1 156 299 V400 M92 210 V195 H128 V210',
-    delay: 0.28,
-  },
+  // (1. New Delhi: India Gate is drawn with its light show below the landmarks)
 
   // ── 2. New Delhi: Qutub Minar (fluted, tapering with balconies) ─────
   {
@@ -112,6 +112,9 @@ const LANDMARKS = [
     d: 'M1572 400 L1584 230 M1608 400 L1596 230 M1587 400 V230 M1593 400 V230 M1576 350 H1604 M1580 290 H1600 M1585 230 V198 H1595 V230 M1585 198 L1573 186 V172 L1586 162 M1595 198 L1607 186 V172 L1594 162 M1573 179 H1607 M1574 175 H1606 M1587 162 V132 H1593 V162 M1585 132 L1581 126 V120 L1587 116 M1595 132 L1599 126 V120 L1593 116 M1581 123 H1599 M1588 116 V40 H1592 V116 M1590 40 V24 M1586 95 H1594 M1586 75 H1594 M1587 55 H1593',
     delay: 1.32,
   },
+
+  // ── 13. Dubai: Burj Khalifa (Setback tiers to the spire) ───────────
+  { d: BURJ, delay: 1.42 },
 ];
 
 export default function Skyline({ play = true, className = '' }) {
@@ -123,16 +126,16 @@ export default function Skyline({ play = true, className = '' }) {
       aria-hidden="true"
     >
       <defs>
-        <clipPath id="burj-clip">
-          <path d={BURJ} />
+        <clipPath id="gate-clip">
+          <path d={GATE} />
         </clipPath>
-        <linearGradient id="burj-band" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id="gate-band" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0" stopColor="#FF6F5E" stopOpacity="0" />
           <stop offset="0.35" stopColor="#FF6F5E" stopOpacity="0.85" />
           <stop offset="0.6" stopColor="#F3D48F" stopOpacity="1" />
           <stop offset="1" stopColor="#F3D48F" stopOpacity="0" />
         </linearGradient>
-        <linearGradient id="burj-body" x1="0" y1="1" x2="0" y2="0">
+        <linearGradient id="gate-body" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0" stopColor="#D9B36A" stopOpacity="0.22" />
           <stop offset="1" stopColor="#D9B36A" stopOpacity="0.04" />
         </linearGradient>
@@ -148,26 +151,26 @@ export default function Skyline({ play = true, className = '' }) {
         />
       ))}
 
-      {/* ── 13. Dubai: Burj Khalifa (Body, Climb Light Show, Beacon) ──── */}
-      <g className="burj">
-        <path className="burj-body" d={BURJ} fill="url(#burj-body)" />
-        <g clipPath="url(#burj-clip)">
-          <rect className="burj-band" x="1746" y="400" width="88" height="170" fill="url(#burj-band)" />
+      {/* ── 1. New Delhi: India Gate (Body, Climb Light Show, Flame) ──── */}
+      <g className="lit">
+        <path className="lit-body" d={GATE} fill="url(#gate-body)" />
+        <g clipPath="url(#gate-clip)">
+          <rect className="lit-band" x="5" y="400" width="210" height="110" fill="url(#gate-band)" />
           {TIERS.map(([x, y, w], i) => (
             <rect
               key={y}
-              className="burj-tier"
+              className="lit-tier"
               x={x}
               y={y}
               width={w}
-              height={i === 0 ? 68 : TIERS[i - 1][1] - y}
+              height={(i === 0 ? 400 : TIERS[i - 1][1]) - y}
               fill="#F3D48F"
               style={{ '--i': i }}
             />
           ))}
         </g>
-        <path className="sky-draw burj-line" d={BURJ} pathLength="1" style={{ '--d': '1.42s' }} />
-        <circle className="burj-beacon" cx="1790" cy="6" r="3" fill="#FF6F5E" />
+        <path className="sky-draw lit-line" d={GATE_LINES} pathLength="1" style={{ '--d': '0.28s' }} />
+        <circle className="lit-beacon" cx="110" cy="192" r="3" fill="#FF6F5E" />
       </g>
     </svg>
   );

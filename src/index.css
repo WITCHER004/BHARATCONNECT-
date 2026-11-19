@@ -787,15 +787,16 @@ a,
   opacity: 0.45;
 }
 
-.skyline .burj-line {
+/* India Gate light show (lit-*): body glow, climbing band, level flashes, flame */
+.skyline .lit-line {
   opacity: 1;
   stroke-width: 1.5;
 }
 
-.skyline .burj-body,
-.skyline .burj-band,
-.skyline .burj-tier,
-.skyline .burj-beacon {
+.skyline .lit-body,
+.skyline .lit-band,
+.skyline .lit-tier,
+.skyline .lit-beacon {
   opacity: 0;
 }
 
@@ -803,20 +804,20 @@ a,
   animation: sky-draw 1.4s var(--ease-out) var(--d, 0s) forwards;
 }
 
-.skyline.is-playing .burj-body {
+.skyline.is-playing .lit-body {
   animation: fade-in 0.8s var(--ease-out) 1.8s forwards;
 }
 
-.skyline.is-playing .burj-band {
-  animation: burj-climb 6s cubic-bezier(0.45, 0, 0.25, 1) 2.4s infinite;
+.skyline.is-playing .lit-band {
+  animation: lit-climb 6s cubic-bezier(0.45, 0, 0.25, 1) 2.4s infinite;
 }
 
-.skyline.is-playing .burj-tier {
-  animation: burj-tier 6s linear calc(2.5s + var(--i) * 0.36s) infinite;
+.skyline.is-playing .lit-tier {
+  animation: lit-tier 6s linear calc(2.5s + var(--i) * 0.5s) infinite;
 }
 
-.skyline.is-playing .burj-beacon {
-  animation: burj-beacon 2s ease-in-out 2.4s infinite;
+.skyline.is-playing .lit-beacon {
+  animation: lit-beacon 2s ease-in-out 2.4s infinite;
 }
 
 @keyframes sky-draw {
@@ -825,7 +826,7 @@ a,
   }
 }
 
-@keyframes burj-climb {
+@keyframes lit-climb {
   0% {
     transform: translateY(0);
     opacity: 0;
@@ -836,18 +837,18 @@ a,
   }
 
   48% {
-    transform: translateY(-580px);
+    transform: translateY(-320px);
     opacity: 1;
   }
 
   52%,
   100% {
-    transform: translateY(-580px);
+    transform: translateY(-320px);
     opacity: 0;
   }
 }
 
-@keyframes burj-tier {
+@keyframes lit-tier {
 
   0%,
   100% {
@@ -863,7 +864,7 @@ a,
   }
 }
 
-@keyframes burj-beacon {
+@keyframes lit-beacon {
 
   0%,
   100% {
@@ -881,18 +882,18 @@ a,
     animation: none !important;
   }
 
-  .skyline .burj-body {
+  .skyline .lit-body {
     opacity: 1;
     animation: none !important;
   }
 
-  .skyline .burj-band,
-  .skyline .burj-tier {
+  .skyline .lit-band,
+  .skyline .lit-tier {
     animation: none !important;
     opacity: 0;
   }
 
-  .skyline .burj-beacon {
+  .skyline .lit-beacon {
     opacity: 1;
     animation: none !important;
   }
