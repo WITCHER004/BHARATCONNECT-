@@ -769,6 +769,33 @@ a,
   height: auto;
   overflow: visible;
   filter: drop-shadow(0 0 4px rgba(217, 179, 106, 0.2));
+  pointer-events: none;
+}
+
+/* India Gate is the one clickable landmark: it opens the venue in Google Maps */
+.skyline .gate-link {
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+
+.skyline .gate-link .lit-line {
+  transition: stroke-width 0.2s var(--ease-out);
+}
+
+.skyline .gate-link:hover .lit-line,
+.skyline .gate-link:focus-visible .lit-line {
+  stroke-width: 2.4;
+}
+
+.skyline .gate-hit {
+  stroke: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.skyline .gate-link:focus-visible .gate-hit {
+  stroke: var(--color-coral);
+  stroke-width: 2;
 }
 
 .skyline .sky-draw {
