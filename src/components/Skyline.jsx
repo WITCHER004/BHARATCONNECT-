@@ -124,15 +124,13 @@ const LANDMARKS = [
   // (13. New Delhi: India Gate is drawn with its light show below the landmarks)
 ];
 
-// Venue (Yashobhoomi, New Delhi) on Google Maps: opened by clicking India Gate
-export const VENUE_MAPS_URL = 'https://maps.app.goo.gl/C9w1DpwwUVB6qBYi8';
-
 export default function Skyline({ play = true, className = '' }) {
   return (
     <svg
       className={`skyline ${play ? 'is-playing' : ''} ${className}`}
       viewBox="0 0 1920 400"
       preserveAspectRatio="xMidYMax meet"
+      aria-hidden="true"
     >
       <defs>
         <clipPath id="gate-clip">
@@ -156,29 +154,18 @@ export default function Skyline({ play = true, className = '' }) {
         </linearGradient>
       </defs>
 
-      <g aria-hidden="true">
-        {LANDMARKS.map((l, i) => (
-          <path
-            key={i}
-            className={`sky-draw ${l.faint ? 'sky-faint' : ''}`}
-            d={l.d}
-            pathLength="1"
-            style={{ '--d': `${l.delay}s` }}
-          />
-        ))}
-      </g>
+      {LANDMARKS.map((l, i) => (
+        <path
+          key={i}
+          className={`sky-draw ${l.faint ? 'sky-faint' : ''}`}
+          d={l.d}
+          pathLength="1"
+          style={{ '--d': `${l.delay}s` }}
+        />
+      ))}
 
-      {/* ── 13. New Delhi: India Gate (Body, Climb Light Show, Flame): click opens the venue in Maps ── */}
-      <a
-        className="gate-link"
-        href={VENUE_MAPS_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Open the venue, Yashobhoomi New Delhi, in Google Maps"
-      >
-      <title>Open the venue in Google Maps</title>
-      <rect className="gate-hit" x="1683" y="185" width="214" height="215" rx="6" fill="transparent" />
-      <g className="lit" aria-hidden="true">
+      {/* ── 13. New Delhi: India Gate (Body, Climb Light Show, Flame) ─── */}
+      <g className="lit">
         <path className="lit-body" d={GATE} fill="url(#gate-body)" />
         <g clipPath="url(#gate-clip)">
           <rect className="lit-band" x="1685" y="400" width="210" height="110" fill="url(#gate-band)" />
@@ -198,7 +185,6 @@ export default function Skyline({ play = true, className = '' }) {
         <path className="sky-draw lit-line" d={GATE_LINES} pathLength="1" style={{ '--d': '1.42s' }} />
         <circle className="lit-beacon" cx="1790" cy="192" r="3" fill={FLAG.saffron} />
       </g>
-      </a>
     </svg>
   );
 }

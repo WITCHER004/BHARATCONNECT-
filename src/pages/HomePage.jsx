@@ -397,12 +397,10 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
         />
 
         {/* Skyline line art of Indian, Arab, and global monuments across the horizon */}
-        {/* India Gate in the skyline is clickable and opens the venue in Google Maps */}
-        <Skyline play={true} className="absolute inset-x-0 bottom-0 z-10 opacity-90 sm:opacity-95" />
+        <Skyline play={true} className="absolute inset-x-0 bottom-0 pointer-events-none z-10 opacity-90 sm:opacity-95" />
 
-        {/* pointer-events-none lets clicks reach India Gate through the empty space; the columns stay clickable */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pointer-events-none">
-          <div className="lg:col-span-7 pointer-events-auto">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8 w-full pt-28 pb-24 lg:pt-16 lg:pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          <div className="lg:col-span-7">
             <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
 
             <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
@@ -424,7 +422,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             </div>
           </div>
 
-          <div className="lg:col-span-5 pointer-events-auto">
+          <div className="lg:col-span-5">
             <SummitSpotlightHUD onNavigate={onNavigate} />
           </div>
         </div>
