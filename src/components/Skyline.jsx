@@ -1,7 +1,8 @@
 /*
   World Skyline in gold line art for Bharat Connect 2026.
   A grand panoramic horizon uniting Bharat, the Arab world, and global capitals:
-  - New Delhi: India Gate (lit up: climbing glow, level flashes, flame), Qutub Minar, Lotus Temple
+  - Dubai: Burj Khalifa on the far left (Setback tiers to the spire)
+  - New Delhi: Qutub Minar, Lotus Temple
   - Kyoto: Kiyomizu-dera (Pagoda & Timber Stage)
   - Singapore: Marina Bay Sands (Towers & SkyPark)
   - The Gulf: Burj Al Arab, Kingdom Centre Riyadh, Grand Mosque
@@ -9,43 +10,44 @@
   - Paris: Eiffel Tower (Parabolic base, platforms & lattice spire)
   - New York: Statue of Liberty (Star pedestal, robed figure, radiate crown & torch)
   - Toronto: CN Tower (Flared base, slender shaft, SkyPod radome & mast)
-  - Dubai: Burj Khalifa (Setback tiers to the spire)
+  - New Delhi: India Gate on the far right (lit up: climbing glow, level flashes, flame)
 
   Every path uses pathLength="1" for seamless CSS drawing animation (see .skyline in index.css).
 */
 
-// Burj Khalifa: stepped setbacks narrowing to the spire, centred on x = 1790
+// Burj Khalifa: stepped setbacks narrowing to the spire, centred on x = 110 (far left)
 const BURJ =
-  'M1750 400 V332 H1757 V266 H1764 V206 H1770 V156 H1775 V116 H1779 V86 H1783 V64 H1786 L1789.4 6 H1790.6 ' +
-  'L1794 64 H1797 V86 H1801 V116 H1805 V156 H1810 V206 H1816 V266 H1823 V332 H1830 V400 Z';
+  'M70 400 V332 H77 V266 H84 V206 H90 V156 H95 V116 H99 V86 H103 V64 H106 L109.4 6 H110.6 ' +
+  'L114 64 H117 V86 H121 V116 H125 V156 H130 V206 H136 V266 H143 V332 H150 V400 Z';
 
-// India Gate: line drawing, plus a closed silhouette (arch cut out) for the light show; centred on x = 110
+// India Gate: line drawing, plus a closed silhouette (arch cut out) for the light show; centred on x = 1790 (far right)
 const GATE_LINES =
-  'M18 400 V235 H202 V400 M9 235 H211 M27 235 V210 H193 V235 M64 400 V299 A46 46 0 0 1 156 299 V400 M92 210 V195 H128 V210';
+  'M1698 400 V235 H1882 V400 M1689 235 H1891 M1707 235 V210 H1873 V235 M1744 400 V299 A46 46 0 0 1 1836 299 V400 M1772 210 V195 H1808 V210';
 const GATE =
-  'M18 400 V237 H9 V233 H27 V210 H92 V195 H128 V210 H193 V233 H211 V237 H202 V400 H156 V299 ' +
-  'A46 46 0 0 0 64 299 V400 Z';
+  'M1698 400 V237 H1689 V233 H1707 V210 H1772 V195 H1808 V210 H1873 V233 H1891 V237 H1882 V400 H1836 V299 ' +
+  'A46 46 0 0 0 1744 299 V400 Z';
 
 // Gate levels, bottom to top, for the tier flashes: [x, top y, width]
 const TIERS = [
-  [18, 299, 184],
-  [18, 237, 184],
-  [9, 233, 202],
-  [27, 210, 166],
-  [92, 195, 36],
+  [1698, 299, 184],
+  [1698, 237, 184],
+  [1689, 233, 202],
+  [1707, 210, 166],
+  [1772, 195, 36],
 ];
 
 const LANDMARKS = [
   // ── Baseline Ground & Low City Silhouette ──────────────────────────
   { d: 'M0 399.5 H1920', delay: 0, w: 1 },
   {
-    d: 'M268 400 V372 H294 V384 M454 400 V376 H482 V366 M604 400 V380 H632 V370 M808 400 V374 H828 V386 M904 400 V380 H924 M1004 400 V370 H1028 V385 M1124 400 V376 H1144 M1322 400 V372 H1344 V386 M1448 400 V376 H1472 M1538 400 V370 H1562 V386 M1618 400 V366 H1646 V380 H1672 V358 H1704 V382 H1742 V400 M1836 400 V368 H1864 V384 H1892 V372 H1920',
+    d: 'M16 400 V374 H42 V386 M188 400 V378 H214 V390 M268 400 V372 H294 V384 M454 400 V376 H482 V366 M604 400 V380 H632 V370 M808 400 V374 H828 V386 M904 400 V380 H924 M1004 400 V370 H1028 V385 M1124 400 V376 H1144 M1322 400 V372 H1344 V386 M1448 400 V376 H1472 M1538 400 V370 H1562 V386 M1618 400 V366 H1646 V380 H1672 V400 M1900 400 V372 H1920',
     delay: 0.15,
     w: 1,
     faint: true,
   },
 
-  // (1. New Delhi: India Gate is drawn with its light show below the landmarks)
+  // ── 1. Dubai: Burj Khalifa (Setback tiers to the spire) ────────────
+  { d: BURJ, delay: 0.28 },
 
   // ── 2. New Delhi: Qutub Minar (fluted, tapering with balconies) ─────
   {
@@ -113,8 +115,7 @@ const LANDMARKS = [
     delay: 1.32,
   },
 
-  // ── 13. Dubai: Burj Khalifa (Setback tiers to the spire) ───────────
-  { d: BURJ, delay: 1.42 },
+  // (13. New Delhi: India Gate is drawn with its light show below the landmarks)
 ];
 
 export default function Skyline({ play = true, className = '' }) {
@@ -151,11 +152,11 @@ export default function Skyline({ play = true, className = '' }) {
         />
       ))}
 
-      {/* ── 1. New Delhi: India Gate (Body, Climb Light Show, Flame) ──── */}
+      {/* ── 13. New Delhi: India Gate (Body, Climb Light Show, Flame) ─── */}
       <g className="lit">
         <path className="lit-body" d={GATE} fill="url(#gate-body)" />
         <g clipPath="url(#gate-clip)">
-          <rect className="lit-band" x="5" y="400" width="210" height="110" fill="url(#gate-band)" />
+          <rect className="lit-band" x="1685" y="400" width="210" height="110" fill="url(#gate-band)" />
           {TIERS.map(([x, y, w], i) => (
             <rect
               key={y}
@@ -169,8 +170,8 @@ export default function Skyline({ play = true, className = '' }) {
             />
           ))}
         </g>
-        <path className="sky-draw lit-line" d={GATE_LINES} pathLength="1" style={{ '--d': '0.28s' }} />
-        <circle className="lit-beacon" cx="110" cy="192" r="3" fill="#FF6F5E" />
+        <path className="sky-draw lit-line" d={GATE_LINES} pathLength="1" style={{ '--d': '1.42s' }} />
+        <circle className="lit-beacon" cx="1790" cy="192" r="3" fill="#FF6F5E" />
       </g>
     </svg>
   );
