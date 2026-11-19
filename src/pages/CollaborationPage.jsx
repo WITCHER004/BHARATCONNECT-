@@ -230,7 +230,7 @@ PARTNERSHIP DIRECTORATE:
           </div>
 
           <h1 className="mt-4 font-serif font-medium text-3xl sm:text-5xl text-fg tracking-[-0.02em] max-w-4xl leading-tight">
-            Collaboration for <span className="text-gold-text">Business Summit</span>
+            Collaboration through <span className="text-gold-text">Bharat Connect</span>
           </h1>
 
           <p className="mt-4 text-[15px] sm:text-lg text-fg-2 max-w-3xl leading-relaxed">
