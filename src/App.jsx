@@ -11,6 +11,7 @@ import StartupPage from './pages/StartupPage';
 import CollaborationPage from './pages/CollaborationPage';
 import QueryPage from './pages/QueryPage';
 import QueryConciergeModal from './components/QueryConciergeModal';
+import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
 import { useAuth } from './auth/AuthContext';
 
@@ -149,6 +150,9 @@ export default function App() {
 
       {/* Global Query Desk Floating Concierge */}
       <QueryConciergeModal onNavigate={navigate} />
+
+      {/* Instagram button and follow card (waits until the opening teaser has finished) */}
+      {!introActive && <InstagramPopup />}
 
     </div>
   );

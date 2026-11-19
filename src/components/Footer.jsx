@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Download, ArrowUp, ArrowRight } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
+import { InstagramIcon, INSTAGRAM_URL } from './InstagramIcon';
 
 const PAGES = [
   { id: 'home', label: 'Overview' },
@@ -14,6 +15,7 @@ const PAGES = [
 ];
 
 const icon = 'w-4 h-4 text-fg-3 shrink-0';
+
 
 export default function Footer({ onNavigate, onOpenRegister }) {
   const [emailSub, setEmailSub] = useState('');
@@ -141,6 +143,18 @@ SECRETARIAT & ACCREDITATION:
                 <span className="font-mono text-[13px] tabular-nums leading-5">
                   +91 11 4987 6000<br />+971 4 298 7000
                 </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <InstagramIcon className={icon} />
+                <a
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-fg transition-colors duration-150"
+                  aria-label="Bharat Connect on Instagram"
+                >
+                  @_bharatconnect
+                </a>
               </li>
             </ul>
             <button
