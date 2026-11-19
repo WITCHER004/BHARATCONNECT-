@@ -521,7 +521,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                       Bilateral Directorate · Strategic Partnerships · 2026
                     </p>
                     <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
-                      Collaboration to Bharat Connect
+                      Collaboration through Bharat Connect
                     </h3>
                     <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
                       Partner with the conclave as a country pavilion, industry co-host, sovereign deal-room sponsor, or knowledge think-tank. Dedicated portal for institutions seeking strategic bilateral collaboration.
