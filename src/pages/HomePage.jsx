@@ -4,6 +4,7 @@ import Skyline from '../components/Skyline';
 import AnimatedCounter from '../components/AnimatedCounter';
 import DealMatchmakerSimulator from '../components/DealMatchmakerSimulator';
 import SectorWheel from '../components/SectorWheel';
+import ChamberTarot from '../components/ChamberTarot';
 import {
   EXECUTIVE_METRICS,
   STRATEGIC_VERTICALS,
@@ -300,25 +301,13 @@ function NationsAndChambers({ regions }) {
             <p className="ref-line text-gold-text">{national.length} national · {joint.length} joint</p>
           </div>
 
-          <p className="mt-8 ref-line">National chambers</p>
-          <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-line rounded-2xl overflow-hidden border border-line">
-            {national.map((c, i) => (
-              <li key={c.name} className="group relative bg-surface-1 hover:bg-surface-2 transition-colors duration-300 p-6">
-                <span
-                  className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  aria-hidden="true"
-                />
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold-text">{c.role}</span>
-                  <span className="font-serif text-lg text-fg/20 group-hover:text-gold-foil transition-colors duration-300">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-                <p className="mt-4 font-serif text-[19px] leading-snug text-fg">{c.name}</p>
-                <p className="mt-1.5 text-[13px] text-fg-3">{c.country}</p>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-8 flex flex-wrap items-baseline justify-between gap-2">
+            <p className="ref-line">National chambers</p>
+            <p className="text-xs text-fg-3">Hover or tap a card to read its role</p>
+          </div>
+          <div className="mt-6">
+            <ChamberTarot chambers={national} />
+          </div>
 
           <p className="mt-12 ref-line">Joint chambers</p>
           <ul className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
