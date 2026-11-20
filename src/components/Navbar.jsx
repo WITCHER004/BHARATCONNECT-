@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
+import { PANELS, PANEL_IDS } from '../data/panels';
 
 export { BrandMark };
 
@@ -188,6 +189,68 @@ function RegisterDropdown({ onNavigate }) {
   );
 }
 
+function PanelsDropdown({ activePage, onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const isActive = PANEL_IDS.includes(activePage);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className={`group relative h-10 px-3.5 text-[13.5px] font-medium tracking-[0.01em] flex items-center gap-1 transition-colors duration-200 cursor-pointer ${
+          isActive ? 'text-gold-text' : 'text-fg-2 hover:text-fg'
+        }`}
+      >
+        Panels
+        <ChevronDown className={`w-3.5 h-3.5 opacity-70 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
+        {isActive && (
+          <span className="absolute left-1/2 -translate-x-1/2 bottom-0.5 w-1.5 h-1.5 rotate-45 bg-gold-foil shadow-[0_0_8px_rgb(217_179_106/0.8)]" aria-hidden="true" />
+        )}
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute left-1/2 -translate-x-1/2 mt-2 w-72 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(217,179,106,0.2)] animate-fade-in z-50"
+        >
+          {PANELS.map((p) => (
+            <button
+              key={p.id}
+              role="menuitem"
+              onClick={() => { setOpen(false); onNavigate(p.id); }}
+              className={`w-full text-left p-2.5 rounded-lg hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5 ${
+                activePage === p.id ? 'bg-surface-3' : ''
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">{p.label}</div>
+                <div className="text-[11px] text-fg-3">{p.tagline}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const NAV_ITEMS = [
   { id: 'home', label: 'Overview' },
   { id: 'schedule', label: 'Programme' },
@@ -284,6 +347,7 @@ export default function Navbar({ activePage, onNavigate }) {
                 </button>
               );
             })}
+            <PanelsDropdown activePage={activePage} onNavigate={handleNavClick} />
           </nav>
 
           {/* Right action area */}
@@ -323,6 +387,26 @@ export default function Navbar({ activePage, onNavigate }) {
                     }`}
                   >
                     {item.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-line/60 flex flex-col gap-1">
+              <div className="text-[11px] font-mono text-gold-text uppercase tracking-wider px-1 mb-1">
+                Panels
+              </div>
+              {PANELS.map((p) => {
+                const isActive = activePage === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => handleNavClick(p.id)}
+                    className={`h-11 px-3.5 rounded-lg text-[15px] text-left font-medium transition-colors cursor-pointer ${
+                      isActive ? 'bg-surface-3 text-fg' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
+                    }`}
+                  >
+                    {p.label}
                   </button>
                 );
               })}

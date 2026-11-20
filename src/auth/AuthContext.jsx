@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { recordLogin } from '../data/registry';
 
 /*
   Google sign-in with Google Identity Services (no server).
@@ -71,6 +72,11 @@ export function AuthProvider({ children }) {
   const [authRequest, setAuthRequest] = useState(null);
   const pendingAction = useRef(null);
   const initialised = useRef(false);
+  // kept in refs so the sign-in log knows the mode and who is signing out
+  const modeRef = useRef('signin');
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => { if (authRequest) modeRef.current = authRequest.mode; }, [authRequest]);
 
   const handleCredential = useCallback((response) => {
     try {
@@ -82,6 +88,7 @@ export function AuthProvider({ children }) {
       setUser(u);
       setError('');
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); } catch { /* storage unavailable */ }
+      recordLogin({ action: 'sign-in', name: u.name, email: u.email, method: 'Google' });
       // close the window and carry on with whatever the visitor clicked
       setAuthRequest(null);
       const next = pendingAction.current;
@@ -117,6 +124,7 @@ export function AuthProvider({ children }) {
     try { localStorage.setItem(DEMO_ACCOUNTS_KEY, JSON.stringify(accounts)); } catch { /* storage unavailable */ }
 
     const u = { name: finalName, email: mail, picture: '', exp: Math.floor(Date.now() / 1000) + DEMO_SESSION_DAYS * 86400, demo: true };
+    recordLogin({ action: modeRef.current === 'signup' ? 'sign-up' : 'sign-in', name: u.name, email: u.email, method: 'Email' });
     setUser(u);
     setError('');
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); } catch { /* storage unavailable */ }
@@ -155,6 +163,8 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const signOut = useCallback(() => {
+    const u = userRef.current;
+    if (u) recordLogin({ action: 'sign-out', name: u.name, email: u.email, method: u.demo ? 'Email' : 'Google' });
     setUser(null);
     try { localStorage.removeItem(STORAGE_KEY); } catch { /* storage unavailable */ }
     window.google?.accounts?.id?.disableAutoSelect();

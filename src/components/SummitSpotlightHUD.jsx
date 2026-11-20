@@ -73,7 +73,7 @@ export default function SummitSpotlightHUD({ onNavigate }) {
           onClick={() => onNavigate?.('schedule')}
           className="h-11 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-sm font-medium hover:bg-gold-foil/15 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
-          <span>Explore 6 Tracks</span>
+          <span>Explore 7 Tracks</span>
         </button>
       </div>
     </div>

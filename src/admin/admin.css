@@ -1,0 +1,519 @@
+/* Bharat Connect admin panel: motion and components. Uses the site's tokens from index.css. */
+
+.ad-gate-bg {
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgb(217 179 106 / 0.12), transparent 70%),
+    var(--color-surface-1);
+}
+
+/* entrance: cards rise in one after another */
+.ad-rise {
+  animation: ad-rise 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes ad-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ad-view {
+  animation: fade-in 0.35s var(--ease-out);
+}
+
+.ad-card {
+  transition: border-color 0.2s, transform 0.25s var(--ease-out);
+}
+
+button.ad-card:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+/* sidebar: gold marker slides beside the current view */
+.ad-nav {
+  position: relative;
+}
+
+.ad-nav::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-gold-foil);
+  transform: scaleY(0);
+  transition: transform 0.3s var(--ease-out);
+}
+
+.ad-nav.is-on::before {
+  transform: scaleY(1);
+}
+
+/* live dot */
+.ad-live {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #0CA30C;
+  display: inline-block;
+}
+
+.ad-live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 2px solid #0CA30C;
+  animation: ad-ping 1.8s ease-out infinite;
+}
+
+@keyframes ad-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.ad-flash {
+  animation: ad-flash 1.2s var(--ease-out);
+}
+
+@keyframes ad-flash {
+  0% {
+    color: var(--color-gold-text);
+  }
+
+  100% {
+    color: var(--color-fg-3);
+  }
+}
+
+.ad-blink {
+  animation: ad-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes ad-blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* switch */
+.ad-switch {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--color-surface-4, #2a2f2d);
+  border: 1px solid var(--color-line-strong);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.ad-switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--color-fg-2);
+  transition: transform 0.25s var(--ease-out), background 0.2s;
+}
+
+.ad-switch.is-on {
+  background: rgb(217 179 106 / 0.35);
+}
+
+.ad-switch.is-on span {
+  transform: translateX(14px);
+  background: var(--color-gold-text);
+}
+
+/* status badge: colour + icon + label */
+.ad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.ad-badge-pending {
+  color: #FAB219;
+  border-color: rgb(250 178 25 / 0.35);
+  background: rgb(250 178 25 / 0.08);
+}
+
+.ad-badge-approved {
+  color: #3FC23F;
+  border-color: rgb(12 163 12 / 0.45);
+  background: rgb(12 163 12 / 0.1);
+}
+
+.ad-badge-declined {
+  color: #E66767;
+  border-color: rgb(208 59 59 / 0.45);
+  background: rgb(208 59 59 / 0.1);
+}
+
+.ad-action {
+  font-size: 12px;
+  color: var(--color-fg-2);
+}
+
+.ad-action-sign-up {
+  color: var(--color-gold-text);
+}
+
+.ad-action-sign-out {
+  color: var(--color-fg-3);
+}
+
+/* approve / decline buttons */
+.ad-btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--color-line-strong);
+  color: var(--color-fg-2);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+}
+
+.ad-btn:hover {
+  background: var(--color-surface-3);
+  color: var(--color-fg);
+}
+
+.ad-btn:active {
+  transform: scale(0.97);
+}
+
+.ad-btn-approve {
+  background: #0CA30C;
+  border-color: #0CA30C;
+  color: #fff;
+}
+
+.ad-btn-approve:hover {
+  background: #0b8f0b;
+  border-color: #0b8f0b;
+  color: #fff;
+}
+
+.ad-btn-decline:hover {
+  border-color: #D03B3B;
+  color: #E66767;
+  background: rgb(208 59 59 / 0.08);
+}
+
+/* approval queue: a coloured edge for the type; approved cards fly right, declined fly left */
+.ad-queue {
+  position: relative;
+  transition: border-color 0.2s;
+}
+
+.ad-queue::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--type);
+}
+
+.ad-queue:hover {
+  border-color: var(--color-line-strong);
+}
+
+.ad-queue.is-leaving {
+  animation: none;
+  transition: transform 0.38s var(--ease-out), opacity 0.38s, border-color 0.2s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ad-queue.is-approved {
+  transform: translateX(60px);
+  border-color: #0CA30C;
+}
+
+.ad-queue.is-declined {
+  transform: translateX(-60px);
+  border-color: #D03B3B;
+}
+
+.ad-clear {
+  animation: ad-pop 0.6s var(--ease-out);
+}
+
+@keyframes ad-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ad-toast {
+  animation: ad-toast 0.35s var(--ease-out);
+}
+
+@keyframes ad-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* drawer slides in from the right */
+.ad-drawer {
+  animation: ad-drawer 0.35s var(--ease-out);
+}
+
+@keyframes ad-drawer {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.ad-select {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
+  color: var(--color-fg);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ad-row {
+  animation: ad-row 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 25ms);
+  transition: background 0.15s;
+}
+
+@keyframes ad-row {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ad-feed-item {
+  animation: ad-row 0.45s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* ── charts ── */
+.ad-grid {
+  stroke: var(--color-line);
+  stroke-width: 1;
+}
+
+.ad-axis {
+  font-size: 10px;
+  fill: var(--color-fg-3);
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.ad-hover-col {
+  fill: var(--color-surface-3);
+}
+
+.ad-bar-group {
+  cursor: default;
+}
+
+/* bars grow up from the baseline */
+.ad-bar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: ad-grow 0.7s var(--ease-out) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 35ms);
+}
+
+.ad-bar-group .ad-bar {
+  animation-delay: calc(0.2s + var(--i, 0) * 35ms);
+}
+
+@keyframes ad-grow {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.ad-col {
+  display: block;
+  transform-origin: 50% 100%;
+  animation: ad-grow 0.7s var(--ease-out) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 35ms);
+}
+
+.ad-tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 150px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-surface-0);
+  border: 1px solid var(--color-line-strong);
+  box-shadow: 0 12px 30px -10px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+  z-index: 5;
+  animation: fade-in 0.15s;
+}
+
+/* donut segments sweep round */
+.ad-donut-track {
+  fill: none;
+  stroke: var(--color-surface-3);
+  stroke-width: 18;
+}
+
+.ad-donut-seg {
+  transition: stroke-width 0.2s var(--ease-out);
+  cursor: default;
+  animation: ad-sweep 0.9s var(--ease-out) both;
+  animation-delay: calc(0.25s + var(--i, 0) * 0.15s);
+}
+
+@keyframes ad-sweep {
+  from {
+    stroke-dasharray: 0 var(--c);
+  }
+}
+
+.ad-donut-big {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 30px;
+  fill: var(--color-fg);
+}
+
+.ad-split,
+.ad-rank {
+  transform-origin: left;
+  animation: ad-grow-x 0.8s var(--ease-out) both;
+  animation-delay: calc(0.3s + var(--i, 0) * 80ms);
+}
+
+@keyframes ad-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.ad-split {
+  display: block;
+}
+
+.ad-spark {
+  animation: fade-in 0.8s var(--ease-out) 0.4s both;
+}
+
+.ad-shake {
+  animation: ad-shake 0.35s;
+}
+
+@keyframes ad-shake {
+
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ad-rise,
+  .ad-view,
+  .ad-row,
+  .ad-feed-item,
+  .ad-bar,
+  .ad-col,
+  .ad-donut-seg,
+  .ad-split,
+  .ad-rank,
+  .ad-spark,
+  .ad-drawer,
+  .ad-toast,
+  .ad-clear,
+  .ad-shake,
+  .ad-flash,
+  .ad-blink,
+  .ad-live::after {
+    animation: none !important;
+  }
+
+  .ad-queue.is-leaving {
+    transform: none;
+  }
+}

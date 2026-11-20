@@ -10,6 +10,10 @@ import RegistrationPage from './pages/RegistrationPage';
 import StartupPage from './pages/StartupPage';
 import CollaborationPage from './pages/CollaborationPage';
 import QueryPage from './pages/QueryPage';
+import PanelsPage from './pages/PanelsPage';
+import { PANEL_IDS } from './data/panels';
+
+const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query', ...PANEL_IDS];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
@@ -19,7 +23,7 @@ export default function App() {
   // Sync with URL hash if present (#home, #schedule, #exhibition, #experience, #register, #startup, #collaborate, #query)
   const getInitialPage = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
-    const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query'];
+    const validPages = VALID_PAGES;
     return validPages.includes(hash) ? hash : 'home';
   };
 
@@ -37,7 +41,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
-      const validPages = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query'];
+      const validPages = VALID_PAGES;
       if (validPages.includes(hash)) {
         setActivePage(hash);
       }
@@ -129,6 +133,10 @@ export default function App() {
           <RegistrationPage
             defaultRole={selectedStallTier ? 'Exhibitor Representative' : 'Corporate Delegate'}
           />
+        )}
+
+        {PANEL_IDS.includes(activePage) && (
+          <PanelsPage panelId={activePage} onNavigate={navigate} />
         )}
 
         {activePage === 'query' && (

@@ -12,4 +12,13 @@ export default defineConfig({
     port: 3000,
     open: false,
   },
+  // two pages: the public site (index.html) and the admin panel (admin.html)
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        admin: 'admin.html',
+      },
+    },
+  },
 });

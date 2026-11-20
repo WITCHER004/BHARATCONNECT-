@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
-import { ChevronDown, MapPin, Zap, Building2, Cpu, Wheat, Activity, Compass, ArrowRight } from 'lucide-react';
+import { ChevronDown, MapPin, Zap, Building2, Cpu, Wheat, Activity, Compass, ArrowRight, Shield } from 'lucide-react';
 
 /*
   Find your deal room: a light, app-style panel (white surfaces, black ink).
@@ -35,6 +35,15 @@ function getMatch(vertical) {
       tradeNote: 'Zero-tariff farm-to-port green corridor',
     };
   }
+  if (vertical.includes('Defence') || vertical.includes('Aerospace')) {
+    return {
+      dealPool: '$8.2B',
+      buyerCount: 16,
+      rooms: 4,
+      entities: ['Defence procurement agencies', 'Indian defence PSUs', 'Gulf defence industry groups', 'Aerospace & MRO firms'],
+      tradeNote: 'Government-to-government co-production and offset frameworks',
+    };
+  }
   if (vertical.includes('Healthcare') || vertical.includes('Pharma')) {
     return {
       dealPool: '$6.5B',
@@ -53,7 +62,7 @@ function getMatch(vertical) {
   };
 }
 
-const ICONS = { Zap, Building2, Cpu, Wheat, Activity, Compass };
+const ICONS = { Zap, Building2, Cpu, Wheat, Activity, Compass, Shield };
 const SHORT = {
   'clean-energy': 'Energy',
   'infrastructure-smart-cities': 'Infra',

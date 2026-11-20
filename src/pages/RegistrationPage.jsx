@@ -4,6 +4,7 @@ import HolographicSummitPass from '../components/HolographicSummitPass';
 import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw } from 'lucide-react';
 import SignInGate from '../auth/SignInGate';
 import { getNextDelegateId } from '../data/delegateId';
+import { recordRegistration } from '../data/registry';
 
 const INITIAL_FORM = {
   role: 'Corporate Delegate',
@@ -95,7 +96,23 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
     if (step < 3) {
       setStep(step + 1);
     } else {
-      setGeneratedPassId(getNextDelegateId());
+      const passId = getNextDelegateId();
+      setGeneratedPassId(passId);
+      recordRegistration({
+        id: passId,
+        type: 'delegate',
+        name: formData.fullName,
+        email: formData.email,
+        organisation: formData.organization,
+        country: formData.country,
+        detail: formData.role,
+        sector: formData.vertical,
+        designation: formData.designation,
+        phone: formData.phone,
+        dealSize: formData.dealSize,
+        b2b: formData.interestedInB2B,
+        visaLetter: formData.requiresVisaLetter,
+      });
       setIsCompleted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

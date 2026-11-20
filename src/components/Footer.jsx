@@ -11,6 +11,9 @@ const PAGES = [
   { id: 'register', label: 'Event registration' },
   { id: 'startup', label: 'Register a startup' },
   { id: 'collaborate', label: 'Summit Collaboration' },
+  { id: 'advisory', label: 'Advisory Panel' },
+  { id: 'investor', label: 'Investor Panel' },
+  { id: 'expert', label: 'Expert Panel' },
   { id: 'query', label: 'Inquiries and Helpdesk' },
 ];
 

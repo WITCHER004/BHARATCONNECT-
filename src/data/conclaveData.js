@@ -188,6 +188,23 @@ export const STRATEGIC_VERTICALS = [
     ],
     targetInvestment: "$18B+ Pipeline",
     participatingEntities: ["Tourism Ministries", "Hospitality REITs", "Airlines & Aviation Authorities"]
+  },
+  {
+    id: "defence-aerospace",
+    title: "Defence, Aerospace & Security",
+    tagline: "Co-Production, Aerospace MRO, Maritime & Cyber Security",
+    icon: "Shield",
+    highlight: "Make in India Co-Production for Shared Regional Security",
+    color: "coral",
+    description: "Building defence industrial partnerships between India and Arab nations through joint manufacturing, aerospace maintenance hubs, maritime security cooperation and cyber resilience.",
+    keyAreas: [
+      "Joint Development & Co-Production under Make in India",
+      "Aerospace Maintenance, Repair & Overhaul (MRO) Hubs",
+      "Maritime Domain Awareness & Coastal Security",
+      "Cyber Security & Critical Infrastructure Protection"
+    ],
+    targetInvestment: "$30B+ Pipeline",
+    participatingEntities: ["Defence Procurement Agencies", "Defence Public Sector Undertakings", "Aerospace & MRO Firms"]
   }
 ];
 

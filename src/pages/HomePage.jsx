@@ -3,6 +3,7 @@ import SummitSpotlightHUD from '../components/SummitSpotlightHUD';
 import Skyline from '../components/Skyline';
 import AnimatedCounter from '../components/AnimatedCounter';
 import DealMatchmakerSimulator from '../components/DealMatchmakerSimulator';
+import SectorWheel from '../components/SectorWheel';
 import {
   EXECUTIVE_METRICS,
   STRATEGIC_VERTICALS,
@@ -10,7 +11,7 @@ import {
   ARAB_NATIONS,
   KEYNOTE_SPEAKERS,
 } from '../data/conclaveData';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const ICON = { className: 'w-4 h-4', strokeWidth: 1.5 };
 
@@ -377,6 +378,27 @@ function TextLink({ children, onClick }) {
 
 export default function HomePage({ onNavigate, onOpenRegister }) {
   const [selectedVertical, setSelectedVertical] = useState(STRATEGIC_VERTICALS[0]?.id ?? null);
+  const [hoverVertical, setHoverVertical] = useState(null);
+  const tracksRef = useRef(null);
+  const [tracksIn, setTracksIn] = useState(false);
+
+  // track rows slide in once the list scrolls into view
+  useEffect(() => {
+    const el = tracksRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setTracksIn(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setTracksIn(true);
+        io.disconnect();
+      }
+    }, { threshold: 0.1 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
 
   const regions = ARAB_NATIONS.reduce((acc, n) => {
     (acc[n.region] ||= []).push(n);
@@ -677,61 +699,52 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       <section className="py-20 sm:py-24 border-t border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader
-            title="Six sector tracks"
-            intro="Roundtables, ministerial presentations and private B2B deal rooms, organised around six corridors of trade."
+            title="Seven sector tracks"
+            intro="Roundtables, ministerial presentations and private B2B deal rooms, organised around seven corridors of trade."
             action={<TextLink onClick={() => onNavigate('schedule')}>Track schedules</TextLink>}
           />
 
-          <ul className="border-t border-line">
-            {STRATEGIC_VERTICALS.map((vert, idx) => {
-              const open = selectedVertical === vert.id;
-              return (
-                <li key={vert.id} className="border-b border-line">
-                  <button
-                    onClick={() => setSelectedVertical(open ? null : vert.id)}
-                    aria-expanded={open}
-                    className="w-full py-6 grid grid-cols-[56px_1fr_auto] sm:grid-cols-[96px_1fr_auto_24px] items-baseline gap-4 text-left cursor-pointer group"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+            {/* animated wheel of the seven tracks */}
+            <div className="lg:col-span-6 max-w-lg w-full mx-auto">
+              <SectorWheel
+                sectors={STRATEGIC_VERTICALS}
+                activeId={hoverVertical || selectedVertical}
+                onSelect={setSelectedVertical}
+                onHover={setHoverVertical}
+              />
+            </div>
+
+            {/* track titles: hover or select one to light it up on the wheel */}
+            <ul ref={tracksRef} className="lg:col-span-6 border-t border-line">
+              {STRATEGIC_VERTICALS.map((vert, idx) => {
+                const on = (hoverVertical || selectedVertical) === vert.id;
+                return (
+                  <li
+                    key={vert.id}
+                    className={`track-row relative border-b border-line ${tracksIn ? 'is-in' : ''} ${on ? 'is-open' : ''}`}
+                    style={{ '--i': idx }}
+                    onMouseEnter={() => setHoverVertical(vert.id)}
+                    onMouseLeave={() => setHoverVertical(null)}
                   >
-                    <span className="ref-line text-gold-text">Track {String(idx + 1).padStart(2, '0')}</span>
-                    <span>
-                      <span className="block font-serif text-xl sm:text-2xl font-medium text-fg group-hover:text-fg transition-colors">
+                    <span className="track-bar absolute -left-3 sm:-left-4 top-3 bottom-3 w-0.5 rounded-full bg-gold-foil" aria-hidden="true" />
+                    <button
+                      onClick={() => setSelectedVertical(vert.id)}
+                      onFocus={() => setHoverVertical(vert.id)}
+                      onBlur={() => setHoverVertical(null)}
+                      aria-pressed={selectedVertical === vert.id}
+                      className="w-full py-4 flex items-baseline gap-5 text-left cursor-pointer"
+                    >
+                      <span className="ref-line text-gold-text shrink-0 w-14">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className={`font-serif text-lg sm:text-xl font-medium transition-colors duration-200 ${on ? 'text-gold-text' : 'text-fg'}`}>
                         {vert.title}
                       </span>
-                      <span className="block mt-1 text-sm text-fg-3">{vert.tagline}</span>
-                    </span>
-                    <span className="hidden sm:block font-mono text-sm text-gold-text figure">{vert.targetInvestment}</span>
-                    <ChevronDown
-                      {...ICON}
-                      className={`w-4 h-4 text-fg-3 self-center transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {open && (
-                    <div className="pb-8 grid grid-cols-1 sm:grid-cols-[96px_1fr] gap-4 animate-slide-up">
-                      <span className="hidden sm:block" />
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                          <p className="text-[15px] text-fg-2 leading-relaxed">{vert.description}</p>
-                          <p className="mt-4 sm:hidden font-mono text-sm text-fg-2">{vert.targetInvestment}</p>
-                          <button onClick={onOpenRegister} className="mt-6 btn-secondary h-9 px-4 text-sm">
-                            Join this track
-                          </button>
-                        </div>
-                        <ul className="flex flex-col">
-                          {vert.keyAreas.map((area) => (
-                            <li key={area} className="flex gap-3 py-2 text-sm text-fg">
-                              <span className="mt-2 w-1 h-1 rounded-full bg-fg-3 shrink-0" />
-                              {area}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
 
           <div className="mt-16">
             <DealMatchmakerSimulator onOpenBooking={() => onNavigate('register')} />
