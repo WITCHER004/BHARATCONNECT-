@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Loader2, Mail, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Mail, ShieldCheck, ExternalLink } from 'lucide-react';
 import { useAuth, lastMethod } from './AuthContext';
-import { TERMS_URL } from '../data/startupForm';
+import { hasAccepted, accept, decline, TERMS_LINK } from '../data/terms';
 
 /*
   Sign in / sign up with three options: Google, Apple, or email and password (Firebase Authentication).
@@ -84,13 +84,20 @@ export default function AuthForm({ mode = 'signin' }) {
   const [providerError, setProviderError] = useState('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(''); // '' | 'Google' | 'Apple' | 'Email'
+  const [termsConsent, setTermsConsent] = useState(() => (hasAccepted('auth') ? 'agree' : 'none'));
+  const [termsError, setTermsError] = useState('');
   const signup = mode === 'signup';
   const last = lastMethod();
   const score = strength(password);
 
   const viaProvider = async (p) => {
+    if (termsConsent !== 'agree') {
+      setTermsError('Please select "I Agree" to the Conclave Terms & Protocol Note below.');
+      return;
+    }
     setProviderError('');
     setBusy(p);
+    accept('auth');
     const msg = await signInWith(p);
     setBusy('');
     setProviderError(msg);
@@ -102,11 +109,16 @@ export default function AuthForm({ mode = 'signin' }) {
     if (signup && !name.trim()) err.name = 'Please enter your full name';
     if (!EMAIL.test(email.trim())) err.email = 'Please enter a valid email address';
     if (signup ? password.length < 8 : !password) err.password = signup ? 'Use at least 8 characters' : 'Please enter your password';
+    if (termsConsent !== 'agree') {
+      setTermsError('Please select "I Agree" to the Conclave Terms & Protocol Note to proceed.');
+      err.terms = true;
+    }
     setErrors(err);
     setFormError('');
     setNote('');
     if (Object.keys(err).length) return;
     setBusy('Email');
+    accept('auth');
     const msg = await emailAuth({ mode, name, email, password });
     setBusy('');
     setFormError(msg);
@@ -123,6 +135,69 @@ export default function AuthForm({ mode = 'signin' }) {
 
   return (
     <div className="text-left">
+      {/* Conclave Terms & Conditions Agreement Note */}
+      <div className="mb-5 p-3.5 rounded-xl bg-surface-1 border border-line-strong text-xs space-y-2.5">
+        <div className="flex items-start gap-2.5">
+          <ShieldCheck className="w-4 h-4 text-gold-text shrink-0 mt-0.5" strokeWidth={1.75} />
+          <div className="leading-relaxed text-fg-2">
+            <span className="font-semibold text-fg">Terms &amp; Protocol Note: </span>
+            {signup
+              ? 'Creating an account grants access to official delegate passes, startup accreditation, and sovereign B2B deal rooms subject to Yashobhoomi security and conclave terms.'
+              : 'Signing in confirms adherence to the Bharat Connect 2026 Protocol, non-disclosure standards, and official accreditation rules.'}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-1.5 border-t border-line/60">
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-fg select-none">
+              <input
+                type="radio"
+                name="auth-terms"
+                checked={termsConsent === 'agree'}
+                onChange={() => {
+                  setTermsConsent('agree');
+                  setTermsError('');
+                  accept('auth');
+                }}
+                className="accent-gold-text w-3.5 h-3.5"
+              />
+              <span>I Agree</span>
+            </label>
+
+            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-fg-3 hover:text-fg-2 select-none">
+              <input
+                type="radio"
+                name="auth-terms"
+                checked={termsConsent === 'disagree'}
+                onChange={() => {
+                  setTermsConsent('disagree');
+                  setTermsError('You have selected "Disagree". Conclave services and accreditation require accepting terms.');
+                  decline('auth');
+                }}
+                className="accent-coral w-3.5 h-3.5"
+              />
+              <span>Disagree</span>
+            </label>
+          </div>
+
+          <a
+            href={TERMS_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] text-gold-text hover:underline inline-flex items-center gap-1 font-mono shrink-0"
+          >
+            <span>Read PDF</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+
+        {termsError && (
+          <p className="text-[11px] text-coral font-medium pt-0.5" role="alert">
+            {termsError}
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-col gap-3">
         {['Google', 'Apple'].map((p) => (
           <ProviderButton
@@ -206,11 +281,10 @@ export default function AuthForm({ mode = 'signin' }) {
         </button>
       </form>
 
-      <p className="mt-6 flex items-start gap-2 text-xs text-fg-3 leading-relaxed">
+      <p className="mt-5 flex items-start gap-2 text-xs text-fg-3 leading-relaxed">
         <ShieldCheck className="w-4 h-4 shrink-0 text-gold-text" strokeWidth={1.5} />
         <span>
-          Secured by Firebase. We never see your Google or Apple password. By continuing you agree to the{' '}
-          <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-fg">Registration Terms</a>.
+          Secured by Firebase &amp; DPDP compliance. Credentials and communications are strictly encrypted.
         </span>
       </p>
     </div>

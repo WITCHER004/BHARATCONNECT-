@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
 import HolographicSummitPass from '../components/HolographicSummitPass';
-import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw } from 'lucide-react';
+import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw, ShieldCheck } from 'lucide-react';
 import SignInGate from '../auth/SignInGate';
 import { submitRegistration } from '../data/registry';
 
@@ -80,6 +80,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
   const [generatedPassId, setGeneratedPassId] = useState('BMF.BC-DGO-•••••');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [termsAgreed, setTermsAgreed] = useState(true);
   const [formData, setFormData] = useState({ ...INITIAL_FORM, role: defaultRole });
 
   const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
@@ -97,6 +98,10 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
     if (step < 3) {
       setStep(step + 1);
     } else {
+      if (!termsAgreed) {
+        setSaveError('Please select "I Agree" to the terms to confirm and issue your badge.');
+        return;
+      }
       setSaving(true);
       setSaveError('');
       let passId;
@@ -383,6 +388,51 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                             </span>
                           </span>
                         </label>
+
+                        {/* Delegate Terms Agreement Note */}
+                        <div className="p-4 rounded-xl bg-surface-2 border border-line space-y-2 mt-2">
+                          <div className="flex items-start gap-2.5">
+                            <ShieldCheck className="w-4 h-4 text-gold-text shrink-0 mt-0.5" />
+                            <span className="text-xs text-fg-2 leading-relaxed">
+                              <strong className="text-fg">Delegate Terms &amp; Security Protocol: </strong>
+                              Passes are strictly non-transferable and subject to Yashobhoomi security screening. Admission requires presenting valid photo identification at Gate 3.
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-5 pt-1 border-t border-line/60">
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-fg select-none">
+                              <input
+                                type="radio"
+                                name="delegate-terms"
+                                checked={termsAgreed === true}
+                                onChange={() => {
+                                  setTermsAgreed(true);
+                                  setSaveError('');
+                                }}
+                                className="accent-gold-text w-3.5 h-3.5"
+                              />
+                              <span>I Agree</span>
+                            </label>
+
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-fg-3 hover:text-fg-2 select-none">
+                              <input
+                                type="radio"
+                                name="delegate-terms"
+                                checked={termsAgreed === false}
+                                onChange={() => {
+                                  setTermsAgreed(false);
+                                  setSaveError('You must agree to the Conclave Terms to issue your badge.');
+                                }}
+                                className="accent-coral w-3.5 h-3.5"
+                              />
+                              <span>Disagree</span>
+                            </label>
+                          </div>
+                          {!termsAgreed && (
+                            <p className="text-[11px] text-coral pt-0.5">
+                              You have selected "Disagree". Agreement to the terms is mandatory for summit pass issuance.
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </fieldset>
                   )}

@@ -2,25 +2,23 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
+  HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import {
-  listRegistrations, listLogins, decide, subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
+  listRegistrations, listRegisteredUsers, listQueries, listLogins, decide, toggleFlag, updateQueryStatus,
+  subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
 } from '../data/registry';
 import {
   Counter, StatusBadge, TypeTag, Legend, DailyBars, Donut, StatusSplit, RankBars, Sparkline,
-  timeAgo, lastNDays, sameDay,
+  timeAgo, lastNDays, sameDay, QUERY_STATUS
 } from './charts';
 
 /*
   Bharat Connect admin panel (admin.html), separate from the public site but reading the same
   data through src/data/registry.js.
-
-  ACCESS: sign in with Google. Only accounts listed in the Firestore collection `admins`
-  (one document per admin, named by their email) can open the dashboard, and the database
-  rules enforce the same list, so the data stays protected even if this page is opened directly.
 */
 const SAMPLES_KEY = 'bc-admin-show-samples';
 const SITE_URL = `${import.meta.env.BASE_URL}`;
@@ -28,7 +26,9 @@ const SITE_URL = `${import.meta.env.BASE_URL}`;
 const VIEWS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'approvals', label: 'Approvals', icon: ClipboardCheck },
-  { id: 'registrations', label: 'Registrations', icon: Users },
+  { id: 'users', label: 'Registered Users', icon: Users },
+  { id: 'queries', label: 'Query Desk', icon: HelpCircle },
+  { id: 'registrations', label: 'All Registrations', icon: Database },
   { id: 'signins', label: 'Sign-ins', icon: LogIn },
 ];
 
@@ -37,6 +37,8 @@ const VIEWS = [
 function useRegistry(includeSamples, enabled) {
   const read = useCallback(() => ({
     registrations: listRegistrations({ includeSamples }),
+    users: listRegisteredUsers({ includeSamples }),
+    queries: listQueries({ includeSamples }),
     logins: listLogins({ includeSamples }),
   }), [includeSamples]);
   const [data, setData] = useState(read);
@@ -110,7 +112,6 @@ function Gate({ state, email }) {
 /* ── Shell ────────────────────────────────────────────── */
 
 export default function AdminApp() {
-  // checking → signed-out | not-admin | admin
   const [access, setAccess] = useState({ state: 'checking', email: '' });
   useEffect(() => onAuthStateChanged(auth, async (u) => {
     if (!u || u.isAnonymous) { setAccess({ state: 'signed-out', email: '' }); return; }
@@ -127,13 +128,12 @@ export default function AdminApp() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const { registrations, logins, pulse, error: dataError } = useRegistry(showSamples, unlocked);
+  const { registrations, users = [], queries = [], logins, pulse, error: dataError } = useRegistry(showSamples, unlocked);
 
   useEffect(() => {
     try { localStorage.setItem(SAMPLES_KEY, showSamples ? '1' : '0'); } catch { /* storage unavailable */ }
   }, [showSamples]);
 
-  // follow the address bar, so links like admin.html#approvals and the Back button work
   useEffect(() => {
     const onHash = () => {
       const h = window.location.hash.replace('#', '');
@@ -150,12 +150,25 @@ export default function AdminApp() {
     window.scrollTo({ top: 0 });
   };
 
+  const handleToggleFlag = async (id, coll) => {
+    await toggleFlag(id, coll);
+  };
+
+  const handleUpdateQueryStatus = async (id, status, note) => {
+    await updateQueryStatus(id, status, note);
+  };
+
   if (!unlocked) return <Gate state={access.state} email={access.email} />;
 
   const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending');
+  const flaggedUsersCount = users.filter((u) => u.flagged).length;
+  const openQueriesCount = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
+  const flaggedQueriesCount = queries.filter((q) => q.flagged).length;
+  const totalFlaggedCount = flaggedUsersCount + flaggedQueriesCount;
+
   const liveCount = registrations.filter((r) => r.source === 'live').length + logins.filter((l) => l.source === 'live').length;
-  const current = VIEWS.find((v) => v.id === view);
+  const current = VIEWS.find((v) => v.id === view) || VIEWS[0];
 
   const nav = (
     <nav className="flex flex-col gap-1" aria-label="Admin">
@@ -174,6 +187,16 @@ export default function AdminApp() {
             {v.id === 'approvals' && pending.length > 0 && (
               <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-[#FAB219]/15 text-[#FAB219] text-xs font-semibold flex items-center justify-center tabular-nums">
                 {pending.length}
+              </span>
+            )}
+            {v.id === 'users' && flaggedUsersCount > 0 && (
+              <span className="ml-auto flex items-center gap-1 text-[11px] text-[#FAB219] bg-[#FAB219]/15 px-2 py-0.5 rounded-full font-mono">
+                <Flag className="w-3 h-3 fill-[#FAB219]" /> {flaggedUsersCount}
+              </span>
+            )}
+            {v.id === 'queries' && openQueriesCount > 0 && (
+              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-surface-3 border border-line text-gold-text text-xs font-semibold flex items-center justify-center tabular-nums">
+                {openQueriesCount}
               </span>
             )}
           </button>
@@ -235,6 +258,13 @@ export default function AdminApp() {
             <span key={pulse} className={`ml-2 hidden sm:inline-flex items-center gap-2 text-xs text-fg-3 ${pulse ? 'ad-flash' : ''}`}>
               <span className="ad-live" aria-hidden="true" /> Live
             </span>
+
+            {totalFlaggedCount > 0 && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 ml-3 px-2.5 py-1 rounded-full bg-[#FAB219]/15 border border-[#FAB219]/30 text-[#FAB219] text-xs font-mono">
+                <Flag className="w-3.5 h-3.5 fill-[#FAB219]" /> {totalFlaggedCount} Flagged for review
+              </span>
+            )}
+
             <a href={SITE_URL} target="_blank" rel="noopener noreferrer" className="ml-auto btn-secondary h-9 px-3 text-sm">
               Open site <ExternalLink className="w-3.5 h-3.5 text-fg-3" strokeWidth={1.5} />
             </a>
@@ -262,17 +292,60 @@ export default function AdminApp() {
         )}
 
         <main key={view} className="ad-view p-4 sm:p-8">
-          {view === 'overview' && <Overview registrations={registrations} logins={logins} onOpen={setSelected} go={go} />}
-          {view === 'approvals' && <Approvals registrations={approvable} onOpen={setSelected} />}
-          {view === 'registrations' && <Registrations registrations={registrations} onOpen={setSelected} />}
-          {view === 'signins' && <SignIns logins={logins} registrations={registrations} />}
+          {view === 'overview' && (
+            <Overview
+              registrations={registrations}
+              users={users}
+              queries={queries}
+              logins={logins}
+              onOpen={setSelected}
+              go={go}
+            />
+          )}
+          {view === 'approvals' && (
+            <Approvals
+              registrations={approvable}
+              onOpen={setSelected}
+              onToggleFlag={handleToggleFlag}
+            />
+          )}
+          {view === 'users' && (
+            <RegisteredUsers
+              users={users}
+              onOpen={setSelected}
+              onToggleFlag={handleToggleFlag}
+            />
+          )}
+          {view === 'queries' && (
+            <QueryDesk
+              queries={queries}
+              onOpen={setSelected}
+              onToggleFlag={handleToggleFlag}
+              onUpdateStatus={handleUpdateQueryStatus}
+            />
+          )}
+          {view === 'registrations' && (
+            <Registrations
+              registrations={registrations}
+              onOpen={setSelected}
+              onToggleFlag={handleToggleFlag}
+            />
+          )}
+          {view === 'signins' && (
+            <SignIns
+              logins={logins}
+              registrations={registrations}
+            />
+          )}
         </main>
       </div>
 
       {selected && (
         <Drawer
-          record={registrations.find((r) => r.id === selected)}
+          record={[...registrations, ...queries, ...users].find((r) => r.id === selected)}
           onClose={() => setSelected(null)}
+          onToggleFlag={handleToggleFlag}
+          onUpdateStatus={handleUpdateQueryStatus}
         />
       )}
     </div>
@@ -313,7 +386,7 @@ function Card({ title, action, children, className = '', i = 0 }) {
 
 /* ── Overview ─────────────────────────────────────────── */
 
-function Overview({ registrations, logins, onOpen, go }) {
+function Overview({ registrations, users = [], queries = [], logins, onOpen, go }) {
   const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending').length;
   const approved = approvable.filter((r) => r.status === 'approved').length;
@@ -325,6 +398,9 @@ function Overview({ registrations, logins, onOpen, go }) {
   const regSpark = days14.map((d) => approvable.filter((r) => sameDay(r.submittedAt, d)).length);
   const loginSpark = days14.map((d) => logins.filter((l) => l.action !== 'sign-out' && sameDay(l.at, d)).length);
 
+  const flaggedCount = [...users, ...queries].filter((x) => x.flagged).length;
+  const openQueries = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
+
   const countries = Object.entries(
     approvable.reduce((acc, r) => {
       if (r.country) acc[r.country] = (acc[r.country] || 0) + 1;
@@ -333,15 +409,16 @@ function Overview({ registrations, logins, onOpen, go }) {
   ).map(([label, n]) => ({ label, n })).sort((a, b) => b.n - a.n).slice(0, 6);
 
   const feed = [
-    ...registrations.slice(0, 12).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
-    ...logins.slice(0, 12).map((l) => ({ kind: 'login', at: l.at, l })),
+    ...registrations.slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
+    ...queries.slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
+    ...logins.slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
   ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 9);
 
   const tiles = [
-    { label: 'Registrations', value: approvable.length, caption: 'all forms, all time', spark: regSpark },
+    { label: 'Registered Users', value: users.length, caption: `${approvable.length} conclave accreditations`, spark: regSpark, onClick: () => go('users') },
     { label: 'Awaiting review', value: pending, caption: pending ? 'need a decision' : 'queue is clear', accent: '#FAB219', onClick: () => go('approvals') },
-    { label: 'Approval rate', value: decided ? Math.round((approved / decided) * 100) : null, suffix: '%', caption: decided ? `${approved} approved · ${declined} declined` : 'no decisions yet' },
-    { label: 'Sign-ins, 7 days', value: signIns7, caption: (() => { const n = new Set(logins.map((l) => l.email)).size; return `${n} ${n === 1 ? 'person' : 'people'} overall`; })(), spark: loginSpark },
+    { label: 'Query Desk', value: openQueries, suffix: ` / ${queries.length}`, caption: `${openQueries} inquiries pending response`, onClick: () => go('queries'), accent: openQueries ? '#FAB219' : undefined },
+    { label: 'Flagged for review', value: flaggedCount, caption: flaggedCount ? 'requires administrative attention' : 'no flagged items', accent: flaggedCount ? '#FAB219' : undefined, onClick: () => go('users') },
   ];
 
   return (
@@ -398,7 +475,7 @@ function Overview({ registrations, logins, onOpen, go }) {
           <ul className="flex flex-col">
             {feed.length === 0 && <Empty text="Nothing yet. Activity on the site appears here." />}
             {feed.map((f, i) => (
-              <li key={(f.r?.id || f.l?.email) + f.at} className="ad-feed-item py-2.5 border-b border-line last:border-0" style={{ '--i': i }}>
+              <li key={(f.r?.id || f.q?.id || f.l?.email) + f.at} className="ad-feed-item py-2.5 border-b border-line last:border-0" style={{ '--i': i }}>
                 {f.kind === 'reg' ? (
                   <button onClick={() => onOpen(f.r.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
                     <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: TYPES[f.r.type]?.color }} />
@@ -406,7 +483,17 @@ function Overview({ registrations, logins, onOpen, go }) {
                       <span className="block text-sm text-fg truncate group-hover:text-gold-text transition-colors">
                         {f.r.name || 'Someone'} <span className="text-fg-3">registered · {TYPES[f.r.type]?.short}</span>
                       </span>
-                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.r.source === 'sample' && <SampleTag />}</span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.r.source === 'sample' && <SampleTag />} {f.r.flagged && <span className="text-[#FAB219] font-mono ml-1">· Flagged</span>}</span>
+                    </span>
+                  </button>
+                ) : f.kind === 'query' ? (
+                  <button onClick={() => onOpen(f.q.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
+                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0 bg-[#8A9E97]" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm text-fg truncate group-hover:text-gold-text transition-colors">
+                        {f.q.name} <span className="text-fg-3">inquired · {f.q.category}</span>
+                      </span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} · <span className="font-mono text-gold-text">{f.q.id}</span></span>
                     </span>
                   </button>
                 ) : (
@@ -459,9 +546,9 @@ function TypeFilter({ value, onChange, records }) {
   );
 }
 
-function SearchBox({ value, onChange, placeholder = 'Search name, email, ID…' }) {
+function SearchBox({ value, onChange, placeholder = 'Search name, company, ID…' }) {
   return (
-    <label className="relative block w-full sm:w-72">
+    <label className="relative block w-full sm:w-80">
       <span className="sr-only">Search</span>
       <Search className="w-4 h-4 text-fg-3 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
       <input
@@ -474,20 +561,32 @@ function SearchBox({ value, onChange, placeholder = 'Search name, email, ID…' 
   );
 }
 
-const matches = (r, q) => !q || [r.name, r.email, r.id, r.organisation, r.country].some((v) => v && String(v).toLowerCase().includes(q.toLowerCase()));
+const matches = (r, q) => {
+  if (!q) return true;
+  const s = q.trim().toLowerCase();
+  return [r.name, r.email, r.id, r.ref, r.organisation, r.organization, r.country, r.category, r.subject]
+    .some((v) => v && String(v).toLowerCase().includes(s));
+};
 
-function Approvals({ registrations, onOpen }) {
+function Approvals({ registrations, onOpen, onToggleFlag }) {
   const [type, setType] = useState('all');
   const [q, setQ] = useState('');
+  const [flagFilter, setFlagFilter] = useState(false);
   const [leaving, setLeaving] = useState({});
   const [toast, setToast] = useState(null);
 
   const pending = registrations.filter((r) => r.status === 'pending');
-  const shown = pending.filter((r) => (type === 'all' || r.type === type) && matches(r, q));
+  const shown = pending
+    .filter((r) => (type === 'all' || r.type === type))
+    .filter((r) => (!flagFilter || r.flagged))
+    .filter((r) => matches(r, q));
+
   const recent = registrations
     .filter((r) => r.status !== 'pending' && r.decidedAt)
     .sort((a, b) => new Date(b.decidedAt) - new Date(a.decidedAt))
     .slice(0, 8);
+
+  const pendingFlagged = pending.filter((r) => r.flagged).length;
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -497,7 +596,6 @@ function Approvals({ registrations, onOpen }) {
 
   const act = (r, status) => {
     setLeaving((l) => ({ ...l, [r.id]: status }));
-    // let the card animate out, then record the decision
     setTimeout(() => {
       decide(r.id, status);
       setLeaving((l) => { const n = { ...l }; delete n[r.id]; return n; });
@@ -509,7 +607,18 @@ function Approvals({ registrations, onOpen }) {
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6 items-start">
       <div className="xl:col-span-2 flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <TypeFilter value={type} onChange={setType} records={pending} />
+          <div className="flex flex-wrap items-center gap-2">
+            <TypeFilter value={type} onChange={setType} records={pending} />
+            <button
+              onClick={() => setFlagFilter(!flagFilter)}
+              className={`h-9 px-3 rounded-full text-xs font-mono flex items-center gap-1.5 border transition-colors cursor-pointer ${
+                flagFilter ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+              }`}
+            >
+              <Flag className={`w-3.5 h-3.5 ${flagFilter ? 'fill-[#FAB219]' : ''}`} />
+              Flagged only ({pendingFlagged})
+            </button>
+          </div>
           <SearchBox value={q} onChange={setQ} />
         </div>
 
@@ -530,7 +639,7 @@ function Approvals({ registrations, onOpen }) {
             <li
               key={r.id}
               className={`ad-queue ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden ${leaving[r.id] ? `is-leaving is-${leaving[r.id]}` : ''}`}
-              style={{ '--i': Math.min(i, 8), '--type': TYPES[r.type].color }}
+              style={{ '--i': Math.min(i, 8), '--type': TYPES[r.type]?.color || '#FAB219' }}
             >
               <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                 <button onClick={() => onOpen(r.id)} className="flex-1 min-w-0 text-left cursor-pointer group">
@@ -538,15 +647,30 @@ function Approvals({ registrations, onOpen }) {
                     <TypeTag type={r.type} />
                     <span className="text-xs text-fg-3">{timeAgo(r.submittedAt)}</span>
                     {r.source === 'sample' && <SampleTag />}
+                    {r.flagged && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#FAB219] bg-[#FAB219]/15 border border-[#FAB219]/30 rounded px-1.5 py-0.5">
+                        <Flag className="w-3 h-3 fill-[#FAB219]" /> Flagged for review
+                      </span>
+                    )}
                   </div>
                   <p className="mt-1.5 text-[15px] text-fg font-medium truncate group-hover:text-gold-text transition-colors">
                     {r.name || 'Unnamed'} <span className="text-fg-3 font-normal">· {r.organisation || '—'}</span>
                   </p>
                   <p className="mt-0.5 text-xs text-fg-3 truncate">
-                    {[r.detail, r.sector, r.country].filter(Boolean).join(' · ')} · <span className="font-mono">{r.id}</span>
+                    {[r.detail, r.sector, r.country].filter(Boolean).join(' · ')} · <span className="font-mono text-gold-text">{r.id}</span>
                   </p>
                 </button>
                 <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => onToggleFlag(r.id, 'registrations')}
+                    className={`h-9 px-2.5 rounded-xl border flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors ${
+                      r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg hover:bg-surface-2'
+                    }`}
+                    title={r.flagged ? 'Remove review flag' : 'Flag for review'}
+                  >
+                    <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+                    <span className="hidden sm:inline">{r.flagged ? 'Flagged' : 'Flag'}</span>
+                  </button>
                   <button onClick={() => act(r, 'declined')} className="ad-btn ad-btn-decline" aria-label={`Decline ${r.name}`}>
                     <X className="w-4 h-4" strokeWidth={2} /> Decline
                   </button>
@@ -567,7 +691,7 @@ function Approvals({ registrations, onOpen }) {
             <li key={r.id} className="py-2.5 border-b border-line last:border-0 flex items-center gap-3">
               <button onClick={() => onOpen(r.id)} className="flex-1 min-w-0 text-left cursor-pointer">
                 <span className="block text-sm text-fg truncate">{r.name}</span>
-                <span className="block text-xs text-fg-3">{TYPES[r.type].short} · {timeAgo(r.decidedAt)}</span>
+                <span className="block text-xs text-fg-3">{TYPES[r.type]?.short || r.type} · {timeAgo(r.decidedAt)}</span>
               </button>
               <StatusBadge status={r.status} />
             </li>
@@ -591,20 +715,544 @@ function Approvals({ registrations, onOpen }) {
   );
 }
 
+/* ── Registered Users View ────────────────────────────── */
+
+function RegisteredUsers({ users, onOpen, onToggleFlag }) {
+  const [tab, setTab] = useState('all');
+  const [status, setStatus] = useState('all');
+  const [q, setQ] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
+
+  const flaggedCount = users.filter((u) => u.flagged).length;
+
+  // Search by: Name, Company/Organisation, Registered Unique ID, Email
+  const userMatches = (u, searchStr) => {
+    if (!searchStr) return true;
+    const s = searchStr.trim().toLowerCase();
+    const name = (u.name || '').toLowerCase();
+    const company = (u.organisation || u.organization || '').toLowerCase();
+    const id = (u.id || u.ref || '').toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    return name.includes(s) || company.includes(s) || id.includes(s) || email.includes(s);
+  };
+
+  const rows = users
+    .filter((u) => {
+      if (tab === 'flagged') return u.flagged;
+      if (tab !== 'all') return u.type === tab;
+      return true;
+    })
+    .filter((u) => status === 'all' || u.status === status)
+    .filter((u) => userMatches(u, q));
+
+  const copyId = (e, id) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 1500);
+  };
+
+  const download = () => {
+    const cols = ['Registered Unique ID', 'Name', 'Email', 'Company / Organisation', 'Type', 'Country', 'Status', 'Flagged', 'Submitted Date'];
+    const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const csvRows = [
+      cols.join(','),
+      ...rows.map((u) => [
+        esc(u.id), esc(u.name), esc(u.email), esc(u.organisation || u.organization), esc(u.type),
+        esc(u.country), esc(u.status), esc(u.flagged ? 'Yes' : 'No'), esc(u.submittedAt)
+      ].join(','))
+    ].join('\n');
+    const blob = new Blob([csvRows], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bharat-connect-registered-users-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Search & Top Action Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Tabs */}
+          <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-surface-2/80 border border-line">
+            <button
+              onClick={() => setTab('all')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'all' ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-3 hover:text-fg'}`}
+            >
+              All Users ({users.length})
+            </button>
+            <button
+              onClick={() => setTab('flagged')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors ${tab === 'flagged' ? 'bg-[#FAB219]/20 text-[#FAB219] font-semibold border border-[#FAB219]/40' : 'text-fg-3 hover:text-fg'}`}
+            >
+              <Flag className={`w-3 h-3 ${tab === 'flagged' ? 'fill-[#FAB219]' : ''}`} />
+              Flagged for Review ({flaggedCount})
+            </button>
+            <button
+              onClick={() => setTab('delegate')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'delegate' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Delegates
+            </button>
+            <button
+              onClick={() => setTab('startup')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'startup' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Startups
+            </button>
+            <button
+              onClick={() => setTab('collaboration')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'collaboration' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Collaborations
+            </button>
+          </div>
+
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="ad-select text-xs h-10"
+            aria-label="Filter by approval status"
+          >
+            <option value="all">All statuses</option>
+            {Object.keys(STATUS).map((s) => (
+              <option key={s} value={s}>{STATUS[s].label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <SearchBox
+            value={q}
+            onChange={setQ}
+            placeholder="Search by name, company, registered ID…"
+          />
+          <button onClick={download} className="btn-secondary h-10 px-3.5 text-xs sm:text-sm shrink-0 flex items-center gap-2">
+            <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} /> CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[840px]">
+            <thead>
+              <tr className="text-left text-xs text-fg-3 border-b border-line bg-surface-1/40">
+                <th className="font-medium px-4 py-3">Registered Unique ID</th>
+                <th className="font-medium px-4 py-3">User Name &amp; Contact</th>
+                <th className="font-medium px-3 py-3">Company / Organisation</th>
+                <th className="font-medium px-3 py-3">Category / Role</th>
+                <th className="font-medium px-3 py-3">Country</th>
+                <th className="font-medium px-3 py-3">Registered</th>
+                <th className="font-medium px-3 py-3">Status</th>
+                <th className="font-medium px-4 py-3 text-right">Review Flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.slice(0, 200).map((u, i) => (
+                <tr
+                  key={u.id}
+                  onClick={() => onOpen(u.id)}
+                  className={`ad-row border-b border-line last:border-0 hover:bg-surface-2/70 cursor-pointer transition-colors ${
+                    u.flagged ? 'bg-[#FAB219]/[0.03]' : ''
+                  }`}
+                  style={{ '--i': Math.min(i, 14) }}
+                >
+                  {/* Unique ID */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs text-gold-text font-semibold bg-surface-2 px-2 py-1 rounded border border-line">
+                        {u.id}
+                      </span>
+                      <button
+                        onClick={(e) => copyId(e, u.id)}
+                        className="text-fg-3 hover:text-fg p-1 rounded hover:bg-surface-3 transition-colors"
+                        title="Copy ID"
+                      >
+                        {copiedId === u.id ? <Check className="w-3.5 h-3.5 text-[#0CA30C]" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </td>
+
+                  {/* Name & Email */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="block font-medium text-fg">{u.name || '—'}</span>
+                      {u.source === 'sample' && <SampleTag />}
+                    </div>
+                    <span className="block text-xs text-fg-3">{u.email}</span>
+                  </td>
+
+                  {/* Company */}
+                  <td className="px-3 py-3">
+                    <span className="text-fg-2 font-medium flex items-center gap-1.5">
+                      <Building2 className="w-3.5 h-3.5 text-fg-3 shrink-0" />
+                      <span className="truncate max-w-[200px]">{u.organisation || u.organization || '—'}</span>
+                    </span>
+                  </td>
+
+                  {/* Type */}
+                  <td className="px-3 py-3">
+                    <TypeTag type={u.type} />
+                    {u.detail && <span className="block text-[11px] text-fg-3 mt-0.5 truncate max-w-[160px]">{u.detail}</span>}
+                  </td>
+
+                  {/* Country */}
+                  <td className="px-3 py-3 text-fg-2 text-xs">
+                    {u.country || '—'}
+                  </td>
+
+                  {/* Submitted */}
+                  <td className="px-3 py-3 text-fg-3 text-xs whitespace-nowrap">
+                    {timeAgo(u.submittedAt)}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-3 py-3">
+                    <StatusBadge status={u.status} />
+                  </td>
+
+                  {/* Flag Toggle Button */}
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFlag(u.id, 'registrations');
+                      }}
+                      className={`h-8 px-2.5 rounded-lg border flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors ml-auto ${
+                        u.flagged
+                          ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                          : 'border-line text-fg-3 hover:text-fg hover:bg-surface-3'
+                      }`}
+                      title={u.flagged ? 'Flagged for review (click to unflag)' : 'Flag for review'}
+                    >
+                      <Flag className={`w-3.5 h-3.5 ${u.flagged ? 'fill-[#FAB219]' : ''}`} />
+                      <span>{u.flagged ? 'Flagged' : 'Flag'}</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {rows.length === 0 && <Empty text="No registered users match your search criteria." />}
+
+        <div className="px-4 py-3 border-t border-line text-xs text-fg-3 flex items-center justify-between">
+          <span>{rows.length} of {users.length} registered users</span>
+          {flaggedCount > 0 && (
+            <span className="text-[#FAB219] font-mono">
+              {flaggedCount} user{flaggedCount === 1 ? '' : 's'} marked for review
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Query Desk View ──────────────────────────────────── */
+
+function QueryDesk({ queries, onOpen, onToggleFlag, onUpdateStatus }) {
+  const [tab, setTab] = useState('all');
+  const [dept, setDept] = useState('all');
+  const [q, setQ] = useState('');
+  const [copiedId, setCopiedId] = useState(null);
+
+  const flaggedQueriesCount = queries.filter((q) => q.flagged).length;
+  const urgentCount = queries.filter((q) => q.urgent).length;
+  const receivedCount = queries.filter((q) => q.status === 'received').length;
+  const inProgressCount = queries.filter((q) => q.status === 'in-progress').length;
+  const answeredCount = queries.filter((q) => q.status === 'answered').length;
+
+  const depts = [...new Set(queries.map((x) => x.dept || x.category).filter(Boolean))];
+
+  const queryMatches = (item, searchStr) => {
+    if (!searchStr) return true;
+    const s = searchStr.trim().toLowerCase();
+    return [
+      item.name, item.fullName, item.email, item.phone, item.organisation, item.organization,
+      item.subject, item.message, item.id, item.ref, item.category, item.dept
+    ].some((v) => v && String(v).toLowerCase().includes(s));
+  };
+
+  const rows = queries
+    .filter((item) => {
+      if (tab === 'flagged') return item.flagged;
+      if (tab === 'urgent') return item.urgent;
+      if (tab !== 'all') return item.status === tab;
+      return true;
+    })
+    .filter((item) => dept === 'all' || (item.dept === dept || item.category === dept))
+    .filter((item) => queryMatches(item, q));
+
+  const copyId = (e, id) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 1500);
+  };
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="rounded-xl border border-line bg-surface-0/70 p-4">
+          <p className="text-xs text-fg-3">Total Inquiries</p>
+          <p className="mt-1 font-serif text-2xl text-fg">{queries.length}</p>
+        </div>
+        <div className="rounded-xl border border-line bg-surface-0/70 p-4">
+          <p className="text-xs text-fg-3">Awaiting Response</p>
+          <p className="mt-1 font-serif text-2xl text-[#FAB219]">{receivedCount}</p>
+        </div>
+        <div className="rounded-xl border border-line bg-surface-0/70 p-4">
+          <p className="text-xs text-fg-3">In Progress</p>
+          <p className="mt-1 font-serif text-2xl text-[#5B8DEF]">{inProgressCount}</p>
+        </div>
+        <div className="rounded-xl border border-line bg-surface-0/70 p-4">
+          <p className="text-xs text-fg-3">Urgent Protocol</p>
+          <p className="mt-1 font-serif text-2xl text-coral">{urgentCount}</p>
+        </div>
+        <div className="rounded-xl border border-line bg-surface-0/70 p-4">
+          <p className="text-xs text-fg-3">Flagged for Review</p>
+          <p className="mt-1 font-serif text-2xl text-[#FAB219] flex items-center gap-2">
+            <Flag className="w-5 h-5 fill-[#FAB219]" /> {flaggedQueriesCount}
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Tabs & Search */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-surface-2/80 border border-line">
+            <button
+              onClick={() => setTab('all')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'all' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              All ({queries.length})
+            </button>
+            <button
+              onClick={() => setTab('flagged')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors ${tab === 'flagged' ? 'bg-[#FAB219]/20 text-[#FAB219] font-semibold border border-[#FAB219]/40' : 'text-fg-3 hover:text-fg'}`}
+            >
+              <Flag className={`w-3 h-3 ${tab === 'flagged' ? 'fill-[#FAB219]' : ''}`} />
+              Flagged ({flaggedQueriesCount})
+            </button>
+            <button
+              onClick={() => setTab('received')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'received' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Received ({receivedCount})
+            </button>
+            <button
+              onClick={() => setTab('in-progress')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'in-progress' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              In Progress
+            </button>
+            <button
+              onClick={() => setTab('answered')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'answered' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Answered ({answeredCount})
+            </button>
+            <button
+              onClick={() => setTab('urgent')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors ${tab === 'urgent' ? 'bg-coral/20 text-coral font-semibold border border-coral/40' : 'text-fg-3 hover:text-fg'}`}
+            >
+              Urgent ({urgentCount})
+            </button>
+          </div>
+
+          <select
+            value={dept}
+            onChange={(e) => setDept(e.target.value)}
+            className="ad-select text-xs h-10"
+            aria-label="Filter by department"
+          >
+            <option value="all">All Departments</option>
+            {depts.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </div>
+
+        <SearchBox
+          value={q}
+          onChange={setQ}
+          placeholder="Search subject, inquirer, ticket ID…"
+        />
+      </div>
+
+      {/* Query Desk Table */}
+      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[880px]">
+            <thead>
+              <tr className="text-left text-xs text-fg-3 border-b border-line bg-surface-1/40">
+                <th className="font-medium px-4 py-3">Ticket Ref</th>
+                <th className="font-medium px-4 py-3">Inquirer Contact</th>
+                <th className="font-medium px-3 py-3">Department &amp; Topic</th>
+                <th className="font-medium px-4 py-3">Subject &amp; Message Excerpt</th>
+                <th className="font-medium px-3 py-3">Received</th>
+                <th className="font-medium px-3 py-3">Status</th>
+                <th className="font-medium px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.slice(0, 150).map((item, i) => (
+                <tr
+                  key={item.id}
+                  onClick={() => onOpen(item.id)}
+                  className={`ad-row border-b border-line last:border-0 hover:bg-surface-2/70 cursor-pointer transition-colors ${
+                    item.flagged ? 'bg-[#FAB219]/[0.03]' : ''
+                  }`}
+                  style={{ '--i': Math.min(i, 14) }}
+                >
+                  {/* Ticket ID */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono text-xs text-gold-text font-semibold bg-surface-2 px-2 py-1 rounded border border-line">
+                        {item.id}
+                      </span>
+                      <button
+                        onClick={(e) => copyId(e, item.id)}
+                        className="text-fg-3 hover:text-fg p-1 rounded hover:bg-surface-3 transition-colors"
+                        title="Copy Ticket ID"
+                      >
+                        {copiedId === item.id ? <Check className="w-3.5 h-3.5 text-[#0CA30C]" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    {item.urgent && (
+                      <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-mono font-bold text-coral bg-coral/15 px-1.5 py-0.5 rounded border border-coral/30">
+                        URGENT
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Submitter Info */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-fg">{item.name || item.fullName || 'Anonymous'}</span>
+                      {item.source === 'sample' && <SampleTag />}
+                    </div>
+                    <span className="block text-xs text-fg-3">{item.email}</span>
+                    {(item.organisation || item.organization) && (
+                      <span className="block text-[11px] text-fg-2 truncate max-w-[180px]">
+                        {item.organisation || item.organization}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Dept / Category */}
+                  <td className="px-3 py-3">
+                    <span className="text-xs text-fg-2 font-medium block truncate max-w-[180px]">
+                      {item.dept || item.category || 'General'}
+                    </span>
+                    <span className="text-[11px] text-fg-3 block mt-0.5">{item.country || 'India'}</span>
+                  </td>
+
+                  {/* Subject & Message Preview */}
+                  <td className="px-4 py-3 max-w-xs">
+                    <span className="block text-xs font-medium text-fg truncate">
+                      {item.subject || 'Conclave General Query'}
+                    </span>
+                    <p className="text-xs text-fg-3 line-clamp-2 mt-0.5 leading-relaxed">
+                      {item.message || 'No additional message text provided.'}
+                    </p>
+                  </td>
+
+                  {/* Time */}
+                  <td className="px-3 py-3 text-xs text-fg-3 whitespace-nowrap">
+                    {timeAgo(item.submittedAt)}
+                  </td>
+
+                  {/* Status & Quick Change */}
+                  <td className="px-3 py-3">
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <select
+                        value={item.status || 'received'}
+                        onChange={(e) => onUpdateStatus(item.id, e.target.value)}
+                        className="ad-select text-xs h-7 py-0 px-2 rounded-lg"
+                      >
+                        <option value="received">Received</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="answered">Answered</option>
+                        <option value="closed">Closed</option>
+                      </select>
+                    </div>
+                  </td>
+
+                  {/* Flag & Email Actions */}
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      {item.email && (
+                        <a
+                          href={`mailto:${item.email}?subject=Re: [${item.id}] ${encodeURIComponent(item.subject || 'Bharat Connect Inquiry')}`}
+                          className="h-8 w-8 rounded-lg border border-line text-fg-3 hover:text-fg hover:bg-surface-3 flex items-center justify-center transition-colors"
+                          title="Reply via Email"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onToggleFlag(item.id, 'queries')}
+                        className={`h-8 px-2.5 rounded-lg border flex items-center gap-1 text-xs font-medium cursor-pointer transition-colors ${
+                          item.flagged
+                            ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                            : 'border-line text-fg-3 hover:text-fg hover:bg-surface-3'
+                        }`}
+                        title={item.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${item.flagged ? 'fill-[#FAB219]' : ''}`} />
+                        <span className="hidden sm:inline">{item.flagged ? 'Flagged' : 'Flag'}</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {rows.length === 0 && <Empty text="No inquiries match these filter settings." />}
+
+        <div className="px-4 py-3 border-t border-line text-xs text-fg-3 flex items-center justify-between">
+          <span>{rows.length} of {queries.length} queries</span>
+          {flaggedQueriesCount > 0 && (
+            <span className="text-[#FAB219] font-mono">
+              {flaggedQueriesCount} query ticket{flaggedQueriesCount === 1 ? '' : 's'} flagged for review
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Registrations table ──────────────────────────────── */
 
 function toCsv(rows) {
-  const cols = ['id', 'type', 'status', 'name', 'email', 'organisation', 'country', 'detail', 'sector', 'submittedAt', 'decidedAt', 'source'];
+  const cols = ['id', 'type', 'status', 'name', 'email', 'organisation', 'country', 'detail', 'sector', 'submittedAt', 'decidedAt', 'flagged', 'source'];
   const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
 }
 
-function Registrations({ registrations, onOpen }) {
+function Registrations({ registrations, onOpen, onToggleFlag }) {
   const [type, setType] = useState('all');
   const [status, setStatus] = useState('all');
   const [q, setQ] = useState('');
-  const withQueries = registrations;
-  const rows = withQueries.filter((r) => (type === 'all' || r.type === type) && (status === 'all' || r.status === status) && matches(r, q));
+  const [flagOnly, setFlagOnly] = useState(false);
+  const rows = registrations
+    .filter((r) => (type === 'all' || r.type === type))
+    .filter((r) => (status === 'all' || r.status === status))
+    .filter((r) => (!flagOnly || r.flagged))
+    .filter((r) => matches(r, q));
 
   const download = () => {
     const blob = new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' });
@@ -617,9 +1265,6 @@ function Registrations({ registrations, onOpen }) {
 
   const typeOpts = [...TYPE_ORDER, 'query'];
 
-  // Reminder for the next event to every registered (not declined) startup, blind-copied.
-  // shortcut: opens the admin's mail app; long lists can exceed mailto limits, so switch to a
-  // scheduled Cloud Function + email service once Firebase is connected.
   const event = currentEvent();
   const startupEmails = [...new Set(registrations
     .filter((r) => r.type === 'startup' && r.source !== 'sample' && r.status !== 'declined' && r.email)
@@ -627,32 +1272,32 @@ function Registrations({ registrations, onOpen }) {
   const remindStartups = () => {
     const when = new Date(event.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
     const subject = `Reminder: ${event.name} on ${when}`;
-    const body = `Dear founder,
-
-This is a reminder that ${event.name} (${event.subtitle}) begins on ${when} at ${event.venue}.
-
-${event.startupNote}
-
-Sign in to your startup page on the Bharat Connect website for your registration details, the programme and live updates during the event.
-
-Regards,
-Bharat Connect Secretariat`;
+    const body = `Dear founder,\n\nThis is a reminder that ${event.name} (${event.subtitle}) begins on ${when} at ${event.venue}.\n\n${event.startupNote}\n\nSign in to your startup page on the Bharat Connect website for your registration details, the programme and live updates during the event.\n\nRegards,\nBharat Connect Secretariat`;
     window.location.href = `mailto:?bcc=${encodeURIComponent(startupEmails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          <select value={type} onChange={(e) => setType(e.target.value)} className="ad-select" aria-label="Type">
+        <div className="flex flex-wrap items-center gap-2">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="ad-select text-xs h-10" aria-label="Type">
             <option value="all">All types</option>
-            {typeOpts.map((t) => <option key={t} value={t}>{TYPES[t].short}</option>)}
+            {typeOpts.map((t) => <option key={t} value={t}>{TYPES[t]?.short || t}</option>)}
           </select>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="ad-select" aria-label="Status">
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="ad-select text-xs h-10" aria-label="Status">
             <option value="all">All statuses</option>
             {Object.keys(STATUS).map((s) => <option key={s} value={s}>{STATUS[s].label}</option>)}
             <option value="received">Received (inquiries)</option>
           </select>
+          <button
+            onClick={() => setFlagOnly(!flagOnly)}
+            className={`h-10 px-3 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer ${
+              flagOnly ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+            }`}
+          >
+            <Flag className={`w-3.5 h-3.5 ${flagOnly ? 'fill-[#FAB219]' : ''}`} />
+            Flagged
+          </button>
         </div>
         <div className="flex gap-2 items-center">
           <SearchBox value={q} onChange={setQ} />
@@ -674,15 +1319,17 @@ Bharat Connect Secretariat`;
 
       <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[760px]">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
-              <tr className="text-left text-xs text-fg-3 border-b border-line">
-                <th className="font-medium px-5 py-3">Name</th>
+              <tr className="text-left text-xs text-fg-3 border-b border-line bg-surface-1/40">
+                <th className="font-medium px-4 py-3">ID / Reference</th>
+                <th className="font-medium px-4 py-3">Name</th>
                 <th className="font-medium px-3 py-3">Type</th>
                 <th className="font-medium px-3 py-3">Organisation</th>
                 <th className="font-medium px-3 py-3">Country</th>
                 <th className="font-medium px-3 py-3">Submitted</th>
-                <th className="font-medium px-5 py-3">Status</th>
+                <th className="font-medium px-3 py-3">Status</th>
+                <th className="font-medium px-4 py-3 text-right">Flag</th>
               </tr>
             </thead>
             <tbody>
@@ -690,18 +1337,38 @@ Bharat Connect Secretariat`;
                 <tr
                   key={r.id}
                   onClick={() => onOpen(r.id)}
-                  className="ad-row border-b border-line last:border-0 hover:bg-surface-2/70 cursor-pointer"
+                  className={`ad-row border-b border-line last:border-0 hover:bg-surface-2/70 cursor-pointer ${
+                    r.flagged ? 'bg-[#FAB219]/[0.03]' : ''
+                  }`}
                   style={{ '--i': Math.min(i, 14) }}
                 >
-                  <td className="px-5 py-3">
-                    <span className="block text-fg">{r.name || '—'} {r.source === 'sample' && <SampleTag />}</span>
+                  <td className="px-4 py-3">
+                    <span className="font-mono text-xs text-gold-text font-semibold">{r.id}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="block text-fg font-medium">{r.name || '—'} {r.source === 'sample' && <SampleTag />}</span>
                     <span className="block text-xs text-fg-3">{r.email}</span>
                   </td>
                   <td className="px-3 py-3"><TypeTag type={r.type} /></td>
                   <td className="px-3 py-3 text-fg-2">{r.organisation || '—'}</td>
                   <td className="px-3 py-3 text-fg-2">{r.country || '—'}</td>
                   <td className="px-3 py-3 text-fg-3 whitespace-nowrap">{timeAgo(r.submittedAt)}</td>
-                  <td className="px-5 py-3"><StatusBadge status={r.status} /></td>
+                  <td className="px-3 py-3"><StatusBadge status={r.status} /></td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFlag(r.id, r.type === 'query' ? 'queries' : 'registrations');
+                      }}
+                      className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
+                        r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+                      }`}
+                      title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
+                    >
+                      <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -709,7 +1376,7 @@ Bharat Connect Secretariat`;
         </div>
         {rows.length === 0 && <Empty text="No registrations match these filters." />}
         <p className="px-5 py-3 border-t border-line text-xs text-fg-3">
-          {rows.length} of {withQueries.length} records{rows.length > 200 ? ' · showing the latest 200' : ''}
+          {rows.length} of {registrations.length} records{rows.length > 200 ? ' · showing the latest 200' : ''}
         </p>
       </div>
     </div>
@@ -811,16 +1478,16 @@ function SignIns({ logins, registrations }) {
 /* ── Detail drawer ────────────────────────────────────── */
 
 const FIELD_LABELS = {
-  id: 'Reference', email: 'Email', phone: 'Phone', organisation: 'Organisation', designation: 'Designation',
-  country: 'Country', detail: 'Category', sector: 'Sector', dealSize: 'Deal size', payment: 'Payment',
-  message: 'Message', b2b: 'B2B deal rooms', visaLetter: 'Visa letter',
+  id: 'Reference / ID', email: 'Email', phone: 'Phone', organisation: 'Organisation', organization: 'Organisation',
+  designation: 'Designation', country: 'Country', detail: 'Category / Track', sector: 'Sector',
+  dealSize: 'Deal size', payment: 'Payment', message: 'Message', b2b: 'B2B deal rooms', visaLetter: 'Visa letter',
+  category: 'Inquiry Category', dept: 'Department', subject: 'Subject', urgent: 'Urgent Protocol',
 };
 
-// "dpiitNumber" → "Dpiit number"
 const fieldLabel = (k) => k.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase()).replace(/ ([A-Z])(?=[a-z])/g, (m, c) => ` ${c.toLowerCase()}`);
 const formatValue = (v) => (typeof v === 'boolean' ? (v ? 'Yes' : 'No') : Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v));
 
-function Drawer({ record, onClose }) {
+function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
@@ -829,41 +1496,103 @@ function Drawer({ record, onClose }) {
 
   if (!record) return null;
   const r = record;
+  const isQuery = r.type === 'query';
   const fields = Object.keys(FIELD_LABELS).filter((k) => r[k] !== undefined && r[k] !== '' && r[k] !== null);
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={`${r.name} details`}>
       <div className="absolute inset-0 bg-black/60 animate-fade-in" onClick={onClose} />
       <aside className="ad-drawer absolute right-0 top-0 bottom-0 w-full max-w-md bg-surface-0 border-l border-line overflow-y-auto">
-        <div className="h-1" style={{ background: TYPES[r.type]?.color }} />
+        <div className="h-1.5" style={{ background: TYPES[r.type]?.color || '#FAB219' }} />
         <div className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <TypeTag type={r.type} />
-              <h2 className="mt-2 font-serif text-2xl text-fg">{r.name || 'Unnamed'}</h2>
-              <p className="text-sm text-fg-3">Submitted {new Date(r.submittedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+              <div className="flex items-center gap-2">
+                <TypeTag type={r.type} />
+                {r.urgent && (
+                  <span className="text-[10px] font-mono font-bold text-coral bg-coral/15 px-1.5 py-0.5 rounded border border-coral/30">
+                    URGENT
+                  </span>
+                )}
+              </div>
+              <h2 className="mt-2 font-serif text-2xl text-fg">{r.name || r.fullName || 'Unnamed'}</h2>
+              <p className="text-sm text-fg-3">
+                Submitted {new Date(r.submittedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+              </p>
             </div>
             <button onClick={onClose} className="w-9 h-9 rounded-lg text-fg-3 hover:text-fg hover:bg-surface-3 flex items-center justify-center cursor-pointer" aria-label="Close">
               <X className="w-4 h-4" strokeWidth={1.5} />
             </button>
           </div>
 
-          <div className="mt-4 flex items-center gap-3">
-            <StatusBadge status={r.status} />
-            {r.source === 'sample' && <SampleTag />}
+          {/* Status & Flag Actions Row */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-surface-2/60 border border-line">
+            <div className="flex items-center gap-2">
+              <StatusBadge status={r.status} />
+              {r.source === 'sample' && <SampleTag />}
+            </div>
+
+            {/* Flag for Review Toggle */}
+            <button
+              type="button"
+              onClick={() => onToggleFlag(r.id, isQuery ? 'queries' : 'registrations')}
+              className={`h-8 px-3 rounded-lg border flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors ${
+                r.flagged
+                  ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                  : 'border-line text-fg-3 hover:text-fg hover:bg-surface-3'
+              }`}
+            >
+              <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+              <span>{r.flagged ? 'Flagged for review' : 'Flag for review'}</span>
+            </button>
           </div>
 
+          {/* Query Status Selector */}
+          {isQuery && (
+            <div className="mt-4 p-3.5 rounded-xl border border-line bg-surface-1">
+              <label className="block text-xs font-medium text-fg mb-1.5">Query Processing Status</label>
+              <div className="grid grid-cols-2 gap-2">
+                {['received', 'in-progress', 'answered', 'closed'].map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => onUpdateStatus(r.id, st)}
+                    className={`h-8 px-2 rounded-lg text-xs font-medium border transition-colors cursor-pointer capitalize ${
+                      r.status === st
+                        ? 'bg-surface-3 border-gold-foil text-gold-text font-semibold'
+                        : 'border-line text-fg-3 hover:text-fg hover:bg-surface-2'
+                    }`}
+                  >
+                    {st.replace('-', ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Query Message Block */}
+          {isQuery && r.message && (
+            <div className="mt-4 p-3.5 rounded-xl border border-line bg-surface-2">
+              <p className="text-xs font-medium text-gold-text mb-1 flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5" /> Full Inquiry Message
+              </p>
+              <p className="text-xs sm:text-sm text-fg leading-relaxed whitespace-pre-wrap">{r.message}</p>
+            </div>
+          )}
+
+          {/* Key Fields */}
           <dl className="mt-6 divide-y divide-line border-y border-line">
             {fields.map((k) => (
               <div key={k} className="py-2.5 grid grid-cols-[120px_1fr] gap-3 text-sm">
                 <dt className="text-fg-3">{FIELD_LABELS[k]}</dt>
-                <dd className={`text-fg break-words ${k === 'id' ? 'font-mono text-xs pt-0.5' : ''}`}>
+                <dd className={`text-fg break-words ${k === 'id' ? 'font-mono text-xs pt-0.5 text-gold-text' : ''}`}>
                   {typeof r[k] === 'boolean' ? (r[k] ? 'Yes' : 'No') : String(r[k])}
                 </dd>
               </div>
             ))}
           </dl>
 
+          {/* Registration Form Details */}
           {r.details && typeof r.details === 'object' && (
             <details className="mt-6 group" open>
               <summary className="text-xs font-medium text-fg cursor-pointer select-none">Full form ({Object.keys(r.details).length} fields)</summary>
@@ -880,6 +1609,7 @@ function Drawer({ record, onClose }) {
             </details>
           )}
 
+          {/* Review Approval Controls */}
           {TYPES[r.type]?.approvable && (
             <div className="mt-6 flex flex-wrap gap-2">
               {r.status !== 'approved' && (
@@ -893,11 +1623,23 @@ function Drawer({ record, onClose }) {
               )}
             </div>
           )}
+
           {r.email && (
-            <a href={`mailto:${r.email}`} className="mt-4 inline-flex items-center gap-1.5 text-sm text-fg-2 hover:text-gold-text">
-              Email {r.name?.split(' ')[0] || 'them'} <ArrowUpRight className="w-4 h-4" strokeWidth={1.5} />
-            </a>
+            <div className="mt-5 pt-3 border-t border-line flex items-center justify-between">
+              <a
+                href={`mailto:${r.email}?subject=${encodeURIComponent(`Bharat Connect 2026: Reference ${r.id}`)}`}
+                className="inline-flex items-center gap-1.5 text-sm text-gold-text hover:text-fg font-medium"
+              >
+                <Mail className="w-4 h-4" strokeWidth={1.5} /> Email {r.name?.split(' ')[0] || 'submitter'} <ArrowUpRight className="w-4 h-4" strokeWidth={1.5} />
+              </a>
+              {r.phone && (
+                <a href={`tel:${r.phone}`} className="inline-flex items-center gap-1 text-xs text-fg-3 hover:text-fg">
+                  <Phone className="w-3.5 h-3.5" /> Call
+                </a>
+              )}
+            </div>
           )}
+
           {r.source === 'sample' && (
             <p className="mt-6 text-xs text-fg-3 leading-relaxed">This is a sample record for demonstration, not a real person.</p>
           )}

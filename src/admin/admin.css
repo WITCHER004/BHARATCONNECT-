@@ -178,6 +178,36 @@ button.ad-card:not(:disabled):hover {
   background: rgb(208 59 59 / 0.1);
 }
 
+.ad-badge-received {
+  color: #8A9E97;
+  border-color: rgb(138 158 151 / 0.4);
+  background: rgb(138 158 151 / 0.1);
+}
+
+.ad-badge-in-progress {
+  color: #5B8DEF;
+  border-color: rgb(91 141 239 / 0.45);
+  background: rgb(91 141 239 / 0.1);
+}
+
+.ad-badge-answered {
+  color: #2FA58C;
+  border-color: rgb(47 165 140 / 0.45);
+  background: rgb(47 165 140 / 0.1);
+}
+
+.ad-badge-closed {
+  color: #9CA3AF;
+  border-color: rgb(156 163 175 / 0.35);
+  background: rgb(156 163 175 / 0.08);
+}
+
+.ad-badge-flagged {
+  color: #FAB219;
+  border-color: rgb(250 178 25 / 0.5);
+  background: rgb(250 178 25 / 0.15);
+}
+
 .ad-action {
   font-size: 12px;
   color: var(--color-fg-2);

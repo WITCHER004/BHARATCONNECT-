@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, Activity, Check, HelpCircle } from 'lucide-react';
 import { TYPES, TYPE_ORDER, STATUS } from '../data/registry';
 
 /* ── helpers ─────────────────────────────────────────── */
 
-export const STATUS_ICON = { pending: Clock, approved: CheckCircle2, declined: XCircle };
+export const STATUS_ICON = {
+  pending: Clock,
+  approved: CheckCircle2,
+  declined: XCircle,
+  received: HelpCircle,
+  'in-progress': Activity,
+  answered: CheckCircle2,
+  closed: Check,
+};
 
 export function timeAgo(iso) {
   const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
@@ -64,15 +72,20 @@ export function Counter({ value, suffix = '' }) {
 
 /* ── Status badge: colour + icon + label, never colour alone ─ */
 
+export const QUERY_STATUS = {
+  received: { label: 'Received', color: '#8A9E97' },
+  'in-progress': { label: 'In Progress', color: '#5B8DEF' },
+  answered: { label: 'Answered', color: '#2FA58C' },
+  closed: { label: 'Closed', color: '#9CA3AF' },
+};
+
 export function StatusBadge({ status }) {
-  if (!STATUS[status]) {
-    return <span className="text-xs text-fg-3">Received</span>;
-  }
-  const Icon = STATUS_ICON[status];
+  const meta = STATUS[status] || QUERY_STATUS[status] || { label: status || 'Received', color: '#8A9E97' };
+  const Icon = STATUS_ICON[status] || STATUS_ICON.received;
   return (
     <span className={`ad-badge ad-badge-${status}`}>
       <Icon className="w-3.5 h-3.5" strokeWidth={2} aria-hidden="true" />
-      {STATUS[status].label}
+      {meta.label}
     </span>
   );
 }

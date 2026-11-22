@@ -100,7 +100,7 @@ export async function findMyRecord(ref) {
 
 /* The signed-in visitor's registrations, live. Returns an unsubscribe function. */
 export function watchMyRegistrations(uid, cb) {
-  if (!uid) { cb([]); return () => {}; }
+  if (!uid) { cb([]); return () => { }; }
   return onSnapshot(
     query(collection(db, 'registrations'), where('uid', '==', uid)),
     (s) => cb(s.docs.map((d) => toRecord(d, 'registrations'))),
@@ -119,19 +119,65 @@ export function watchStartupDirectory(cb) {
 
 /* ── Reading (used by the admin panel) ─────────────── */
 
+// Local flag overrides so review flags persist instantly even for sample records
+const LOCAL_FLAGS_KEY = 'babc_admin_flags';
+function getLocalFlags() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_FLAGS_KEY) || '{}'); } catch { return {}; }
+}
+function setLocalFlag(id, flagged) {
+  try {
+    const flags = getLocalFlags();
+    if (flagged) flags[id] = true;
+    else delete flags[id];
+    localStorage.setItem(LOCAL_FLAGS_KEY, JSON.stringify(flags));
+  } catch { /* storage unavailable */ }
+}
+
 const iso = (t) => (t?.toDate ? t.toDate().toISOString() : t || null);
 
 function toRecord(d, coll) {
   const r = d.data();
+  const flags = getLocalFlags();
+  const isFlagged = flags[d.id] !== undefined ? flags[d.id] : !!r.flagged;
   // a just-written record has no server time yet; show it as "now" until it arrives
   const submittedAt = iso(r.submittedAt) || new Date().toISOString();
   if (coll === 'queries') {
     return {
-      ...r, id: d.id, type: 'query', name: r.fullName || '', organisation: r.organization || '',
-      detail: r.subject || r.category || 'Inquiry', submittedAt, decidedAt: iso(r.decidedAt), source: 'live',
+      ...r,
+      id: d.id,
+      ref: d.id,
+      type: 'query',
+      name: r.fullName || r.name || 'Anonymous Inquirer',
+      fullName: r.fullName || r.name || '',
+      email: r.email || '',
+      phone: r.phone || '',
+      organisation: r.organization || r.organisation || '—',
+      organization: r.organization || r.organisation || '—',
+      country: r.country || 'India',
+      regId: r.regId || '',
+      category: r.category || 'General Conclave Inquiry',
+      dept: r.dept || 'Secretariat Helpdesk',
+      subject: r.subject || 'Conclave General Query',
+      message: r.message || '',
+      urgent: !!r.urgent,
+      flagged: isFlagged,
+      flaggedAt: iso(r.flaggedAt),
+      status: r.status || 'received',
+      submittedAt,
+      decidedAt: iso(r.decidedAt),
+      source: 'live',
     };
   }
-  return { ...r, id: d.id, submittedAt, decidedAt: iso(r.decidedAt), source: 'live' };
+  return {
+    ...r,
+    id: d.id,
+    ref: d.id,
+    flagged: isFlagged,
+    flaggedAt: iso(r.flaggedAt),
+    submittedAt,
+    decidedAt: iso(r.decidedAt),
+    source: 'live',
+  };
 }
 
 // Live copies of the three collections, kept while the admin panel is subscribed
@@ -168,12 +214,46 @@ export function subscribe(cb) {
 export const loadError = () => lastError;
 
 export function listRegistrations({ includeSamples = false } = {}) {
+  const flags = getLocalFlags();
   const live = [...cache.registrations, ...cache.queries].map((r) => ({
     ...r,
-    status: TYPES[r.type]?.approvable ? (STATUS[r.status] ? r.status : 'pending') : 'received',
+    status: TYPES[r.type]?.approvable ? (STATUS[r.status] ? r.status : 'pending') : (r.status || 'received'),
+    flagged: flags[r.id] !== undefined ? flags[r.id] : !!r.flagged,
     note: r.note || '',
   }));
   const all = includeSamples ? [...live, ...sampleRegistrations()] : live;
+  return all.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+}
+
+/* Dedicated list of registered users (delegates, startups, collaborations, panel applicants) */
+export function listRegisteredUsers({ includeSamples = false } = {}) {
+  const flags = getLocalFlags();
+  const liveUsers = cache.registrations
+    .filter((r) => r.type !== 'query')
+    .map((r) => ({
+      ...r,
+      ref: r.id,
+      flagged: flags[r.id] !== undefined ? flags[r.id] : !!r.flagged,
+      status: STATUS[r.status] ? r.status : 'pending',
+      note: r.note || '',
+    }));
+  const all = includeSamples
+    ? [...liveUsers, ...sampleRegistrations().filter((r) => r.type !== 'query')]
+    : liveUsers;
+  return all.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+}
+
+/* Dedicated list of helpdesk queries */
+export function listQueries({ includeSamples = false } = {}) {
+  const flags = getLocalFlags();
+  const live = cache.queries.map((q) => ({
+    ...q,
+    ref: q.id,
+    flagged: flags[q.id] !== undefined ? flags[q.id] : !!q.flagged,
+    status: q.status || 'received',
+    note: q.note || '',
+  }));
+  const all = includeSamples ? [...live, ...sampleQueries()] : live;
   return all.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 }
 
@@ -182,11 +262,64 @@ export function listLogins({ includeSamples = false } = {}) {
   return [...all].sort((a, b) => new Date(b.at) - new Date(a.at));
 }
 
+/* Toggle flag for review across any record (registration, user, or query) */
+export async function toggleFlag(id, coll = 'registrations') {
+  const flags = getLocalFlags();
+  const current = flags[id] !== undefined ? flags[id] : false;
+  const next = !current;
+  setLocalFlag(id, next);
+
+  // Update in-memory cache immediately
+  const targetColl = coll === 'queries' || id.includes('-QRY-') ? 'queries' : 'registrations';
+  const list = targetColl === 'queries' ? cache.queries : cache.registrations;
+  const item = list.find((x) => x.id === id);
+  if (item) {
+    item.flagged = next;
+    item.flaggedAt = next ? new Date().toISOString() : null;
+  }
+  notify();
+
+  if (id.startsWith('SAMPLE-')) return next;
+
+  try {
+    await updateDoc(doc(db, targetColl, id), {
+      flagged: next,
+      flaggedAt: next ? serverTimestamp() : null,
+      flaggedBy: auth.currentUser?.email || auth.currentUser?.uid || 'admin',
+    });
+  } catch (err) {
+    console.warn('Flag status updated locally; Firestore error:', err);
+  }
+  return next;
+}
+
+/* Update status of a helpdesk query */
+export async function updateQueryStatus(id, status, note = '') {
+  const item = cache.queries.find((x) => x.id === id);
+  if (item) {
+    item.status = status;
+    if (note) item.note = note;
+    item.decidedAt = new Date().toISOString();
+    notify();
+  }
+  if (id.startsWith('SAMPLE-')) return;
+  try {
+    await updateDoc(doc(db, 'queries', id), {
+      status,
+      note,
+      decidedAt: serverTimestamp(),
+      decidedBy: auth.currentUser?.email || auth.currentUser?.uid || 'admin',
+    });
+  } catch (err) {
+    console.warn('Query status updated locally; Firestore error:', err);
+  }
+}
+
 /* Approve, decline or reset a registration. Approving a startup lists it on the public Startups page. */
 export async function decide(id, status, note = '') {
   const r = cache.registrations.find((x) => x.id === id);
   if (!r) return; // sample records are not stored anywhere
-  await updateDoc(doc(db, 'registrations', id), { status, note, decidedAt: serverTimestamp(), decidedBy: auth.currentUser.uid });
+  await updateDoc(doc(db, 'registrations', id), { status, note, decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid || 'admin' });
   if (r.type !== 'startup') return;
   const card = doc(db, 'startupDirectory', id);
   if (status === 'approved') {
@@ -272,24 +405,53 @@ function sampleRegistrations() {
   return sampleCache;
 }
 
-let loginCache = null;
-function sampleLogins() {
-  if (loginCache) return loginCache;
-  const rnd = seeded(18);
+let queryCache = null;
+export function sampleQueries() {
+  if (queryCache) return queryCache;
+  const rnd = seeded(77);
   const pick = (arr) => arr[Math.floor(rnd() * arr.length)];
   const now = Date.now();
-  loginCache = Array.from({ length: 70 }, () => {
+  const sampleTopics = [
+    { cat: 'Startup Showcase & Pavilion', dept: 'Startups & Innovation Desk', sub: 'Startup Pavilion allocation and presentation schedule' },
+    { cat: 'B2B Matchmaking & Deal Rooms', dept: 'Bilateral Trade Directorate', sub: 'Private bilateral meeting slot with Saudi delegation' },
+    { cat: 'Exhibition Stalls & Pavilions', dept: 'Exhibition & Space Operations', sub: 'Custom stall fabrication and AV rental options' },
+    { cat: 'Diplomatic Protocol & Visas', dept: 'IACCIA Protocol Office', sub: 'Urgent Visa Support Letter for ministerial delegation' },
+    { cat: 'Programme & Keynotes', dept: 'Summit Content & Speaker Bureau', sub: 'Plenary keynote timing and speaker bio update' },
+    { cat: 'Invoices, GST & Accreditations', dept: 'Finance & Accounts Secretariat', sub: 'GST invoice request and corporate pass receipt' },
+    { cat: 'General Conclave Inquiry', dept: 'General Information Bureau', sub: 'Palash Hall access and Yashobhoomi parking badges' },
+  ];
+  const statuses = ['received', 'in-progress', 'answered', 'closed'];
+
+  queryCache = Array.from({ length: 32 }, (_, i) => {
+    const topic = pick(sampleTopics);
     const first = pick(FIRST);
     const last = pick(LAST);
-    const r = rnd();
+    const ageDays = Math.pow(rnd(), 1.3) * 12;
+    const isUrgent = rnd() < 0.28;
+    const status = pick(statuses);
+    const ref = `SAMPLE-QRY-${String(i + 1).padStart(4, '0')}`;
     return {
-      action: r < 0.2 ? 'sign-up' : r < 0.85 ? 'sign-in' : 'sign-out',
+      id: ref,
+      ref,
+      type: 'query',
       name: `${first} ${last}`,
+      fullName: `${first} ${last}`,
       email: `${first}.${last}`.toLowerCase().replace(/[^a-z.]/g, '') + '@example.com',
-      method: rnd() < 0.6 ? 'Google' : 'Email',
-      at: new Date(now - Math.pow(rnd(), 1.3) * 14 * 86400000).toISOString(),
+      phone: `+91 98${Math.floor(10000000 + rnd() * 90000000)}`,
+      organisation: pick(ORGS),
+      organization: pick(ORGS),
+      country: pick(COUNTRIES),
+      category: topic.cat,
+      dept: topic.dept,
+      subject: topic.sub,
+      message: `Inquiry regarding ${topic.sub.toLowerCase()}. We need clarification on participation guidelines, pass limits, and schedule for the upcoming conclave at Yashobhoomi.`,
+      urgent: isUrgent,
+      flagged: isUrgent && rnd() < 0.6,
+      status,
+      submittedAt: new Date(now - ageDays * 86400000).toISOString(),
+      decidedAt: status === 'answered' || status === 'closed' ? new Date(now - ageDays * 86400000 * 0.4).toISOString() : null,
       source: 'sample',
     };
   });
-  return loginCache;
+  return queryCache;
 }

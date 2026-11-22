@@ -15,10 +15,13 @@ import StartupsPage from './pages/StartupsPage';
 import { PANEL_IDS } from './data/panels';
 
 const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'startups', 'collaborate', 'query', ...PANEL_IDS];
+const TERMS_PORTAL_PAGES = ['register', 'startup', 'collaborate', 'exhibition', 'query'];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
 import { useAuth } from './auth/AuthContext';
+import TermsConsentModal from './components/TermsConsentModal';
+import { hasAccepted } from './data/terms';
 
 export default function App() {
   // Sync with URL hash if present (#home, #schedule, #exhibition, #experience, #register, #startup, #collaborate, #query)
@@ -38,6 +41,15 @@ export default function App() {
       return true;
     }
   });
+  const [termsAgreedNonce, setTermsAgreedNonce] = useState(0);
+
+  useEffect(() => {
+    const handleTermsChange = () => {
+      setTermsAgreedNonce((n) => n + 1);
+    };
+    window.addEventListener('babc-terms-change', handleTermsChange);
+    return () => window.removeEventListener('babc-terms-change', handleTermsChange);
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -155,6 +167,15 @@ export default function App() {
       <Footer
         onNavigate={navigate}
         onOpenRegister={handleOpenRegister}
+      />
+
+      {/* Page-Specific Terms and Conditions Consent Modal */}
+      <TermsConsentModal
+        key={`${activePage}-${termsAgreedNonce}`}
+        portalId={activePage}
+        isOpen={TERMS_PORTAL_PAGES.includes(activePage) && !hasAccepted(activePage)}
+        onAgree={() => setTermsAgreedNonce((n) => n + 1)}
+        onNavigate={handleNavigate}
       />
 
       {/* Sign in / sign up */}

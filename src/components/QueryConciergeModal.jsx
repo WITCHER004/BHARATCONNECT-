@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { STATUS_TEXT } from '../pages/QueryPage';
 import { submitQuery, findMyRecord } from '../data/registry';
+import { hasAccepted, accept, TERMS_LINK } from '../data/terms';
 
 export default function QueryConciergeModal({ onNavigate }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function QueryConciergeModal({ onNavigate }) {
   const [ticketId, setTicketId] = useState('');
   const [copied, setCopied] = useState(false);
   const [sending, setSending] = useState(false);
+  const [agreed, setAgreed] = useState(() => hasAccepted('query'));
   const [sendError, setSendError] = useState('');
 
   // Quick lookup state
@@ -25,7 +27,8 @@ export default function QueryConciergeModal({ onNavigate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !email || !message) return;
+    if (!name || !email || !message || !agreed) return;
+    accept('query');
     setSending(true);
     setSendError('');
     try {
@@ -182,10 +185,17 @@ export default function QueryConciergeModal({ onNavigate }) {
                   />
                 </div>
 
+                <label className="flex items-start gap-2 text-xs text-fg-2 cursor-pointer">
+                  <input type="checkbox" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 accent-[#D9604A]" />
+                  <span>
+                    I agree to the helpdesk terms and the{' '}
+                    <a href={TERMS_LINK} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-fg">Registration Terms</a>.
+                  </span>
+                </label>
                 {sendError && <p className="text-xs text-negative" role="alert">{sendError}</p>}
                 <button
                   type="submit"
-                  disabled={sending}
+                  disabled={sending || !agreed}
                   className="w-full btn-primary h-10 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1 whitespace-nowrap"
                 >
                   <Send className="w-3.5 h-3.5" />

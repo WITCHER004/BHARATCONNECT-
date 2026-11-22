@@ -110,6 +110,8 @@ export default function CollaborationPage({ onNavigate }) {
   const [status, setStatus] = useState('idle');
   const [assignedTicket, setAssignedTicket] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [termsAgreed, setTermsAgreed] = useState(true);
+  const [termsError, setTermsError] = useState('');
 
   // fill in the liaison's name and email once they sign in, without overwriting what they typed
   useEffect(() => {
@@ -128,6 +130,12 @@ export default function CollaborationPage({ onNavigate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!termsAgreed) {
+      setTermsError('Please agree to the Bilateral Collaboration & Sovereign Directorate Terms.');
+      setStatus('idle');
+      return;
+    }
+    setTermsError('');
     setStatus('submitting');
     const trackObj = COLLAB_TRACKS.find((t) => t.id === form.track);
     const trackTitle = trackObj?.title || 'Summit Strategic Collaboration';
@@ -624,6 +632,51 @@ PARTNERSHIP DIRECTORATE:
                           </span>
                         </div>
                       </label>
+                    </div>
+
+                    {/* Collaboration Terms Agreement Box */}
+                    <div className="p-4 rounded-xl bg-surface-2 border border-line space-y-2 mt-4 mb-2">
+                      <div className="flex items-start gap-2.5">
+                        <ShieldCheck className="w-4 h-4 text-gold-text shrink-0 mt-0.5" />
+                        <span className="text-xs text-fg-2 leading-relaxed">
+                          <strong className="text-fg">Bilateral Directorate Terms: </strong>
+                          Partnership inquiries are registered as official letters of intent (LOI). Pavilion spaces and ministerial meetings are allocated pursuant to bilateral quota clearances.
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-5 pt-1 border-t border-line/60">
+                        <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-fg select-none">
+                          <input
+                            type="radio"
+                            name="collab-terms"
+                            checked={termsAgreed === true}
+                            onChange={() => {
+                              setTermsAgreed(true);
+                              setTermsError('');
+                            }}
+                            className="accent-gold-text w-3.5 h-3.5"
+                          />
+                          <span>I Agree</span>
+                        </label>
+
+                        <label className="flex items-center gap-1.5 cursor-pointer text-xs text-fg-3 hover:text-fg-2 select-none">
+                          <input
+                            type="radio"
+                            name="collab-terms"
+                            checked={termsAgreed === false}
+                            onChange={() => {
+                              setTermsAgreed(false);
+                              setTermsError('You must agree to the Directorate Terms to submit a collaboration docket.');
+                            }}
+                            className="accent-coral w-3.5 h-3.5"
+                          />
+                          <span>Disagree</span>
+                        </label>
+                      </div>
+                      {termsError && (
+                        <p className="text-[11px] text-coral pt-0.5" role="alert">
+                          {termsError}
+                        </p>
+                      )}
                     </div>
 
                     {/* Submit CTA */}
