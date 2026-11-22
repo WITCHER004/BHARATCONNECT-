@@ -3,38 +3,28 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { BrandMark } from '../components/Navbar';
-import DemoAuthForm from './DemoAuthForm';
+import AuthForm from './AuthForm';
 
 /*
   The sign in / sign up window. Opened with openAuth({ mode, reason, then }) from anywhere.
-  Accounts are Google accounts: signing up creates the account the first time someone continues with Google.
+  Accounts are Firebase accounts: Google, or email and password.
 */
 
 const COPY = {
   signin: {
     title: 'Welcome back',
-    body: 'Sign in with the Google account you used before to continue.',
-    demoBody: 'Sign in to your Bharat Connect account to continue.',
-    button: 'signin_with',
+    body: 'Sign in to your Bharat Connect account to continue.',
   },
   signup: {
     title: 'Create your account',
-    body: 'Sign up with your Google account. It takes a few seconds and keeps your registrations in one place.',
-    demoBody: 'It takes a few seconds and keeps your registrations in one place.',
-    button: 'signup_with',
+    body: 'It takes a few seconds and keeps your registrations in one place.',
   },
 };
 
 export default function AuthModal() {
-  const { authRequest, closeAuth, setAuthMode, ready, error, configured, renderButton, demo } = useAuth();
-  const buttonRef = useRef(null);
+  const { authRequest, closeAuth, setAuthMode } = useAuth();
   const dialogRef = useRef(null);
   const mode = authRequest?.mode === 'signup' ? 'signup' : 'signin';
-
-  // draw Google's button for the current tab
-  useEffect(() => {
-    if (authRequest && ready && !demo) renderButton(buttonRef.current, { text: COPY[mode].button });
-  }, [authRequest, ready, mode, renderButton, demo]);
 
   // Escape closes; focus moves into the window; the page behind stops scrolling
   useEffect(() => {
@@ -99,27 +89,11 @@ export default function AuthModal() {
 
         <h2 id="auth-title" className="mt-6 font-serif text-2xl font-medium text-fg">{copy.title}</h2>
         {authRequest.reason && <p className="mt-2 text-sm text-gold-text">{authRequest.reason}</p>}
-        <p className="mt-2 text-[15px] text-fg-2 leading-relaxed">{demo ? copy.demoBody : copy.body}</p>
+        <p className="mt-2 text-[15px] text-fg-2 leading-relaxed">{copy.body}</p>
 
-        {demo ? (
-          <div className="mt-6">
-            <DemoAuthForm key={mode} mode={mode} />
-          </div>
-        ) : configured ? (
-          <div className="mt-6 flex flex-col items-center gap-3">
-            <div ref={buttonRef} className="w-full max-w-[320px] min-h-11 flex justify-center" />
-            {!ready && !error && <p className="text-sm text-fg-3">Loading Google sign-in…</p>}
-            {error && <p className="text-sm text-negative" role="alert">{error}</p>}
-          </div>
-        ) : (
-          <div className="mt-6 surface-raised rounded-xl p-4 text-sm text-fg-2 leading-relaxed">
-            <p className="text-fg font-medium">Sign-in is not set up yet</p>
-            <p className="mt-2">
-              Add a Google OAuth client ID to <span className="font-mono text-fg">.env.local</span> as{' '}
-              <span className="font-mono text-fg">VITE_GOOGLE_CLIENT_ID</span> and restart the dev server.
-            </p>
-          </div>
-        )}
+        <div className="mt-6">
+          <AuthForm key={mode} mode={mode} />
+        </div>
 
         <p className="mt-6 text-sm text-fg-3 text-center">
           {mode === 'signin' ? (
@@ -128,11 +102,6 @@ export default function AuthModal() {
             <>Already registered? <button onClick={() => setAuthMode('signin')} className="text-fg underline underline-offset-4 decoration-line-strong hover:decoration-fg cursor-pointer">Sign in</button></>
           )}
         </p>
-        {!demo && (
-          <p className="mt-4 text-xs text-fg-3 text-center leading-relaxed">
-            We see only your name, email address and profile photo from Google.
-          </p>
-        )}
       </div>
     </div>,
     document.body

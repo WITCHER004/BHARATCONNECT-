@@ -293,16 +293,3 @@ export const PANEL_IDS = PANELS.map((p) => p.id);
 export function getPanel(id) {
   return PANELS.find((p) => p.id === id) || PANELS[0];
 }
-
-export function getNextPanelId(code) {
-  const prefix = `BMF.BC-${code}-`;
-  const key = `bc-panel-${code.toLowerCase()}-counter`;
-  try {
-    const parsed = parseInt(localStorage.getItem(key) || '0', 10);
-    const nextNum = Number.isNaN(parsed) || parsed < 1 ? 1 : parsed + 1;
-    localStorage.setItem(key, String(nextNum));
-    return `${prefix}${String(nextNum).padStart(5, '0')}`;
-  } catch {
-    return `${prefix}00001`;
-  }
-}

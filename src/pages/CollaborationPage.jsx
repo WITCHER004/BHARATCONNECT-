@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Handshake,
   Building2,
@@ -23,26 +23,8 @@ import {
 } from 'lucide-react';
 import { ARAB_NATIONS } from '../data/conclaveData';
 import { useAuth } from '../auth/AuthContext';
-
-const COLLAB_COUNTER_KEY = 'bc-collab-reg-counter';
-const COLLAB_HISTORY_KEY = 'bc-collaboration-history';
-
-function getNextCollabId() {
-  try {
-    const raw = localStorage.getItem(COLLAB_COUNTER_KEY);
-    let nextNum = 1;
-    if (raw) {
-      const parsed = parseInt(raw, 10);
-      if (!isNaN(parsed) && parsed >= 1) {
-        nextNum = parsed + 1;
-      }
-    }
-    localStorage.setItem(COLLAB_COUNTER_KEY, String(nextNum));
-    return `BMF.BC-CBC-${String(nextNum).padStart(5, '0')}`;
-  } catch {
-    return 'BMF.BC-CBC-00001';
-  }
-}
+import SignInGate from '../auth/SignInGate';
+import { submitRegistration } from '../data/registry';
 
 const COLLAB_TRACKS = [
   {
@@ -129,6 +111,11 @@ export default function CollaborationPage({ onNavigate }) {
   const [assignedTicket, setAssignedTicket] = useState(null);
   const [copied, setCopied] = useState(false);
 
+  // fill in the liaison's name and email once they sign in, without overwriting what they typed
+  useEffect(() => {
+    if (user) setForm((f) => ({ ...f, liaisonName: f.liaisonName || user.name || '', email: f.email || user.email || '' }));
+  }, [user]);
+
   const selectedTrackData = useMemo(() => {
     return COLLAB_TRACKS.find((t) => t.id === form.track) || COLLAB_TRACKS[0];
   }, [form.track]);
@@ -139,37 +126,36 @@ export default function CollaborationPage({ onNavigate }) {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('submitting');
-
-    const newId = getNextCollabId();
     const trackObj = COLLAB_TRACKS.find((t) => t.id === form.track);
-
-    const submission = {
-      id: newId,
-      ...form,
-      trackTitle: trackObj?.title || 'Summit Strategic Collaboration',
-      createdAt: new Date().toISOString(),
-      status: 'Under Review by Directorate',
-      assignedDesk: 'Directorate of Strategic Alliances & Partnerships',
-      eta: form.urgentProtocol ? '12 Hours (Fast-Track Protocol)' : '24 Hours (Standard Review)',
-    };
-
-    // Save to localStorage history
+    const trackTitle = trackObj?.title || 'Summit Strategic Collaboration';
     try {
-      const existing = JSON.parse(localStorage.getItem(COLLAB_HISTORY_KEY) || '[]');
-      existing.unshift(submission);
-      localStorage.setItem(COLLAB_HISTORY_KEY, JSON.stringify(existing));
-    } catch (err) {
-      console.error('Failed to save collaboration ticket to localStorage', err);
-    }
-
-    setTimeout(() => {
-      setAssignedTicket(submission);
+      const newId = await submitRegistration('collaboration', {
+        name: form.liaisonName,
+        email: form.email,
+        organisation: form.orgName,
+        country: form.country,
+        detail: trackTitle,
+        sector: form.orgType,
+        phone: form.phone,
+        details: { ...form, trackTitle },
+      });
+      setAssignedTicket({
+        id: newId,
+        ...form,
+        trackTitle,
+        createdAt: new Date().toISOString(),
+        status: 'Under Review by Directorate',
+        assignedDesk: 'Directorate of Strategic Alliances & Partnerships',
+        eta: form.urgentProtocol ? '12 Hours (Fast-Track Protocol)' : '24 Hours (Standard Review)',
+      });
       setStatus('submitted');
       window.scrollTo({ top: 200, behavior: 'smooth' });
-    }, 700);
+    } catch {
+      setStatus('failed');
+    }
   };
 
   const handleDownloadProspectus = () => {
@@ -374,6 +360,10 @@ PARTNERSHIP DIRECTORATE:
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
               {/* Form Section */}
               <div className="lg:col-span-8">
+                <SignInGate
+                  title="Sign in to submit your collaboration request"
+                  reason="Collaboration requests need an account, so your docket, protocol requests and Secretariat replies stay tied to you."
+                >
                 <form
                   onSubmit={handleSubmit}
                   className="surface-card rounded-2xl p-6 sm:p-10 border border-line shadow-sm"
@@ -646,6 +636,9 @@ PARTNERSHIP DIRECTORATE:
                         <Send className="w-4 h-4" />
                         {status === 'submitting' ? 'Registering Docket…' : 'Submit Collaboration Docket'}
                       </button>
+                      {status === 'failed' && (
+                        <p className="text-sm text-negative" role="alert">We could not submit your docket. Check your connection and try again.</p>
+                      )}
 
                       <div className="text-xs text-fg-3 font-mono text-center sm:text-right">
                         <span>Generates verified ID: </span>
@@ -654,6 +647,7 @@ PARTNERSHIP DIRECTORATE:
                     </div>
                   </div>
                 </form>
+                </SignInGate>
               </div>
 
               {/* Sidebar: Benefits & Directorate Desks */}

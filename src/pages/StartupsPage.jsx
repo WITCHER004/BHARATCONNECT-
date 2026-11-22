@@ -1,27 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Rocket, Search } from 'lucide-react';
-import { listRegistrations, subscribe } from '../data/registry';
+import { watchStartupDirectory } from '../data/registry';
 
 /*
-  Directory of registered startups. Only startups the secretariat has approved in the admin panel
-  appear, and only their public profile (brand, sectors, stage, pitch, website), never founder contact details.
-  shortcut: reads this browser's registry like the admin panel does; it shows every visitor's
-  startups once registry.js is connected to a database.
+  Directory of registered startups. Only startups the Secretariat has approved in the admin panel
+  appear (approving writes a public card to the startupDirectory collection), and only their
+  public profile (brand, sectors, stage, pitch, website), never founder contact details.
 */
-
-const approvedStartups = () =>
-  listRegistrations()
-    .filter((r) => r.type === 'startup' && r.status === 'approved')
-    .map((r) => ({ id: r.id, name: r.profile?.brand || r.organisation, ...(r.profile || {}) }));
 
 const href = (url) => (/^https?:\/\//i.test(url) ? url : `https://${url}`);
 
 export default function StartupsPage({ onNavigate }) {
-  const [startups, setStartups] = useState(approvedStartups);
+  const [startups, setStartups] = useState([]);
   const [query, setQuery] = useState('');
   const [sector, setSector] = useState('All');
 
-  useEffect(() => subscribe(() => setStartups(approvedStartups())), []);
+  useEffect(() => watchStartupDirectory(setStartups), []);
 
   const sectors = useMemo(
     () => ['All', ...new Set(startups.flatMap((s) => s.sectors || []))],

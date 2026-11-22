@@ -3,8 +3,7 @@ import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
 import HolographicSummitPass from '../components/HolographicSummitPass';
 import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw } from 'lucide-react';
 import SignInGate from '../auth/SignInGate';
-import { getNextDelegateId } from '../data/delegateId';
-import { recordRegistration } from '../data/registry';
+import { submitRegistration } from '../data/registry';
 
 const INITIAL_FORM = {
   role: 'Corporate Delegate',
@@ -78,7 +77,9 @@ function Field({ label, children }) {
 export default function RegistrationPage({ defaultRole = 'Corporate Delegate' }) {
   const [step, setStep] = useState(1);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [generatedPassId, setGeneratedPassId] = useState('BMF.BC-DGO-00001');
+  const [generatedPassId, setGeneratedPassId] = useState('BMF.BC-DGO-•••••');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [formData, setFormData] = useState({ ...INITIAL_FORM, role: defaultRole });
 
   const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
@@ -91,16 +92,16 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
     return extra ? extra.code : '';
   };
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
     } else {
-      const passId = getNextDelegateId();
-      setGeneratedPassId(passId);
-      recordRegistration({
-        id: passId,
-        type: 'delegate',
+      setSaving(true);
+      setSaveError('');
+      let passId;
+      try {
+        passId = await submitRegistration('delegate', {
         name: formData.fullName,
         email: formData.email,
         organisation: formData.organization,
@@ -112,7 +113,15 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
         dealSize: formData.dealSize,
         b2b: formData.interestedInB2B,
         visaLetter: formData.requiresVisaLetter,
-      });
+        details: formData,
+        });
+      } catch {
+        setSaveError('We could not save your registration. Check your connection and try again.');
+        return;
+      } finally {
+        setSaving(false);
+      }
+      setGeneratedPassId(passId);
       setIsCompleted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -393,8 +402,9 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
                       <span className="ref-line">Step 1 of 3</span>
                     )}
 
-                    <button type="submit" className="btn-primary h-11 px-5 text-sm">
-                      {step === 3 ? 'Confirm and issue badge' : 'Continue'}
+                    {saveError && <p className="text-sm text-negative" role="alert">{saveError}</p>}
+                    <button type="submit" disabled={saving} className="btn-primary h-11 px-5 text-sm">
+                      {step === 3 ? (saving ? 'Issuing badge…' : 'Confirm and issue badge') : 'Continue'}
                       <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                     </button>
                   </div>

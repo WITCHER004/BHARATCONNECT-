@@ -1,21 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from './AuthContext';
-import DemoAuthForm from './DemoAuthForm';
+import AuthForm from './AuthForm';
 
 /*
   Shows children only to signed-in visitors. Everyone else sees a sign-in panel in its place.
   `title` and `reason` describe what they are signing in for.
 */
 export default function SignInGate({ title, reason, children }) {
-  const { user, ready, error, configured, renderButton, demo } = useAuth();
-  const buttonRef = useRef(null);
+  const { user, ready } = useAuth();
   const [mode, setMode] = useState('signin');
 
-  useEffect(() => {
-    if (!user && ready && !demo) renderButton(buttonRef.current);
-  }, [user, ready, renderButton, demo]);
-
   if (user) return children;
+  // until Firebase has restored the session, don't flash the sign-in panel at a signed-in visitor
+  if (!ready) return <div className="min-h-[320px]" aria-busy="true" />;
 
   return (
     <div className="px-4 sm:px-0">
@@ -26,46 +23,27 @@ export default function SignInGate({ title, reason, children }) {
       <h2 className="mt-4 font-serif text-2xl sm:text-3xl font-medium text-fg">{title}</h2>
       <p className="mt-3 text-[15px] text-fg-2 leading-relaxed">{reason}</p>
 
-      {demo ? (
-        <div className="mt-8">
-          <div role="tablist" aria-label="Sign in or sign up" className="mb-6 grid grid-cols-2 p-1 rounded-xl bg-surface-1 border border-line">
-            {[['signin', 'Sign in'], ['signup', 'Sign up']].map(([id, label]) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={mode === id}
-                onClick={() => setMode(id)}
-                className={`h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  mode === id ? 'bg-surface-3 text-fg' : 'text-fg-2 hover:text-fg'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <DemoAuthForm key={mode} mode={mode} />
+      <div className="mt-8">
+        <div role="tablist" aria-label="Sign in or sign up" className="mb-6 grid grid-cols-2 p-1 rounded-xl bg-surface-1 border border-line">
+          {[['signin', 'Sign in'], ['signup', 'Sign up']].map(([id, label]) => (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={mode === id}
+              onClick={() => setMode(id)}
+              className={`h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                mode === id ? 'bg-surface-3 text-fg' : 'text-fg-2 hover:text-fg'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      ) : configured ? (
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <div ref={buttonRef} className="w-full max-w-[320px] min-h-11 flex justify-center" />
-          {!ready && !error && <p className="text-sm text-fg-3">Loading Google sign-in…</p>}
-          {error && <p className="text-sm text-negative" role="alert">{error}</p>}
-        </div>
-      ) : (
-        <div className="mt-8 text-left surface-raised rounded-xl p-4 text-sm text-fg-2 leading-relaxed">
-          <p className="text-fg font-medium">Sign-in is not set up yet</p>
-          <p className="mt-2">
-            Add a Google OAuth client ID to <span className="font-mono text-fg">.env.local</span> as{' '}
-            <span className="font-mono text-fg">VITE_GOOGLE_CLIENT_ID</span>, then restart the dev server. See{' '}
-            <span className="font-mono text-fg">.env.example</span>.
-          </p>
-        </div>
-      )}
+        <AuthForm key={mode} mode={mode} />
+      </div>
 
       <p className="mt-8 text-sm text-fg-3 leading-relaxed">
-        {demo
-          ? 'Your account keeps your registrations in one place.'
-          : 'We use your Google account only to confirm who is registering. We see your name, email address and profile photo.'}
+        Your account keeps your registrations in one place.
       </p>
     </div>
     </div>

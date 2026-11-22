@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight, BellRing, CalendarDays, CalendarPlus, CheckCircle2, Clock, MapPin, Radio, Rocket, XCircle,
 } from 'lucide-react';
-import { listRegistrations, subscribe } from '../data/registry';
+import { watchMyRegistrations } from '../data/registry';
 import { AGENDA_DATA } from '../data/conclaveData';
 import { EVENTS, eventStatus, currentEvent, istParts, calendarFile, googleCalendarUrl } from '../data/events';
 
@@ -33,14 +33,6 @@ function useNow(ms = 30000) {
     return () => clearInterval(t);
   }, [ms]);
   return now;
-}
-
-function myStartups(email) {
-  const me = (email || '').toLowerCase();
-  if (!me) return [];
-  return listRegistrations().filter(
-    (r) => r.type === 'startup' && [r.accountEmail, r.email].some((e) => (e || '').toLowerCase() === me),
-  );
 }
 
 function downloadCalendar(e) {
@@ -284,11 +276,12 @@ function Events({ now }) {
   );
 }
 
-export default function StartupHub({ email, onRegister, formOpen, refreshKey }) {
+export default function StartupHub({ uid, onRegister, formOpen }) {
   const now = useNow();
-  const [version, setVersion] = useState(0);
-  useEffect(() => subscribe(() => setVersion((v) => v + 1)), []);
-  const regs = useMemo(() => myStartups(email), [email, version, refreshKey]);
+  const [regs, setRegs] = useState([]);
+  useEffect(() => watchMyRegistrations(uid, (list) => setRegs(
+    list.filter((r) => r.type === 'startup').sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)),
+  )), [uid]);
   const event = currentEvent(now);
 
   return (

@@ -65,6 +65,7 @@ export default function App() {
   const AUTH_REASONS = {
     startup: 'Sign in or sign up to register your startup',
     register: 'Sign in or sign up to register for the event',
+    collaborate: 'Sign in or sign up to submit a collaboration request',
   };
 
   const navigate = (pageId) => {

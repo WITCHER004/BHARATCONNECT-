@@ -8,6 +8,7 @@ import {
 import SignInGate from '../auth/SignInGate';
 import { useAuth } from '../auth/AuthContext';
 import StartupHub from '../components/StartupHub';
+import { submitRegistration } from '../data/registry';
 
 const DRAFT_KEY = 'bc-startup-draft';
 const ICON = { className: 'w-4 h-4', strokeWidth: 1.5 };
@@ -46,30 +47,6 @@ function loadDraft() {
     return raw ? { ...EMPTY, ...JSON.parse(raw) } : null;
   } catch {
     return null;
-  }
-}
-
-const STARTUP_COUNTER_KEY = 'bc-startup-counter';
-
-export function generateStartupId() {
-  try {
-    const raw = localStorage.getItem(STARTUP_COUNTER_KEY);
-    let nextNum = 1;
-    if (raw) {
-      const parsed = parseInt(raw, 10);
-      if (!isNaN(parsed) && parsed >= 1) {
-        nextNum = parsed + 1;
-      }
-    } else {
-      const past = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
-      if (past.length > 0) {
-        nextNum = past.length + 1;
-      }
-    }
-    localStorage.setItem(STARTUP_COUNTER_KEY, String(nextNum));
-    return `BMF.BC-SEO-${String(nextNum).padStart(5, '0')}`;
-  } catch {
-    return 'BMF.BC-SEO-00001';
   }
 }
 
@@ -417,38 +394,33 @@ export default function StartupPage({ onNavigate }) {
       if (Object.keys(e).length) { setStep(i); setErrors(e); return; }
     }
     setStatus('sending');
+    const sectors = values.sectors.map((s) => (s === 'Other' && values.sectorOther ? values.sectorOther : s));
+    let uniqueId;
     try {
-      await fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) });
-      const uniqueId = generateStartupId();
-      setAssignedId(uniqueId);
-      setStatus('sent');
-      try {
-        localStorage.removeItem(DRAFT_KEY);
-        localStorage.setItem('bc-startup-last-id', uniqueId);
-        const past = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
-        past.push({
-          id: uniqueId,
-          timestamp: new Date().toISOString(),
-          entityName: values.entityName,
-          brandNames: values.brandNames,
-          founderName: values.fullName,
-          email: values.commEmail || values.email,
-          accountEmail: user?.email || '',
-          phone: values.phone,
-          utr: values.transactionId,
-          amount: values.amountPaid,
-          // public profile, shown in the startup directory once approved
-          sectors: values.sectors.map((s) => (s === 'Other' && values.sectorOther ? values.sectorOther : s)),
-          stage: values.stage,
-          website: values.website,
-          pitch: values.pitch,
-        });
-        localStorage.setItem('bc-startup-history', JSON.stringify(past));
-      } catch { /* storage unavailable */ }
-      requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      // the database record is the one the admin panel and "Your startup" read
+      uniqueId = await submitRegistration('startup', {
+        name: values.fullName,
+        email: values.commEmail || values.email,
+        organisation: values.entityName || values.brandNames,
+        country: 'India',
+        detail: values.brandNames ? `Brand: ${values.brandNames}` : 'Startup showcase',
+        sector: sectors.join(', '),
+        phone: values.phone,
+        payment: values.amountPaid ? `₹${values.amountPaid} · UTR ${values.transactionId || '—'}` : '',
+        // public profile, shown in the startup directory once approved
+        profile: { brand: values.brandNames || values.entityName, sectors, stage: values.stage, website: values.website, pitch: values.pitch },
+        details: values,
+      });
     } catch {
       setStatus('failed');
+      return;
     }
+    // copy to the organiser's Google Form as before; the registration is already saved if this fails
+    fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) }).catch(() => {});
+    setAssignedId(uniqueId);
+    setStatus('sent');
+    try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage unavailable */ }
+    requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
 
   const clearForm = () => {
@@ -905,12 +877,11 @@ export default function StartupPage({ onNavigate }) {
       <section className="theme-ivory py-12 sm:py-16">
         <SignInGate
           title="Sign in to register your startup"
-          reason="Startup registration needs a Google account, so your application, payment details and unique Registration ID [BMF.BC-SEO-numbers] stay tied to you."
+          reason="Startup registration needs an account (Google or email), so your application, payment details and unique Registration ID [BMF.BC-SEO-numbers] stay tied to you."
         >
         <StartupHub
-          email={user?.email}
+          uid={user?.uid}
           formOpen={formOpen}
-          refreshKey={status}
           onRegister={() => {
             setFormOpen(true);
             requestAnimationFrame(() => document.getElementById('startup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));

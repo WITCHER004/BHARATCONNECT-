@@ -3,7 +3,8 @@ import {
   MessageSquare, X, Send, Search, Check, Copy, ExternalLink,
   HelpCircle, ChevronRight, ShieldCheck, AlertCircle
 } from 'lucide-react';
-import { generateQueryTicketId } from '../pages/QueryPage';
+import { STATUS_TEXT } from '../pages/QueryPage';
+import { submitQuery, findMyRecord } from '../data/registry';
 
 export default function QueryConciergeModal({ onNavigate }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,74 +15,44 @@ export default function QueryConciergeModal({ onNavigate }) {
   const [category, setCategory] = useState('General Inquiry');
   const [ticketId, setTicketId] = useState('');
   const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
 
   // Quick lookup state
   const [lookupId, setLookupId] = useState('');
   const [lookupResult, setLookupResult] = useState(null);
   const [searched, setSearched] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !message) return;
-
-    const newTicket = generateQueryTicketId();
-    setTicketId(newTicket);
-
+    setSending(true);
+    setSendError('');
     try {
-      const past = JSON.parse(localStorage.getItem('bc-queries') || '[]');
-      past.unshift({
-        id: newTicket,
-        timestamp: new Date().toISOString(),
-        fullName: name,
-        email,
-        category,
-        message,
-        dept: 'Secretariat Fast-Track Desk',
-        status: 'Assigned to Protocol Officer',
-        eta: '24 Hours',
+      const newTicket = await submitQuery({
+        fullName: name, email, category, message, subject: category, dept: 'Secretariat Fast-Track Desk', urgent: false,
       });
-      localStorage.setItem('bc-queries', JSON.stringify(past));
-    } catch { /* storage fallback */ }
-
-    setMode('success');
+      setTicketId(newTicket);
+      setMode('success');
+    } catch {
+      setSendError('We could not send your query. Check your connection and try again.');
+    } finally {
+      setSending(false);
+    }
   };
 
-  const handleLookup = (e) => {
+  // the visitor's own records only; the database refuses anyone else's
+  const handleLookup = async (e) => {
     e.preventDefault();
     const q = lookupId.trim().toUpperCase();
     if (!q) return;
-
+    const r = await findMyRecord(q);
     setSearched(true);
-    const pastQueries = JSON.parse(localStorage.getItem('bc-queries') || '[]');
-    const qMatch = pastQueries.find((item) => item.id.toUpperCase() === q || item.email?.toUpperCase() === q);
-    if (qMatch) {
-      setLookupResult({ title: qMatch.id, subtitle: qMatch.category, status: qMatch.status });
-      return;
-    }
-
-    const pastStartups = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
-    const sMatch = pastStartups.find((s) => s.id?.toUpperCase() === q || s.email?.toUpperCase() === q);
-    if (sMatch) {
-      setLookupResult({ title: sMatch.id, subtitle: sMatch.entityName, status: 'Accredited (2-Year Validity)' });
-      return;
-    }
-
-    if (q.startsWith('BMF.BC-DGO-')) {
-      setLookupResult({ title: q, subtitle: 'Accredited Conclave Delegate', status: 'Badge Ready for Fast-Track Entry' });
-      return;
-    }
-
-    if (q.startsWith('BMF.BC-CBC-')) {
-      setLookupResult({ title: q, subtitle: 'Summit Collaboration Docket', status: 'Under Review by Partnerships Directorate' });
-      return;
-    }
-
-    if (q === 'BMF.BC-SEO-00001' || q.includes('00001')) {
-      setLookupResult({ title: 'BMF.BC-SEO-00001', subtitle: 'Startup Pavilion Pioneer', status: 'Verified & Confirmed' });
-      return;
-    }
-
-    setLookupResult(null);
+    setLookupResult(r ? {
+      title: r.id,
+      subtitle: r.type === 'query' ? r.category || r.subject : r.organisation || r.detail || r.name,
+      status: STATUS_TEXT[r.status] || 'Received',
+    } : null);
   };
 
   const handleCopy = (txt) => {
@@ -211,12 +182,14 @@ export default function QueryConciergeModal({ onNavigate }) {
                   />
                 </div>
 
+                {sendError && <p className="text-xs text-negative" role="alert">{sendError}</p>}
                 <button
                   type="submit"
+                  disabled={sending}
                   className="w-full btn-primary h-10 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer mt-1 whitespace-nowrap"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  Submit Query (Issue Ticket)
+                  {sending ? 'Sending…' : 'Submit Query (Issue Ticket)'}
                 </button>
               </form>
             )}

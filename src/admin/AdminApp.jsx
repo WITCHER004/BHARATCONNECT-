@@ -4,8 +4,10 @@ import {
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import {
-  listRegistrations, listLogins, decide, subscribe, TYPES, TYPE_ORDER, STATUS,
+  listRegistrations, listLogins, decide, subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
 } from '../data/registry';
 import {
   Counter, StatusBadge, TypeTag, Legend, DailyBars, Donut, StatusSplit, RankBars, Sparkline,
@@ -16,12 +18,10 @@ import {
   Bharat Connect admin panel (admin.html), separate from the public site but reading the same
   data through src/data/registry.js.
 
-  ACCESS: the passcode check below runs in the browser, so it keeps casual visitors out but is not
-  real security. Set VITE_ADMIN_PASSCODE in .env.local, and replace this with a proper server login
-  when a database is connected.
+  ACCESS: sign in with Google. Only accounts listed in the Firestore collection `admins`
+  (one document per admin, named by their email) can open the dashboard, and the database
+  rules enforce the same list, so the data stays protected even if this page is opened directly.
 */
-const PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || 'bharat-admin-2026';
-const SESSION_KEY = 'bc-admin-session';
 const SAMPLES_KEY = 'bc-admin-show-samples';
 const SITE_URL = `${import.meta.env.BASE_URL}`;
 
@@ -34,7 +34,7 @@ const VIEWS = [
 
 /* ── data hook: re-reads whenever the site writes ──── */
 
-function useRegistry(includeSamples) {
+function useRegistry(includeSamples, enabled) {
   const read = useCallback(() => ({
     registrations: listRegistrations({ includeSamples }),
     logins: listLogins({ includeSamples }),
@@ -43,31 +43,32 @@ function useRegistry(includeSamples) {
   const [pulse, setPulse] = useState(0);
   useEffect(() => {
     setData(read());
+    if (!enabled) return undefined;
     return subscribe(() => {
       setData(read());
       setPulse((p) => p + 1);
     });
-  }, [read]);
-  return { ...data, pulse };
+  }, [read, enabled]);
+  return { ...data, pulse, error: enabled ? loadError() : null };
 }
 
 /* ── Gate ─────────────────────────────────────────────── */
 
-function Gate({ onUnlock }) {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState(false);
-  const submit = (e) => {
-    e.preventDefault();
-    if (code.trim() === PASSCODE) {
-      try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* storage unavailable */ }
-      onUnlock();
-    } else {
-      setError(true);
+function Gate({ state, email }) {
+  const [error, setError] = useState('');
+  const signIn = async () => {
+    setError('');
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (e) {
+      if (!['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)) {
+        setError(e.code === 'auth/popup-blocked' ? 'Allow pop-ups for this site, then try again.' : 'Sign-in failed. Please try again.');
+      }
     }
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4 ad-gate-bg">
-      <form onSubmit={submit} className="ad-rise w-full max-w-sm surface-card rounded-2xl p-7 border border-line">
+      <div className="ad-rise w-full max-w-sm surface-card rounded-2xl p-7 border border-line">
         <div className="flex items-center gap-3">
           <span className="h-10 px-2 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 flex items-center">
             <img src={`${import.meta.env.BASE_URL}brand/logo.png`} alt="Bharat Connect" className="h-7 w-auto" />
@@ -77,24 +78,31 @@ function Gate({ onUnlock }) {
             <span className="block text-xs text-fg-3">Bharat Connect 2026</span>
           </span>
         </div>
-        <label htmlFor="ad-code" className="mt-7 block text-xs text-fg-3 mb-1.5">Passcode</label>
-        <div className="relative">
-          <Lock className="w-4 h-4 text-fg-3 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.5} />
-          <input
-            id="ad-code"
-            type="password"
-            autoFocus
-            value={code}
-            onChange={(e) => { setCode(e.target.value); setError(false); }}
-            className={`w-full h-11 pl-9 pr-3 rounded-[10px] bg-surface-3 border text-sm text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/60 ${error ? 'border-[#D03B3B] ad-shake' : 'border-line'}`}
-          />
-        </div>
-        <p className="mt-2 h-4 text-xs text-[#E66767]" aria-live="polite">{error ? 'That passcode is not right.' : ''}</p>
-        <button type="submit" className="mt-3 btn-primary h-11 w-full text-sm">Enter dashboard</button>
-        <p className="mt-5 text-[11px] leading-relaxed text-fg-3">
-          This check runs in the browser and is not real security. Use a server login once a database is connected.
-        </p>
-      </form>
+
+        {state === 'checking' && <p className="mt-7 text-sm text-fg-3" aria-busy="true">Checking your account…</p>}
+
+        {state === 'signed-out' && (
+          <>
+            <p className="mt-7 text-sm text-fg-2 leading-relaxed">Sign in with the Google account the Secretariat registered as an admin.</p>
+            <button onClick={signIn} className="mt-5 btn-primary h-11 w-full text-sm">
+              <Lock className="w-4 h-4" strokeWidth={1.5} /> Sign in with Google
+            </button>
+            <p className="mt-2 min-h-4 text-xs text-[#E66767]" role="alert">{error}</p>
+          </>
+        )}
+
+        {state === 'not-admin' && (
+          <>
+            <p className="mt-7 text-sm text-fg leading-relaxed">
+              <span className="font-mono text-xs break-all">{email}</span> is not an admin account.
+            </p>
+            <p className="mt-2 text-xs text-fg-3 leading-relaxed">
+              Ask the site owner to add it in the Firebase console: Firestore, collection <span className="font-mono">admins</span>, a document named with this email.
+            </p>
+            <button onClick={() => signOut(auth)} className="mt-5 btn-secondary h-10 w-full text-sm">Use a different account</button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -102,19 +110,24 @@ function Gate({ onUnlock }) {
 /* ── Shell ────────────────────────────────────────────── */
 
 export default function AdminApp() {
-  const [unlocked, setUnlocked] = useState(() => {
-    try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch { return false; }
-  });
+  // checking → signed-out | not-admin | admin
+  const [access, setAccess] = useState({ state: 'checking', email: '' });
+  useEffect(() => onAuthStateChanged(auth, async (u) => {
+    if (!u || u.isAnonymous) { setAccess({ state: 'signed-out', email: '' }); return; }
+    setAccess({ state: 'checking', email: u.email });
+    setAccess({ state: (await isAdminAccount(u)) ? 'admin' : 'not-admin', email: u.email });
+  }), []);
+  const unlocked = access.state === 'admin';
   const [view, setView] = useState(() => {
     const h = window.location.hash.replace('#', '');
     return VIEWS.some((v) => v.id === h) ? h : 'overview';
   });
   const [showSamples, setShowSamples] = useState(() => {
-    try { return localStorage.getItem(SAMPLES_KEY) !== '0'; } catch { return true; }
+    try { return localStorage.getItem(SAMPLES_KEY) === '1'; } catch { return false; }
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const { registrations, logins, pulse } = useRegistry(showSamples);
+  const { registrations, logins, pulse, error: dataError } = useRegistry(showSamples, unlocked);
 
   useEffect(() => {
     try { localStorage.setItem(SAMPLES_KEY, showSamples ? '1' : '0'); } catch { /* storage unavailable */ }
@@ -137,7 +150,7 @@ export default function AdminApp() {
     window.scrollTo({ top: 0 });
   };
 
-  if (!unlocked) return <Gate onUnlock={() => setUnlocked(true)} />;
+  if (!unlocked) return <Gate state={access.state} email={access.email} />;
 
   const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending');
@@ -176,7 +189,7 @@ export default function AdminApp() {
         Data source
       </p>
       <p className="mt-1.5 text-[11px] leading-relaxed text-fg-3">
-        This browser · {liveCount} live record{liveCount === 1 ? '' : 's'}. Connect a database to see every visitor.
+        Firestore · {liveCount} record{liveCount === 1 ? '' : 's'} from every visitor, updating live.
       </p>
       <label className="mt-3 flex items-center justify-between gap-3 text-xs text-fg-2 cursor-pointer">
         Show sample data
@@ -202,10 +215,11 @@ export default function AdminApp() {
         <div className="mt-auto flex flex-col gap-3">
           {sourceCard}
           <button
-            onClick={() => { try { sessionStorage.removeItem(SESSION_KEY); } catch { /* */ } setUnlocked(false); }}
+            onClick={() => signOut(auth)}
+            title={access.email}
             className="h-10 px-3 rounded-xl flex items-center gap-2.5 text-sm text-fg-3 hover:text-fg hover:bg-surface-2 cursor-pointer transition-colors"
           >
-            <LogOut className="w-4 h-4" strokeWidth={1.5} /> Lock dashboard
+            <LogOut className="w-4 h-4" strokeWidth={1.5} /> Sign out
           </button>
         </div>
       </aside>
@@ -232,6 +246,14 @@ export default function AdminApp() {
             </div>
           )}
         </header>
+
+        {dataError && (
+          <div role="alert" className="mx-4 sm:mx-8 mt-5 rounded-xl border border-[#D03B3B]/40 bg-[#D03B3B]/[0.08] px-4 py-2.5 text-xs text-fg-2">
+            {dataError === 'permission-denied'
+              ? 'The database refused access. Check that the latest firestore.rules are deployed and that your email is in the admins collection.'
+              : `The data could not be loaded (${dataError}). Check your connection and reload.`}
+          </div>
+        )}
 
         {showSamples && (
           <div className="mx-4 sm:mx-8 mt-5 rounded-xl border border-dashed border-[#FAB219]/40 bg-[#FAB219]/[0.06] px-4 py-2.5 text-xs text-fg-2">
@@ -794,6 +816,10 @@ const FIELD_LABELS = {
   message: 'Message', b2b: 'B2B deal rooms', visaLetter: 'Visa letter',
 };
 
+// "dpiitNumber" → "Dpiit number"
+const fieldLabel = (k) => k.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase()).replace(/ ([A-Z])(?=[a-z])/g, (m, c) => ` ${c.toLowerCase()}`);
+const formatValue = (v) => (typeof v === 'boolean' ? (v ? 'Yes' : 'No') : Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v));
+
 function Drawer({ record, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
@@ -837,6 +863,22 @@ function Drawer({ record, onClose }) {
               </div>
             ))}
           </dl>
+
+          {r.details && typeof r.details === 'object' && (
+            <details className="mt-6 group" open>
+              <summary className="text-xs font-medium text-fg cursor-pointer select-none">Full form ({Object.keys(r.details).length} fields)</summary>
+              <dl className="mt-2 divide-y divide-line border-y border-line">
+                {Object.entries(r.details)
+                  .filter(([, v]) => v !== '' && v !== null && v !== undefined && !(Array.isArray(v) && !v.length))
+                  .map(([k, v]) => (
+                    <div key={k} className="py-2 grid grid-cols-[120px_1fr] gap-3 text-xs">
+                      <dt className="text-fg-3 break-words">{fieldLabel(k)}</dt>
+                      <dd className="text-fg break-words whitespace-pre-wrap">{formatValue(v)}</dd>
+                    </div>
+                  ))}
+              </dl>
+            </details>
+          )}
 
           {TYPES[r.type]?.approvable && (
             <div className="mt-6 flex flex-wrap gap-2">

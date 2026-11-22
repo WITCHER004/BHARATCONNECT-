@@ -5,30 +5,29 @@ rules_version = '2';
 
   Collections (everything not listed here is denied):
 
-    registrations/{autoId}    delegate passes, startup showcase and collaboration requests
-                              (the "registrations" the admin panel approves or declines)
-    queries/{autoId}          helpdesk inquiries (Inquiries page and the Query desk pop-up)
-    logins/{autoId}           sign-in / sign-up / sign-out log shown in the admin panel
-    startupDirectory/{regId}  public profile of each APPROVED startup (the Startups page)
+    registrations/{ref}     delegate passes, startup showcase and collaboration requests,
+                            stored under their reference (BMF.BC-DGO-00001 …) with the full form in `details`
+    queries/{ref}           helpdesk inquiries (BMF.BC-QRY-…)
+    counters/{code}         last reference number for DGO, SEO, CBC and QRY
+    logins/{autoId}         sign-in / sign-up / sign-out log shown in the admin panel
+    startupDirectory/{ref}  public card of each APPROVED startup (the Startups page)
+    admins/{email}          who may open the admin panel; added by hand in the Firebase console,
+                            one document per admin, named with their email in lower case
 
   Who is who:
-    - Visitors are signed in with Firebase Auth. Inquiries and collaboration requests can be sent
-      without an account, so the site signs those visitors in anonymously behind the scenes.
-    - Delegate and startup registration need a real (Google or email) account, as the site already asks.
-    - Admins carry the custom claim  admin: true , set once per admin with the Firebase Admin SDK.
-      This replaces the browser-side passcode in src/admin/AdminApp.jsx, which is not real security.
+    - Registering (delegate, startup, collaboration) needs an account: Google, Apple or email.
+      Visitors who only send an inquiry get an anonymous session behind the scenes.
+    - Admins sign in with Google and must have a document in `admins`.
 
   What the rules guarantee:
-    - Nobody but an admin can read other people's submissions, the sign-in log, or change a status.
-    - A visitor can create a submission only as themselves, only with status "pending"/"received",
-      only with the server's timestamp, and only with the known fields at sane sizes.
-    - Submissions cannot be edited or deleted by the person who sent them (the admin panel is the record).
+    - Only admins read other people's submissions or the sign-in log, and only admins change a status.
+    - A visitor creates a submission only as themselves, as "pending"/"received", at server time,
+      with known fields at sane sizes, and under the next reference number (the counter and the
+      record are written together, and the counter can only go up by one).
+    - Nobody can edit or delete a submission after sending it, except an admin.
     - The startup directory is public but holds only public fields, and only admins write it.
 
-  Not covered by rules (do these elsewhere):
-    - Reference numbers (BMF.BC-DGO-00001 …) must be issued by a Cloud Function: a public counter
-      would let anyone skip or reuse numbers. Only admins (or the function) may set `ref`.
-    - Spam / flooding: turn on Firebase App Check for Firestore.
+  Not covered by rules: spam and flooding. Turn on Firebase App Check for Firestore before launch.
 */
 
 service cloud.firestore {
@@ -45,8 +44,12 @@ service cloud.firestore {
       return signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous';
     }
 
+    // admins: the emails listed here, plus any added as documents in the `admins` collection
     function isAdmin() {
-      return signedIn() && request.auth.token.admin == true;
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && (request.auth.token.email.lower() in ['aryamansaxena04@gmail.com']
+            || exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())));
     }
 
     function str(v, max) {
@@ -69,6 +72,27 @@ service cloud.firestore {
       return !(k in d) || d[k] is bool;
     }
 
+    // the complete form as submitted; the admin panel shows it field by field
+    function optDetails(d) {
+      return !('details' in d) || (d.details is map && d.details.size() <= 80);
+    }
+
+    // the record's reference must be the number the counter was moved to in the same write
+    function takesNextRef(ref, code) {
+      return ref.matches('^BMF\\.BC-' + code + '-[0-9]{5}$')
+        && getAfter(/databases/$(database)/documents/counters/$(code)).data.n == int(ref.split('-')[2]);
+    }
+
+    // ── Reference counters ──────────────────────────────
+
+    match /counters/{code} {
+      allow get: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY'];
+      allow create: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY']
+        && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
+      allow update: if signedIn()
+        && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == resource.data.n + 1;
+    }
+
     // ── Registrations: delegate, startup, collaboration ───
 
     function validProfile(p) {
@@ -81,74 +105,65 @@ service cloud.firestore {
         && optStr(p, 'pitch', 1000);
     }
 
-    function validNewRegistration(d) {
+    function validNewRegistration(ref, d) {
       return d.keys().hasOnly([
-          'type', 'uid', 'status', 'submittedAt',
-          'name', 'email', 'organisation', 'country', 'detail', 'sector', 'phone', 'message',
-          // delegate
-          'designation', 'dealSize', 'b2b', 'visaLetter',
-          // startup
-          'payment', 'utr', 'amount', 'profile',
-          // collaboration
-          'liaisonTitle', 'track', 'delegationSize', 'objectives', 'mouSigning', 'urgentProtocol'
+          'ref', 'type', 'uid', 'status', 'submittedAt', 'accountEmail',
+          'name', 'email', 'organisation', 'country', 'detail', 'sector', 'phone',
+          'designation', 'dealSize', 'b2b', 'visaLetter', 'payment', 'profile', 'details'
         ])
         && d.type in ['delegate', 'startup', 'collaboration']
+        && d.ref == ref
+        && takesNextRef(ref, {'delegate': 'DGO', 'startup': 'SEO', 'collaboration': 'CBC'}[d.type])
         && d.uid == request.auth.uid
         && d.status == 'pending'
         && d.submittedAt == request.time
-        // delegate and startup registration need a real account; collaboration may be anonymous
-        && (d.type == 'collaboration' || hasAccount())
+        // every registration portal needs a real account (Google, Apple or email)
+        && hasAccount()
         && filled(d.name, 120)
         && isEmail(d.email)
+        && optStr(d, 'accountEmail', 254)
         && optStr(d, 'organisation', 200)
         && optStr(d, 'country', 80)
         && optStr(d, 'detail', 200)
         && optStr(d, 'sector', 300)
         && optStr(d, 'phone', 30)
-        && optStr(d, 'message', 2000)
         && optStr(d, 'designation', 120)
         && optStr(d, 'dealSize', 60)
         && optBool(d, 'b2b')
         && optBool(d, 'visaLetter')
         && optStr(d, 'payment', 120)
-        && optStr(d, 'utr', 40)
-        && optStr(d, 'amount', 20)
         && (!('profile' in d) || validProfile(d.profile))
-        && optStr(d, 'liaisonTitle', 120)
-        && optStr(d, 'track', 60)
-        && optStr(d, 'delegationSize', 60)
-        && optStr(d, 'objectives', 3000)
-        && optBool(d, 'mouSigning')
-        && optBool(d, 'urgentProtocol');
+        && optDetails(d);
     }
 
-    // an admin approves or declines; nothing else on the record changes
-    function validDecision() {
+    // an admin approves, declines or resets; nothing else on the record changes
+    function validDecision(statuses) {
       let d = request.resource.data;
-      return d.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'decidedAt', 'decidedBy', 'ref'])
-        && d.status in ['pending', 'approved', 'declined']
+      return d.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'decidedAt', 'decidedBy'])
+        && d.status in statuses
         && d.decidedAt == request.time
         && d.decidedBy == request.auth.uid
-        && optStr(d, 'note', 1000)
-        && optStr(d, 'ref', 40);
+        && optStr(d, 'note', 1000);
     }
 
-    match /registrations/{regId} {
-      // the admin panel lists everything; a visitor sees only their own (query with where uid == their uid)
+    match /registrations/{ref} {
+      // the admin panel lists everything; a visitor reads only their own (query with where uid == their uid)
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow create: if signedIn() && validNewRegistration(request.resource.data);
-      allow update: if isAdmin() && validDecision();
+      allow create: if signedIn() && validNewRegistration(ref, request.resource.data);
+      allow update: if isAdmin() && validDecision(['pending', 'approved', 'declined']);
       allow delete: if isAdmin();
     }
 
     // ── Helpdesk inquiries ─────────────────────────────
 
-    function validNewQuery(d) {
+    function validNewQuery(ref, d) {
       return d.keys().hasOnly([
-          'uid', 'status', 'submittedAt',
+          'ref', 'uid', 'status', 'submittedAt',
           'fullName', 'email', 'phone', 'organization', 'country', 'regId',
           'category', 'dept', 'subject', 'message', 'urgent'
         ])
+        && d.ref == ref
+        && takesNextRef(ref, 'QRY')
         && d.uid == request.auth.uid
         && d.status == 'received'
         && d.submittedAt == request.time
@@ -165,14 +180,10 @@ service cloud.firestore {
         && optBool(d, 'urgent');
     }
 
-    match /queries/{queryId} {
+    match /queries/{ref} {
       allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow create: if signedIn() && validNewQuery(request.resource.data);
-      allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'decidedAt', 'decidedBy', 'ref'])
-        && request.resource.data.status in ['received', 'in-progress', 'answered', 'closed']
-        && optStr(request.resource.data, 'note', 1000)
-        && optStr(request.resource.data, 'ref', 40);
+      allow create: if signedIn() && validNewQuery(ref, request.resource.data);
+      allow update: if isAdmin() && validDecision(['received', 'in-progress', 'answered', 'closed']);
       allow delete: if isAdmin();
     }
 
@@ -180,20 +191,20 @@ service cloud.firestore {
 
     match /logins/{loginId} {
       allow read, delete: if isAdmin();
-      // a visitor can only log their own sign-in, with their own verified email, at server time
+      // a visitor can only log their own sign-in, with their own account email, at server time
       allow create: if hasAccount()
         && request.resource.data.keys().hasOnly(['uid', 'action', 'name', 'email', 'method', 'at'])
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.action in ['sign-in', 'sign-up', 'sign-out']
-        && request.resource.data.method in ['Google', 'Email']
+        && request.resource.data.method in ['Google', 'Apple', 'Email']
         && str(request.resource.data.name, 120)
         && request.resource.data.at == request.time;
     }
 
     // ── Public startup directory ────────────────────────
 
-    match /startupDirectory/{regId} {
+    match /startupDirectory/{ref} {
       allow read: if true;
       // written by an admin when approving a startup; public fields only, never contact details
       allow create, update: if isAdmin()
@@ -206,6 +217,13 @@ service cloud.firestore {
         && optStr(request.resource.data, 'pitch', 1000)
         && optStr(request.resource.data, 'ref', 40);
       allow delete: if isAdmin();
+    }
+
+    // ── Admin list ──────────────────────────────────────
+
+    match /admins/{email} {
+      // an account may check whether it is itself an admin; the list is edited only in the console
+      allow get: if signedIn() && request.auth.token.email != null && request.auth.token.email.lower() == email;
     }
   }
 }

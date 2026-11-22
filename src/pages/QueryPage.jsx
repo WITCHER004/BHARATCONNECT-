@@ -5,31 +5,18 @@ import {
   AlertCircle, Sparkles, Filter, CheckCircle2, ChevronDown
 } from 'lucide-react';
 import { ORGANISER } from '../data/startupForm';
+import { submitQuery, findMyRecord } from '../data/registry';
 
-const QUERY_COUNTER_KEY = 'bc-query-counter';
-const QUERY_STORAGE_KEY = 'bc-queries';
-
-export function generateQueryTicketId() {
-  try {
-    const raw = localStorage.getItem(QUERY_COUNTER_KEY);
-    let nextNum = 1;
-    if (raw) {
-      const parsed = parseInt(raw, 10);
-      if (!isNaN(parsed) && parsed >= 1) {
-        nextNum = parsed + 1;
-      }
-    } else {
-      const past = JSON.parse(localStorage.getItem(QUERY_STORAGE_KEY) || '[]');
-      if (past.length > 0) {
-        nextNum = past.length + 1;
-      }
-    }
-    localStorage.setItem(QUERY_COUNTER_KEY, String(nextNum));
-    return `BMF.BC-QRY-${String(nextNum).padStart(5, '0')}`;
-  } catch {
-    return 'BMF.BC-QRY-00001';
-  }
-}
+// what a visitor sees for each status in the ticket lookup
+export const STATUS_TEXT = {
+  pending: 'Under review by the Secretariat',
+  approved: 'Approved',
+  declined: 'Not approved',
+  received: 'Received and assigned',
+  'in-progress': 'In progress',
+  answered: 'Answered',
+  closed: 'Closed',
+};
 
 const CATEGORIES = [
   { id: 'startup', label: 'Startup Showcase & Pavilion', dept: 'Startups & Innovation Desk' },
@@ -104,41 +91,38 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
   const [faqSearch, setFaqSearch] = useState('');
   const [openFaq, setOpenFaq] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.message) return;
 
     setStatus('submitting');
-    setTimeout(() => {
-      const ticketId = generateQueryTicketId();
-      const catObj = CATEGORIES.find((c) => c.id === form.category);
-      const newQuery = {
+    const catObj = CATEGORIES.find((c) => c.id === form.category);
+    const newQuery = {
+      category: catObj?.label || form.category,
+      dept: catObj?.dept || 'Secretariat Helpdesk',
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      organization: form.organization,
+      country: form.country,
+      regId: form.regId,
+      subject: form.subject || 'Conclave General Query',
+      message: form.message,
+      urgent: form.urgent,
+    };
+    try {
+      const ticketId = await submitQuery(newQuery);
+      setAssignedTicket({
+        ...newQuery,
         id: ticketId,
         timestamp: new Date().toISOString(),
-        category: catObj?.label || form.category,
-        dept: catObj?.dept || 'Secretariat Helpdesk',
-        fullName: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        organization: form.organization,
-        country: form.country,
-        regId: form.regId,
-        subject: form.subject || 'Conclave General Query',
-        message: form.message,
-        urgent: form.urgent,
         status: form.urgent ? 'Expedited Protocol Attention' : 'Received & Assigned',
         eta: form.urgent ? '4 Hours' : '24 Hours',
-      };
-
-      try {
-        const past = JSON.parse(localStorage.getItem(QUERY_STORAGE_KEY) || '[]');
-        past.unshift(newQuery);
-        localStorage.setItem(QUERY_STORAGE_KEY, JSON.stringify(past));
-      } catch { /* storage fallback */ }
-
-      setAssignedTicket(newQuery);
+      });
       setStatus('submitted');
-    }, 600);
+    } catch {
+      setStatus('failed');
+    }
   };
 
   const handleCopy = (text) => {
@@ -147,121 +131,26 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
     setTimeout(() => setCopied(false), 1800);
   };
 
-  const handleTrackSearch = (e) => {
+  // Looks up the visitor's own record by reference; the database only lets them see their own
+  const handleTrackSearch = async (e) => {
     e.preventDefault();
     const q = searchQuery.trim().toUpperCase();
     if (!q) return;
 
+    const r = await findMyRecord(q);
     setSearched(true);
-    // 1. Search in local queries
-    const pastQueries = JSON.parse(localStorage.getItem(QUERY_STORAGE_KEY) || '[]');
-    const queryMatch = pastQueries.find(
-      (item) => item.id.toUpperCase() === q || item.email.toUpperCase() === q
-    );
-
-    if (queryMatch) {
-      setSearchResult({ type: 'query', data: queryMatch });
-      return;
+    if (!r) { setSearchResult(null); return; }
+    const status = STATUS_TEXT[r.status] || 'Received';
+    const d = r.details || {};
+    if (r.type === 'query') {
+      setSearchResult({ type: 'query', data: { id: r.id, status, fullName: r.fullName, dept: r.dept, subject: r.subject } });
+    } else if (r.type === 'startup') {
+      setSearchResult({ type: 'startup', data: { id: r.id, status, entityName: r.organisation, founderName: r.name, hall: 'Startup Pavilion · Palash Hall (6F)', utr: d.transactionId } });
+    } else if (r.type === 'collaboration') {
+      setSearchResult({ type: 'collaboration', data: { id: r.id, status, orgName: r.organisation, liaisonName: r.name, country: r.country, trackTitle: r.detail } });
+    } else {
+      setSearchResult({ type: 'delegate', data: { id: r.id, status, role: r.detail, hall: 'Main Plenary & B2B Deal Lounge' } });
     }
-
-    // 2. Search in startup registrations
-    const pastStartups = JSON.parse(localStorage.getItem('bc-startup-history') || '[]');
-    const startupMatch = pastStartups.find(
-      (s) => (s.id && s.id.toUpperCase() === q) || (s.email && s.email.toUpperCase() === q)
-    );
-
-    if (startupMatch) {
-      setSearchResult({
-        type: 'startup',
-        data: {
-          id: startupMatch.id,
-          entityName: startupMatch.entityName,
-          founderName: startupMatch.founderName,
-          email: startupMatch.email,
-          status: 'Accredited & Active (2-Year Validity)',
-          hall: 'Startup Pavilion · Palash Hall (6F)',
-          timestamp: startupMatch.timestamp,
-          utr: startupMatch.utr,
-        },
-      });
-      return;
-    }
-
-    // 3. Search in collaboration registrations
-    const pastCollabs = JSON.parse(localStorage.getItem('bc-collaboration-history') || '[]');
-    const collabMatch = pastCollabs.find(
-      (c) => (c.id && c.id.toUpperCase() === q) || (c.email && c.email.toUpperCase() === q) || (c.orgName && c.orgName.toUpperCase().includes(q))
-    );
-
-    if (collabMatch) {
-      setSearchResult({
-        type: 'collaboration',
-        data: {
-          id: collabMatch.id,
-          orgName: collabMatch.orgName,
-          liaisonName: collabMatch.liaisonName,
-          trackTitle: collabMatch.trackTitle,
-          country: collabMatch.country,
-          status: 'Under Review by Partnerships Directorate (Priority Protocol)',
-          hall: 'Executive Deal Suites, Palash Hall 6F',
-          eta: collabMatch.eta,
-        },
-      });
-      return;
-    }
-
-    if (q === 'BMF.BC-CBC-00001') {
-      setSearchResult({
-        type: 'collaboration',
-        data: {
-          id: 'BMF.BC-CBC-00001',
-          orgName: 'Apex Gulf-India Bilateral Chamber',
-          liaisonName: 'Ambassador H.E. Delegate',
-          trackTitle: 'Country & State Sovereign Pavilion',
-          country: 'United Arab Emirates',
-          status: 'Active · Protocol Cleared for Plenary Stage Slot',
-          hall: 'Palash Hall (6F) Sovereign Pavilion Wing',
-          eta: '12 Hours (Fast-Track Protocol)',
-        },
-      });
-      return;
-    }
-
-    // 3. Delegate passes: BMF.BC-DGO-… (older passes used BC-…)
-    if (q.startsWith('BMF.BC-DGO-') || q.startsWith('BC-')) {
-      setSearchResult({
-        type: 'delegate',
-        data: {
-          id: q,
-          role: 'Corporate Delegate',
-          fullName: 'Accredited Conclave Delegate',
-          status: 'Badge Ready for Yashobhoomi Fast-Track',
-          hall: 'Main Plenary & B2B Deal Lounge',
-          dates: '18–19 December 2026',
-        },
-      });
-      return;
-    }
-
-    // 4. Fallback demo match for BMF.BC-SEO-00001 or BMF.BC-QRY-00001
-    if (q === 'BMF.BC-SEO-00001' || q.includes('00001')) {
-      setSearchResult({
-        type: 'startup',
-        data: {
-          id: 'BMF.BC-SEO-00001',
-          entityName: 'Bharat Connect Pioneer Innovations',
-          founderName: 'Delegate Founder',
-          email: 'founder@startup.com',
-          status: 'Verified & Confirmed · Priority Matchmaking',
-          hall: 'Startup Pavilion Pod #01, Palash Hall 6F',
-          timestamp: new Date().toISOString(),
-          utr: 'HDFC98421094',
-        },
-      });
-      return;
-    }
-
-    setSearchResult(null);
   };
 
   const filteredFaqs = useMemo(() => {
@@ -624,9 +513,11 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                           {status === 'submitting' ? 'Logging Ticket…' : 'Submit Official Inquiry'}
                         </button>
 
-                        <span className="text-xs text-fg-3 font-mono text-center sm:text-right">
-                          Generates [BMF.BC-QRY-00001]
-                        </span>
+                        {status === 'failed' ? (
+                          <span className="text-sm text-negative" role="alert">We could not send your inquiry. Check your connection and try again.</span>
+                        ) : (
+                          <span className="text-xs text-fg-3 font-mono text-center sm:text-right">Generates [BMF.BC-QRY-•••••]</span>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -704,7 +595,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                   <input
                     type="text"
                     required
-                    placeholder="Enter ID e.g. BMF.BC-SEO-00001 or BMF.BC-QRY-00001 or email"
+                    placeholder="Enter your reference, e.g. BMF.BC-SEO-00001"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 h-12 px-4 rounded-xl bg-surface-2 border border-line text-[15px] font-mono text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil"
@@ -714,39 +605,6 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                     Search Record
                   </button>
                 </form>
-
-                {/* Quick Examples */}
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-fg-3">
-                  <span>Try sample:</span>
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-SEO-00001'); }}
-                    className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
-                  >
-                    BMF.BC-SEO-00001
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-QRY-00001'); }}
-                    className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
-                  >
-                    BMF.BC-QRY-00001
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-CBC-00001'); }}
-                    className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
-                  >
-                    BMF.BC-CBC-00001
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery('BMF.BC-DGO-00001'); }}
-                    className="font-mono px-2 py-1 rounded bg-surface-3 text-fg hover:text-gold-text border border-line cursor-pointer"
-                  >
-                    BMF.BC-DGO-00001
-                  </button>
-                </div>
 
                 {/* Search Result */}
                 {searched && (
@@ -854,7 +712,7 @@ export default function QueryPage({ onNavigate, onOpenRegister }) {
                         <AlertCircle className="w-8 h-8 text-fg-3 mx-auto mb-3" />
                         <p className="font-medium text-fg">No matching record found for "{searchQuery}"</p>
                         <p className="mt-1 text-xs text-fg-3 max-w-md mx-auto">
-                          Please verify your ticket or registration ID spelling, or submit a query to have the secretariat assist you.
+                          Check the reference spelling. You can look up references from your own account or device; for anything else, submit a query and the Secretariat will help.
                         </p>
                       </div>
                     )}

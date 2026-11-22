@@ -2,32 +2,38 @@
   Tests for firestore.rules against the Firestore emulator.
 
   One-time setup (needs Java 11+ for the emulator):
-    npm i -D firebase-tools @firebase/rules-unit-testing firebase
+    npm i -D firebase-tools @firebase/rules-unit-testing
   Run:
     npx firebase emulators:exec --only firestore --project demo-bharatconnect "node --test tests/"
 */
 import { readFileSync } from 'node:fs';
 import { test, before, after, beforeEach } from 'node:test';
+import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import {
-  initializeTestEnvironment, assertSucceeds, assertFails,
-} from '@firebase/rules-unit-testing';
-import {
-  doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, serverTimestamp,
+  doc, setDoc, getDoc, updateDoc, deleteDoc, collection, addDoc, getDocs, query, where, serverTimestamp, writeBatch,
 } from 'firebase/firestore';
 
 let env;
-const google = (uid, extra = {}) => ({ email: `${uid}@example.com`, firebase: { sign_in_provider: 'google.com' }, ...extra });
-const anon = { firebase: { sign_in_provider: 'anonymous' } };
-
+const google = (uid, email = `${uid}@example.com`) => ({ email, email_verified: true, firebase: { sign_in_provider: 'google.com' } });
 const asUser = (uid = 'alice') => env.authenticatedContext(uid, google(uid)).firestore();
-const asAnon = (uid = 'anon1') => env.authenticatedContext(uid, anon).firestore();
-const asAdmin = () => env.authenticatedContext('admin1', google('admin1', { admin: true })).firestore();
+const asAnon = (uid = 'anon1') => env.authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous' } }).firestore();
+const asAdmin = () => env.authenticatedContext('admin1', google('admin1', 'Boss@Example.com')).firestore();
 const asNobody = () => env.unauthenticatedContext().firestore();
 
+const seed = (path, data) => env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), path), data));
+
+// what the site does: move the counter and write the record under the new number, together
+function submit(db, coll, code, n, data) {
+  const ref = `BMF.BC-${code}-${String(n).padStart(5, '0')}`;
+  const b = writeBatch(db);
+  b.set(doc(db, 'counters', code), { n });
+  b.set(doc(db, coll, ref), { ...data, ref, submittedAt: serverTimestamp() });
+  return b.commit();
+}
 const delegate = (uid = 'alice', extra = {}) => ({
-  type: 'delegate', uid, status: 'pending', submittedAt: serverTimestamp(),
-  name: 'Alice Rao', email: 'alice@example.com', organisation: 'Example Co', country: 'India',
-  detail: 'Corporate Delegate', b2b: true, ...extra,
+  type: 'delegate', uid, status: 'pending', name: 'Alice Rao', email: 'alice@example.com',
+  organisation: 'Example Co', country: 'India', detail: 'Corporate Delegate', b2b: true,
+  details: { fullName: 'Alice Rao', role: 'Corporate Delegate' }, ...extra,
 });
 
 before(async () => {
@@ -37,63 +43,76 @@ before(async () => {
   });
 });
 after(() => env.cleanup());
-beforeEach(() => env.clearFirestore());
+beforeEach(async () => {
+  await env.clearFirestore();
+  await seed('admins/boss@example.com', {});
+});
 
-const seed = (path, data) => env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), path), data));
+test('a visitor registers under the next reference number', async () => {
+  await assertSucceeds(submit(asUser(), 'registrations', 'DGO', 1, delegate()));
+  await assertSucceeds(submit(asUser(), 'registrations', 'DGO', 2, delegate()));
+});
 
-test('a signed-in visitor can register as a delegate', async () => {
-  await assertSucceeds(addDoc(collection(asUser(), 'registrations'), delegate()));
+test('references cannot be skipped, reused or mismatched', async () => {
+  await assertFails(submit(asUser(), 'registrations', 'DGO', 5, delegate()));            // skips ahead
+  await assertSucceeds(submit(asUser(), 'registrations', 'DGO', 1, delegate()));
+  await assertFails(submit(asUser(), 'registrations', 'DGO', 1, delegate()));            // reuses 00001
+  await assertFails(submit(asUser(), 'registrations', 'SEO', 1, delegate()));            // delegate under a startup code
+  await assertFails(setDoc(doc(asUser(), 'registrations/BMF.BC-DGO-00002'), { ...delegate(), ref: 'BMF.BC-DGO-00002', submittedAt: serverTimestamp() })); // no counter move
 });
 
 test('registrations are refused when faked or malformed', async () => {
-  const reg = collection(asUser(), 'registrations');
-  await assertFails(addDoc(collection(asNobody(), 'registrations'), delegate()));          // not signed in
-  await assertFails(addDoc(collection(asAnon(), 'registrations'), delegate('anon1')));     // delegate needs an account
-  await assertFails(addDoc(reg, delegate('bob')));                                         // posing as someone else
-  await assertFails(addDoc(reg, delegate('alice', { status: 'approved' })));               // self-approval
-  await assertFails(addDoc(reg, delegate('alice', { submittedAt: new Date(2020, 0, 1) }))); // backdated
-  await assertFails(addDoc(reg, delegate('alice', { isAdmin: true })));                    // unknown field
-  await assertFails(addDoc(reg, delegate('alice', { email: 'not-an-email' })));
-  await assertFails(addDoc(reg, delegate('alice', { type: 'panel' })));
+  const db = asUser();
+  await assertFails(submit(asNobody(), 'registrations', 'DGO', 1, delegate()));         // not signed in
+  await assertFails(submit(db, 'registrations', 'DGO', 1, delegate('bob')));            // posing as someone else
+  await assertFails(submit(db, 'registrations', 'DGO', 1, delegate('alice', { status: 'approved' })));
+  await assertFails(submit(db, 'registrations', 'DGO', 1, delegate('alice', { isAdmin: true })));
+  await assertFails(submit(db, 'registrations', 'DGO', 1, delegate('alice', { email: 'nope' })));
+  await assertFails(submit(asAnon(), 'registrations', 'SEO', 1, { ...delegate('anon1'), type: 'startup' })); // startup needs an account
 });
 
-test('an anonymous visitor can send a collaboration request and an inquiry', async () => {
-  const db = asAnon();
-  await assertSucceeds(addDoc(collection(db, 'registrations'), {
-    type: 'collaboration', uid: 'anon1', status: 'pending', submittedAt: serverTimestamp(),
-    name: 'Omar', email: 'omar@example.com', track: 'country-pavilion', mouSigning: true,
+test('anonymous visitors can send an inquiry but not register', async () => {
+  await assertFails(submit(asAnon(), 'registrations', 'CBC', 1, {
+    type: 'collaboration', uid: 'anon1', status: 'pending', name: 'Omar', email: 'omar@example.com',
+    details: { orgName: 'Gulf Co', track: 'country-pavilion' },
   }));
-  await assertSucceeds(addDoc(collection(db, 'queries'), {
-    uid: 'anon1', status: 'received', submittedAt: serverTimestamp(),
-    fullName: 'Omar', email: 'omar@example.com', message: 'Visa letter?', urgent: false,
+  await assertSucceeds(submit(asAnon(), 'queries', 'QRY', 1, {
+    uid: 'anon1', status: 'received', fullName: 'Omar', email: 'omar@example.com', message: 'Visa letter?', urgent: false,
   }));
 });
 
-test('visitors read only their own submissions; admins read all', async () => {
-  await seed('registrations/r1', { ...delegate('alice'), submittedAt: new Date() });
-  await seed('registrations/r2', { ...delegate('bob'), submittedAt: new Date() });
-  await assertSucceeds(getDoc(doc(asUser('alice'), 'registrations/r1')));
-  await assertFails(getDoc(doc(asUser('alice'), 'registrations/r2')));
+test('visitors read only their own records; admins read everything', async () => {
+  await seed('registrations/BMF.BC-DGO-00001', { ...delegate('alice'), submittedAt: new Date() });
+  await seed('registrations/BMF.BC-DGO-00002', { ...delegate('bob'), submittedAt: new Date() });
+  await assertSucceeds(getDoc(doc(asUser('alice'), 'registrations/BMF.BC-DGO-00001')));
+  await assertFails(getDoc(doc(asUser('alice'), 'registrations/BMF.BC-DGO-00002')));
   await assertSucceeds(getDocs(query(collection(asUser('alice'), 'registrations'), where('uid', '==', 'alice'))));
-  await assertFails(getDocs(collection(asUser('alice'), 'registrations')));                // listing everyone
+  await assertFails(getDocs(collection(asUser('alice'), 'registrations')));
   await assertSucceeds(getDocs(collection(asAdmin(), 'registrations')));
+  await assertFails(getDocs(collection(asUser('alice'), 'logins')));
+  await assertSucceeds(getDocs(collection(asAdmin(), 'logins')));
 });
 
-test('only admins approve or decline, and only the status fields change', async () => {
-  await seed('registrations/r1', { ...delegate('alice'), submittedAt: new Date() });
-  const decision = { status: 'approved', decidedAt: serverTimestamp(), decidedBy: 'admin1' };
-  await assertFails(updateDoc(doc(asUser('alice'), 'registrations/r1'), { ...decision, decidedBy: 'alice' }));
-  await assertFails(updateDoc(doc(asAdmin(), 'registrations/r1'), { ...decision, email: 'x@example.com' }));
-  await assertSucceeds(updateDoc(doc(asAdmin(), 'registrations/r1'), decision));
-  await assertFails(deleteDoc(doc(asUser('alice'), 'registrations/r1')));
+test('only admins approve or decline, and only the decision fields change', async () => {
+  await seed('registrations/BMF.BC-DGO-00001', { ...delegate('alice'), submittedAt: new Date() });
+  const decision = { status: 'approved', note: '', decidedAt: serverTimestamp() };
+  await assertFails(updateDoc(doc(asUser('alice'), 'registrations/BMF.BC-DGO-00001'), { ...decision, decidedBy: 'alice' }));
+  await assertFails(updateDoc(doc(asAdmin(), 'registrations/BMF.BC-DGO-00001'), { ...decision, decidedBy: 'admin1', email: 'x@example.com' }));
+  await assertSucceeds(updateDoc(doc(asAdmin(), 'registrations/BMF.BC-DGO-00001'), { ...decision, decidedBy: 'admin1' }));
+  await assertFails(deleteDoc(doc(asUser('alice'), 'registrations/BMF.BC-DGO-00001')));
 });
 
-test('sign-in log: own entry only, admins read', async () => {
+test('admin list: you can check yourself, nobody can edit it', async () => {
+  await assertSucceeds(getDoc(doc(asAdmin(), 'admins/boss@example.com')));
+  await assertFails(getDoc(doc(asUser('alice'), 'admins/boss@example.com')));
+  await assertFails(setDoc(doc(asUser('alice'), 'admins/alice@example.com'), {}));
+});
+
+test('sign-in log: own entry only', async () => {
   const entry = { uid: 'alice', action: 'sign-in', name: 'Alice', email: 'alice@example.com', method: 'Google', at: serverTimestamp() };
   await assertSucceeds(addDoc(collection(asUser('alice'), 'logins'), entry));
   await assertFails(addDoc(collection(asUser('alice'), 'logins'), { ...entry, email: 'bob@example.com' }));
-  await assertFails(getDocs(collection(asUser('alice'), 'logins')));
-  await assertSucceeds(getDocs(collection(asAdmin(), 'logins')));
+  await assertFails(addDoc(collection(asAnon(), 'logins'), { ...entry, uid: 'anon1' }));
 });
 
 test('startup directory: public read, admin-only write, public fields only', async () => {
@@ -103,9 +122,4 @@ test('startup directory: public read, admin-only write, public fields only', asy
   await assertFails(setDoc(doc(asAdmin(), 'startupDirectory/s1'), { ...card, website: 'javascript:alert(1)' }));
   await assertSucceeds(setDoc(doc(asAdmin(), 'startupDirectory/s1'), card));
   await assertSucceeds(getDoc(doc(asNobody(), 'startupDirectory/s1')));
-});
-
-test('anything else is denied', async () => {
-  await assertFails(setDoc(doc(asAdmin(), 'counters/delegate'), { n: 1 }));
-  await assertFails(getDoc(doc(asNobody(), 'registrations/r1')));
 });
