@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, LogIn } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
 import { PANELS, PANEL_IDS } from '../data/panels';
@@ -54,9 +54,10 @@ function AccountMenu({ onSignIn }) {
     return (
       <button
         onClick={() => { onSignIn?.(); openAuth({ mode: 'signin' }); }}
-        className="h-11 px-3 sm:px-4 rounded-xl text-sm sm:text-[15px] font-medium text-fg-2 hover:text-fg border border-transparent hover:border-gold-foil/40 transition-colors cursor-pointer"
+        className="btn-primary !rounded-xl h-10 sm:h-11 px-4 sm:px-5 text-sm sm:text-[15px] font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
       >
-        Sign in
+        <LogIn className="w-4 h-4" strokeWidth={2} />
+        <span>Login</span>
       </button>
     );
   }
@@ -89,99 +90,6 @@ function AccountMenu({ onSignIn }) {
           >
             <LogOut className="w-4 h-4" strokeWidth={1.5} />
             Sign out
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function RegisterDropdown({ onNavigate }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
-    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', close);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('mousedown', close);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="btn-primary !rounded-xl h-11 px-3.5 sm:px-5 text-sm sm:text-[15px] font-medium flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
-        aria-expanded={open}
-        aria-haspopup="menu"
-      >
-        <span>Register</span>
-        <ChevronDown className={`w-3.5 h-3.5 opacity-80 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6),0_0_0_1px_rgba(217,179,106,0.2)] animate-fade-in z-50"
-        >
-          <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-gold-text">
-            Registration Portals
-          </div>
-
-          <button
-            role="menuitem"
-            onClick={() => { setOpen(false); onNavigate('register'); }}
-            className="w-full text-left p-2.5 rounded-lg hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-coral mt-1.5 shrink-0" />
-            <div>
-              <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                Event &amp; Delegate Pass
-              </div>
-              <div className="text-[11px] text-fg-3">
-                Keynotes, deal rooms, networking lunches
-              </div>
-            </div>
-          </button>
-
-          <button
-            role="menuitem"
-            onClick={() => { setOpen(false); onNavigate('startup'); }}
-            className="w-full text-left p-2.5 rounded-lg hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-gold-foil mt-1.5 shrink-0" />
-            <div>
-              <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                Startup Showcase
-              </div>
-              <div className="text-[11px] text-fg-3">
-                Pitching, pavilion booth, investor matching
-              </div>
-            </div>
-          </button>
-
-          <div className="my-1 border-t border-line/60" />
-
-          <button
-            role="menuitem"
-            onClick={() => { setOpen(false); onNavigate('collaborate'); }}
-            className="w-full text-left p-2.5 rounded-lg hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-gold-text mt-1.5 shrink-0" />
-            <div>
-              <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                Summit Collaboration
-              </div>
-              <div className="text-[11px] text-fg-3">
-                Sovereign, corporate &amp; institutional partnership
-              </div>
-            </div>
           </button>
         </div>
       )}
@@ -262,6 +170,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar({ activePage, onNavigate }) {
+  const { user, signOut, openAuth } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -360,9 +269,7 @@ export default function Navbar({ activePage, onNavigate }) {
           </nav>
 
           {/* Right action area */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <RegisterDropdown onNavigate={handleNavClick} />
-
+          <div className="flex items-center gap-2 shrink-0">
             <AccountMenu onSignIn={() => setMobileMenuOpen(false)} />
 
             {/* Mobile Hamburger Button */}
@@ -423,27 +330,37 @@ export default function Navbar({ activePage, onNavigate }) {
             </div>
 
             <div className="mt-4 pt-4 border-t border-line/60 flex flex-col gap-2.5 pb-2">
-              <div className="text-[11px] font-mono text-gold-text uppercase tracking-wider px-1">
-                Registration &amp; Portals
-              </div>
-              <button
-                onClick={() => handleNavClick('register')}
-                className="w-full btn-primary min-h-[44px] text-sm font-semibold flex items-center justify-center cursor-pointer shadow-sm active:scale-[0.98]"
-              >
-                Event &amp; Delegate Registration
-              </button>
-              <button
-                onClick={() => handleNavClick('startup')}
-                className="w-full min-h-[44px] rounded-xl border border-gold-foil/50 text-gold-text text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
-              >
-                Register a Startup
-              </button>
-              <button
-                onClick={() => handleNavClick('collaborate')}
-                className="w-full min-h-[44px] rounded-xl border border-line text-fg-2 text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
-              >
-                Summit Collaboration
-              </button>
+              {!user ? (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openAuth({ mode: 'signin' });
+                  }}
+                  className="w-full btn-primary min-h-[44px] text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                >
+                  <LogIn className="w-4 h-4" strokeWidth={2} />
+                  <span>Login to Bharat Connect</span>
+                </button>
+              ) : (
+                <div className="p-3 rounded-xl bg-surface-2 border border-line flex items-center justify-between">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Avatar user={user} size={30} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-fg truncate">{user.name}</p>
+                      <p className="text-xs text-fg-3 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      signOut();
+                    }}
+                    className="h-8 px-2.5 rounded-lg text-xs font-medium text-coral hover:bg-surface-3 transition-colors cursor-pointer shrink-0"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

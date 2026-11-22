@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Rocket, Search } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Rocket, Search, LogIn } from 'lucide-react';
 import { watchStartupDirectory } from '../data/registry';
+import { useAuth } from '../auth/AuthContext';
 
 /*
   Directory of registered startups. Only startups the Secretariat has approved in the admin panel
@@ -11,6 +12,7 @@ import { watchStartupDirectory } from '../data/registry';
 const href = (url) => (/^https?:\/\//i.test(url) ? url : `https://${url}`);
 
 export default function StartupsPage({ onNavigate }) {
+  const { openAuth } = useAuth();
   const [startups, setStartups] = useState([]);
   const [query, setQuery] = useState('');
   const [sector, setSector] = useState('All');
@@ -45,9 +47,12 @@ export default function StartupsPage({ onNavigate }) {
               <span className="block font-serif text-3xl text-gold-text tabular-nums">{String(startups.length).padStart(2, '0')}</span>
               <span className="text-xs text-fg-3">Confirmed startups</span>
             </div>
-            <button onClick={() => onNavigate('startup')} className="btn-primary h-11 px-5 text-sm">
-              Register your startup
-              <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
+            <button
+              onClick={() => openAuth({ mode: 'signin' })}
+              className="btn-primary h-11 px-5 text-sm flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+            >
+              <LogIn className="w-4 h-4" strokeWidth={2} />
+              <span>Login to Portal</span>
             </button>
           </div>
         </div>
@@ -62,9 +67,12 @@ export default function StartupsPage({ onNavigate }) {
               <p className="mt-2 text-sm text-fg-2 leading-6">
                 Startups appear here once the secretariat confirms their registration.
               </p>
-              <button onClick={() => onNavigate('startup')} className="mt-6 btn-secondary h-10 px-4 text-sm">
-                Register your startup
-                <ArrowRight className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+              <button
+                onClick={() => openAuth({ mode: 'signin' })}
+                className="mt-6 btn-secondary h-10 px-4 text-sm flex items-center gap-2 mx-auto cursor-pointer active:scale-[0.98]"
+              >
+                <LogIn className="w-4 h-4 text-fg-3" strokeWidth={2} />
+                <span>Login to Portal</span>
               </button>
             </div>
           ) : (

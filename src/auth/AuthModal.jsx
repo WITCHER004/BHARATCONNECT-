@@ -6,25 +6,13 @@ import { BrandMark } from '../components/Navbar';
 import AuthForm from './AuthForm';
 
 /*
-  The sign in / sign up window. Opened with openAuth({ mode, reason, then }) from anywhere.
-  Accounts are Firebase accounts: Google, or email and password.
+  The dedicated login window. Opened with openAuth({ mode: 'signin', reason, then }) from anywhere.
+  Accounts are Firebase accounts: Google, Apple, or email and password.
 */
 
-const COPY = {
-  signin: {
-    title: 'Welcome back',
-    body: 'Sign in to your Bharat Connect account to continue.',
-  },
-  signup: {
-    title: 'Create your account',
-    body: 'It takes a few seconds and keeps your registrations in one place.',
-  },
-};
-
 export default function AuthModal() {
-  const { authRequest, closeAuth, setAuthMode } = useAuth();
+  const { authRequest, closeAuth } = useAuth();
   const dialogRef = useRef(null);
-  const mode = authRequest?.mode === 'signup' ? 'signup' : 'signin';
 
   // Escape closes; focus moves into the window; the page behind stops scrolling
   useEffect(() => {
@@ -41,7 +29,6 @@ export default function AuthModal() {
   }, [authRequest, closeAuth]);
 
   if (!authRequest) return null;
-  const copy = COPY[mode];
 
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
@@ -67,41 +54,15 @@ export default function AuthModal() {
           <span className="text-[15px] font-semibold">Bharat Connect 2026</span>
         </div>
 
-        {/* Sign in | Sign up */}
-        <div role="tablist" aria-label="Sign in or sign up" className="mt-6 grid grid-cols-2 p-1 rounded-xl bg-surface-1 border border-line">
-          {[
-            ['signin', 'Sign in'],
-            ['signup', 'Sign up'],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              role="tab"
-              aria-selected={mode === id}
-              onClick={() => setAuthMode(id)}
-              className={`h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                mode === id ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-2 hover:text-fg'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <h2 id="auth-title" className="mt-6 font-serif text-2xl font-medium text-fg">{copy.title}</h2>
+        <h2 id="auth-title" className="mt-6 font-serif text-2xl font-medium text-fg">Login to Bharat Connect</h2>
         {authRequest.reason && <p className="mt-2 text-sm text-gold-text">{authRequest.reason}</p>}
-        <p className="mt-2 text-[15px] text-fg-2 leading-relaxed">{copy.body}</p>
+        <p className="mt-2 text-[15px] text-fg-2 leading-relaxed">
+          Sign in to access your accreditations, passes, and deal rooms.
+        </p>
 
         <div className="mt-6">
-          <AuthForm key={mode} mode={mode} />
+          <AuthForm mode="signin" />
         </div>
-
-        <p className="mt-6 text-sm text-fg-3 text-center">
-          {mode === 'signin' ? (
-            <>New here? <button onClick={() => setAuthMode('signup')} className="text-fg underline underline-offset-4 decoration-line-strong hover:decoration-fg cursor-pointer">Create an account</button></>
-          ) : (
-            <>Already registered? <button onClick={() => setAuthMode('signin')} className="text-fg underline underline-offset-4 decoration-line-strong hover:decoration-fg cursor-pointer">Sign in</button></>
-          )}
-        </p>
       </div>
     </div>,
     document.body

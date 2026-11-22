@@ -277,7 +277,7 @@ export default function AuthForm({ mode = 'signin' }) {
 
         <button type="submit" disabled={!!busy} className="btn-primary h-12 text-[15px] mt-1 rounded-xl">
           {busy === 'Email' ? <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2} /> : null}
-          {busy === 'Email' ? (signup ? 'Creating account…' : 'Signing in…') : signup ? 'Create account' : 'Sign in with email'}
+          {busy === 'Email' ? (signup ? 'Creating account…' : 'Logging in…') : signup ? 'Create account' : 'Login to Bharat Connect'}
         </button>
       </form>
 
