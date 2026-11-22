@@ -59,7 +59,7 @@ export default function TermsConsentModal({
       aria-modal="true"
       aria-labelledby="terms-title"
     >
-      <div className="relative w-full max-w-2xl bg-surface-0 border border-line-strong rounded-2xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.85),0_0_0_1px_rgba(217,179,106,0.2)] overflow-hidden flex flex-col max-h-[92vh] animate-slide-up">
+      <div className="relative w-full max-w-2xl bg-surface-0 border border-line-strong rounded-2xl shadow-[0_24px_64px_-12px_rgba(0,0,0,0.85),0_0_0_1px_rgba(217,179,106,0.2)] overflow-hidden flex flex-col max-h-[min(90dvh,750px)] animate-slide-up">
         {/* Top Gold Accent Bar */}
         <div className="h-1.5 w-full bg-gradient-to-r from-gold-foil via-coral to-gold-text" />
 
@@ -177,7 +177,7 @@ export default function TermsConsentModal({
               <button
                 type="button"
                 onClick={handleDisagree}
-                className="h-11 px-5 rounded-xl border border-line text-fg-3 hover:text-fg hover:bg-surface-2 text-xs sm:text-sm font-medium transition-colors cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2"
+                className="min-h-[44px] h-11 px-5 rounded-xl border border-line text-fg-3 hover:text-fg hover:bg-surface-2 text-xs sm:text-sm font-medium transition-colors cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2 select-none"
               >
                 <X className="w-4 h-4" />
                 <span>Disagree</span>
@@ -187,7 +187,7 @@ export default function TermsConsentModal({
                 <button
                   type="button"
                   onClick={handleAgree}
-                  className="btn-primary h-11 px-7 rounded-xl text-xs sm:text-sm font-medium flex-1 sm:flex-initial flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all"
+                  className="btn-primary min-h-[44px] h-11 px-7 rounded-xl text-xs sm:text-sm font-semibold flex-1 sm:flex-initial flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 transition-all select-none"
                 >
                   <Check className="w-4 h-4" strokeWidth={2.5} />
                   <span>I Agree &amp; Continue</span>

@@ -43,7 +43,7 @@ export default function InstagramPopup() {
         <div
           role="dialog"
           aria-label="Follow Bharat Connect on Instagram"
-          className="relative w-[min(300px,calc(100vw-2rem))] p-4 rounded-2xl bg-surface-0/98 backdrop-blur-xl border border-line-strong shadow-2xl motion-safe:animate-slide-up"
+          className="relative w-[min(280px,calc(100vw-2rem))] sm:w-[300px] p-4 rounded-2xl bg-surface-0/98 backdrop-blur-xl border border-line-strong shadow-2xl motion-safe:animate-slide-up"
         >
           <button
             onClick={close}

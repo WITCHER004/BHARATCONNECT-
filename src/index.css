@@ -139,6 +139,23 @@
   background: var(--color-surface-4);
 }
 
+/* Responsive Scrollbar & Touch Utilities */
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button, a, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 /* Royal hero ground: deep obsidian black with subtle directional lighting */
 .bg-royal {
   background:
@@ -1661,9 +1678,15 @@ a,
 .tarot-slot {
   position: relative;
   z-index: 1;
-  width: calc((100% - 2 * 14px) / 3);
+  width: calc((100% - 14px) / 2);
   max-width: 190px;
   opacity: 0;
+}
+
+@media (min-width: 480px) {
+  .tarot-slot {
+    width: calc((100% - 2 * 14px) / 3);
+  }
 }
 
 @media (min-width: 640px) {

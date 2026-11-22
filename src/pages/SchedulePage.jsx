@@ -108,8 +108,8 @@ END:VCALENDAR`;
       </section>
 
       {/* Day switcher */}
-      <section className="sticky top-16 z-30 bg-surface-0/95 backdrop-blur-sm border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 py-3">
+      <section className="sticky top-[76px] sm:top-[88px] z-30 bg-surface-0/95 backdrop-blur-md border-b border-line shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 py-2.5 sm:py-3">
           <div className="flex items-center gap-2" role="tablist">
             {DAYS.map((day) => {
               const isActive = activeDay === day.id;
@@ -119,16 +119,16 @@ END:VCALENDAR`;
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveDay(day.id)}
-                  className={`px-4 py-2 rounded-lg text-left transition-colors duration-150 cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-2 rounded-xl text-left transition-colors duration-150 cursor-pointer min-h-[44px] flex flex-col justify-center ${
                     isActive
-                      ? 'bg-surface-3 shadow-sm'
+                      ? 'bg-surface-3 shadow-sm border border-gold-foil/30'
                       : 'hover:bg-surface-2'
                   }`}
                 >
-                  <span className={`block text-sm font-medium ${isActive ? 'text-fg' : 'text-fg-2'}`}>
+                  <span className={`block text-xs sm:text-sm font-semibold ${isActive ? 'text-fg' : 'text-fg-2'}`}>
                     {day.label}
                   </span>
-                  <span className="block ref-line">{day.date}</span>
+                  <span className="block ref-line text-[10.5px] sm:text-xs">{day.date}</span>
                 </button>
               );
             })}
@@ -139,19 +139,19 @@ END:VCALENDAR`;
       </section>
 
       {/* Sessions */}
-      <section className="theme-cream py-16 sm:py-20 flex-1">
+      <section className="theme-cream py-12 sm:py-20 flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
 
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <h2 className="font-serif font-medium text-2xl sm:text-3xl text-fg mb-1">
               {activeDayMeta.theme}
             </h2>
-            <p className="text-sm text-fg-3">{AGENDA_DATA[activeDay].date}</p>
+            <p className="text-xs sm:text-sm text-fg-3">{AGENDA_DATA[activeDay].date}</p>
           </div>
 
           {/* Track filter */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 border-b border-line">
-            <span className="text-sm text-fg-3 shrink-0 pr-2">Track</span>
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 border-b border-line -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none [-webkit-overflow-scrolling:touch]">
+            <span className="text-xs sm:text-sm text-fg-3 shrink-0 pr-2 font-mono uppercase tracking-wider">Track:</span>
             {TRACKS.map((track) => {
               const isActive = activeTrack === track;
               return (
@@ -159,10 +159,10 @@ END:VCALENDAR`;
                   key={track}
                   onClick={() => setActiveTrack(track)}
                   aria-pressed={isActive}
-                  className={`shrink-0 h-8 px-3 rounded-lg text-sm transition-colors duration-150 cursor-pointer ${
+                  className={`shrink-0 h-9 px-3.5 rounded-xl text-xs sm:text-sm font-medium transition-colors duration-150 cursor-pointer select-none ${
                     isActive
-                      ? 'bg-surface-3 text-fg border border-line-strong'
-                      : 'text-fg-2 hover:text-fg hover:bg-surface-2 border border-transparent'
+                      ? 'bg-surface-3 text-gold-text border border-gold-foil/50 shadow-sm'
+                      : 'text-fg-2 hover:text-fg hover:bg-surface-2 border border-line/60'
                   }`}
                 >
                   {track}

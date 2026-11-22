@@ -52,7 +52,7 @@ export default function AuthModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-title"
-        className="relative w-full max-w-md bg-surface-2 border border-line-strong rounded-2xl p-6 sm:p-8 shadow-2xl animate-slide-up focus:outline-none"
+        className="relative w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain bg-surface-2 border border-line-strong rounded-2xl p-5 sm:p-8 shadow-2xl animate-slide-up focus:outline-none"
       >
         <button
           onClick={closeAuth}

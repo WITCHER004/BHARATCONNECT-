@@ -169,7 +169,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
               <div className="lg:col-span-7 surface-card rounded-2xl p-6 sm:p-8">
 
                 {/* Stepper */}
-                <ol className="flex items-center gap-6 pb-6 mb-8 border-b border-line">
+                <ol className="flex items-center gap-3 sm:gap-6 pb-4 sm:pb-6 mb-6 sm:mb-8 border-b border-line overflow-x-auto scrollbar-none">
                   {STEPS.map((s) => {
                     const isCurrent = step === s.num;
                     const isDone = step > s.num;

@@ -271,6 +271,14 @@ export default function Navbar({ activePage, onNavigate }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile drawer on Escape key or route change
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKey = (e) => { if (e.key === 'Escape') setMobileMenuOpen(false); };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [mobileMenuOpen]);
+
   const handleNavClick = (pageId) => {
     onNavigate(pageId);
     setMobileMenuOpen(false);
@@ -279,7 +287,7 @@ export default function Navbar({ activePage, onNavigate }) {
   const solid = isScrolled || mobileMenuOpen;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3">
+    <header className="fixed top-0 left-0 right-0 z-50 px-2.5 sm:px-6 pt-2 sm:pt-3">
       <div
         className={`relative max-w-[1440px] mx-auto rounded-2xl border transition-all duration-300 ${
           solid
@@ -360,14 +368,14 @@ export default function Navbar({ activePage, onNavigate }) {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+              className="xl:hidden w-11 h-11 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer select-none active:scale-95 [-webkit-tap-highlight-color:transparent]"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
-                <X className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                <X className="w-5 h-5 text-fg" strokeWidth={1.75} />
               ) : (
-                <Menu className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                <Menu className="w-5 h-5" strokeWidth={1.75} />
               )}
             </button>
           </div>
@@ -375,7 +383,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden px-3 pb-5 pt-3 border-t border-line animate-slide-up">
+          <div className="xl:hidden px-3 sm:px-4 pb-6 pt-3 border-t border-line animate-slide-up max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;
@@ -383,8 +391,8 @@ export default function Navbar({ activePage, onNavigate }) {
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`h-11 px-3.5 rounded-lg text-[15px] text-left font-medium transition-colors cursor-pointer ${
-                      isActive ? 'bg-surface-3 text-fg' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
+                    className={`min-h-[44px] px-3.5 rounded-xl text-[15px] text-left font-medium transition-colors cursor-pointer flex items-center ${
+                      isActive ? 'bg-surface-3 text-gold-text font-semibold' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
                     }`}
                   >
                     {item.label}
@@ -403,35 +411,36 @@ export default function Navbar({ activePage, onNavigate }) {
                   <button
                     key={p.id}
                     onClick={() => handleNavClick(p.id)}
-                    className={`h-11 px-3.5 rounded-lg text-[15px] text-left font-medium transition-colors cursor-pointer ${
-                      isActive ? 'bg-surface-3 text-fg' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
+                    className={`min-h-[44px] px-3.5 rounded-xl text-[15px] text-left font-medium transition-colors cursor-pointer flex items-center gap-2.5 ${
+                      isActive ? 'bg-surface-3 text-gold-text font-semibold' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
                     }`}
                   >
-                    {p.label}
+                    <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil shrink-0" />
+                    <span>{p.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-line/60 flex flex-col gap-2">
+            <div className="mt-4 pt-4 border-t border-line/60 flex flex-col gap-2.5 pb-2">
               <div className="text-[11px] font-mono text-gold-text uppercase tracking-wider px-1">
                 Registration &amp; Portals
               </div>
               <button
                 onClick={() => handleNavClick('register')}
-                className="w-full btn-primary h-11 text-sm font-medium flex items-center justify-center cursor-pointer"
+                className="w-full btn-primary min-h-[44px] text-sm font-semibold flex items-center justify-center cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 Event &amp; Delegate Registration
               </button>
               <button
                 onClick={() => handleNavClick('startup')}
-                className="w-full h-11 rounded-[10px] border border-gold-foil/50 text-gold-text text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-full min-h-[44px] rounded-xl border border-gold-foil/50 text-gold-text text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
               >
                 Register a Startup
               </button>
               <button
                 onClick={() => handleNavClick('collaborate')}
-                className="w-full h-11 rounded-[10px] border border-line text-fg-2 text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-full min-h-[44px] rounded-xl border border-line text-fg-2 text-sm font-medium hover:bg-surface-3 flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
               >
                 Summit Collaboration
               </button>

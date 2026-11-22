@@ -891,12 +891,47 @@ export default function StartupPage({ onNavigate }) {
         <div id="startup-form" className="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
           <aside className="lg:sticky lg:top-24 self-start">
-            <p className="lg:hidden text-sm text-fg-2 mb-2">
-              Step {step + 1} of {STEPS.length} · <span className="text-fg">{STEPS[step].label}</span>
-            </p>
-            <div className="lg:hidden h-1 rounded-full bg-surface-3 overflow-hidden">
-              <div className="h-full bg-fg" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+            <div className="lg:hidden mb-4">
+              <div className="flex items-center justify-between text-xs sm:text-sm text-fg-2 mb-2">
+                <span>Step {step + 1} of {STEPS.length} · <strong className="text-fg">{STEPS[step].label}</strong></span>
+                <span className="font-mono text-gold-text">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-surface-3 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-gold-foil to-coral transition-all duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+              </div>
+
+              {/* Touch-Friendly Mobile & Tablet Step Chip Carousel */}
+              <div className="flex items-center gap-1.5 overflow-x-auto py-2.5 mt-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none [-webkit-overflow-scrolling:touch]">
+                {STEPS.map((s, i) => {
+                  const active = i === step && status !== 'sent';
+                  const done = i < reachable || status === 'sent';
+                  const can = i <= reachable && status !== 'sent';
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      disabled={!can}
+                      onClick={() => goTo(i)}
+                      className={`shrink-0 min-h-[36px] px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none ${
+                        active
+                          ? 'bg-surface-3 text-gold-text border border-gold-foil shadow-sm'
+                          : done
+                          ? 'bg-surface-2 text-fg border border-line-strong hover:bg-surface-3'
+                          : 'bg-surface-1 text-fg-3 border border-line/40 opacity-60 cursor-not-allowed'
+                      }`}
+                    >
+                      <span className={`w-4 h-4 rounded-full flex items-center justify-center font-mono text-[10px] ${
+                        done && !active ? 'bg-gold-foil/20 text-gold-text font-bold' : 'border border-current'
+                      }`}>
+                        {done && !active ? '✓' : i + 1}
+                      </span>
+                      <span>{s.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
             <ol className="hidden lg:flex flex-col gap-1">
               {STEPS.map((s, i) => {
                 const active = i === step && status !== 'sent';

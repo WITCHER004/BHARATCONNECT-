@@ -237,11 +237,11 @@ function NationsAndChambers({ regions }) {
           <div className="lg:col-span-7">
             <Ornament />
             <h2 className="mt-5 font-serif font-medium text-fg tracking-[-0.02em]">
-              <span className="block text-[96px] sm:text-[132px] leading-[0.85] bg-[linear-gradient(180deg,#F3DDA6_0%,#D9B36A_55%,#9c7330_100%)] bg-clip-text text-transparent">
+              <span className="block text-[64px] xs:text-[84px] sm:text-[120px] lg:text-[132px] leading-[0.85] bg-[linear-gradient(180deg,#F3DDA6_0%,#D9B36A_55%,#9c7330_100%)] bg-clip-text text-transparent">
                 {nationCount}
               </span>
-              <span className="block mt-3 text-4xl sm:text-5xl leading-[1.05]">Arab nations,</span>
-              <span className="block text-4xl sm:text-5xl leading-[1.1] italic text-fg-2">one corridor.</span>
+              <span className="block mt-3 text-3xl sm:text-5xl leading-[1.05]">Arab nations,</span>
+              <span className="block text-3xl sm:text-5xl leading-[1.1] italic text-fg-2">one corridor.</span>
             </h2>
           </div>
           <p className="lg:col-span-5 text-[15px] text-fg-2 leading-relaxed lg:pb-3 max-w-md">
@@ -414,20 +414,20 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
           <div className="lg:col-span-7">
             <p className="ref-line text-gold-text">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi, New Delhi</p>
 
-            <h1 className="mt-6 font-serif font-medium text-fg text-[40px] leading-[1.08] sm:text-6xl lg:text-[68px] lg:leading-[1.04] tracking-[-0.025em] max-w-[13ch]">
+            <h1 className="mt-6 font-serif font-medium text-fg text-[32px] sm:text-5xl lg:text-[68px] leading-[1.12] sm:leading-[1.08] lg:leading-[1.04] tracking-[-0.025em] max-w-[14ch]">
               India and 22 Arab nations <span className="text-gold-text">at one table</span>
             </h1>
 
-            <p className="mt-6 text-lg leading-[1.6] text-fg-2 max-w-xl">
+            <p className="mt-5 text-base sm:text-lg leading-[1.6] text-fg-2 max-w-xl">
               Two days of ministerial plenaries, sector deal rooms and 100+ exhibition stalls, working towards
               a $500B bilateral trade target. Organised by IACCIA in New Delhi.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-3">
-              <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-6 text-[15px]">
+            <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3">
+              <button onClick={() => onNavigate('startup')} className="btn-primary min-h-[44px] h-12 px-6 text-[15px] shadow-md active:scale-[0.98]">
                 Register a startup
               </button>
-              <button onClick={() => onNavigate('register')} className="btn-secondary h-12 px-6 text-[15px]">
+              <button onClick={() => onNavigate('register')} className="btn-secondary min-h-[44px] h-12 px-6 text-[15px] active:scale-[0.98]">
                 Event registration
               </button>
             </div>
@@ -449,35 +449,35 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
           <div className="relative">
             {/* cards and their dividers share one grid: card | line | card | line | card */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-8 lg:gap-x-5 xl:gap-x-6 lg:-mx-4 xl:-mx-8 items-stretch">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-6 lg:gap-x-4 xl:gap-x-6 items-stretch">
               {/* Box 1: Startup Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
                   <div>
-                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi
                     </p>
-                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
                       Want to register a startup?
                     </h3>
-                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
                       Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
                       receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SEO-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                     </p>
-                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
                       <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure font-medium">₹5,900 incl.</dd></div>
                       <div><dt className="text-fg-3">Valid for</dt><dd className="mt-1 text-fg font-medium">2 yrs / 5 evts</dd></div>
-                      <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg font-medium">10 minutes</dd></div>
+                      <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg font-medium">10 mins</dd></div>
                     </dl>
                   </div>
-                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('startup')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                  <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('startup')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Register now
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('query')}
-                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Startup Showcase FAQ
                     </button>
@@ -489,32 +489,32 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
               {/* Box 2: Event Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
                   <div>
-                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       500 Accreditations · 18–19 Dec 2026 · Yashobhoomi
                     </p>
-                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
                       Event &amp; delegate registration
                     </h3>
-                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
                       Attend plenary keynotes, private B2B deal rooms, the 7,000 sq ft Yashobhoomi lounge, bilateral
                       networking lunches, and the inaugural gala dinner and leadership awards with 22 Arab delegations.
                     </p>
-                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
                       <div><dt className="text-fg-3">Access</dt><dd className="mt-1 text-fg font-medium">Plenary &amp; B2B</dd></div>
                       <div><dt className="text-fg-3">Capacity</dt><dd className="mt-1 text-fg font-mono figure font-medium">500 Passes</dd></div>
                       <div><dt className="text-fg-3">Accreditation</dt><dd className="mt-1 text-fg font-medium">Instant E-Badge</dd></div>
                     </dl>
                   </div>
-                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('register')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                  <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('register')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Register for the event
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('exhibition')}
-                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Book an exhibition stall
                     </button>
@@ -526,31 +526,31 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
               {/* Box 3: Collaboration for Business Summit (New Portal) */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-6 sm:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
                   <div>
-                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-[22px] flex items-center">
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       Bilateral Directorate · Strategic Partnerships · 2026
                     </p>
-                    <h3 className="mt-4 font-serif text-2xl sm:text-[26px] xl:text-[28px] font-medium text-fg leading-tight min-h-[68px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
                       Collaboration through Bharat Connect
                     </h3>
-                    <p className="mt-4 text-[14px] sm:text-[15px] text-fg-2 leading-relaxed min-h-[105px]">
+                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
                       Partner with the conclave as a country pavilion, industry co-host, sovereign deal-room sponsor, or knowledge think-tank. Dedicated portal for institutions seeking strategic bilateral collaboration.
                     </p>
-                    <dl className="mt-6 grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-[13px] border-t border-line/80 pt-6">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
                       <div><dt className="text-fg-3">Track</dt><dd className="mt-1 text-fg font-medium">Country / Sponsor</dd></div>
                       <div><dt className="text-fg-3">Fast-track</dt><dd className="mt-1 text-fg font-medium">Direct Desk</dd></div>
                       <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-CBC</dd></div>
                     </dl>
                   </div>
-                  <div className="mt-8 pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('collaborate')} className="btn-primary h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer">
+                  <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('collaborate')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Collaborate with summit
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('query')}
-                      className="h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Partnership Prospectus
                     </button>
@@ -587,7 +587,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
           <div className="mt-12 news-clip-shadow relative">
             {/* push pin holding the clipping to the board */}
             <svg
-              className="absolute z-10 left-4 sm:left-7 -top-4 w-11 h-12 pointer-events-none"
+              className="absolute z-10 left-2 sm:left-7 -top-4 w-11 h-12 pointer-events-none"
               viewBox="0 0 44 48"
               aria-hidden="true"
             >
@@ -614,12 +614,12 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
               <circle cx="22" cy="13" r="11" fill="url(#pin-head)" />
               <ellipse cx="18" cy="8.5" rx="3.6" ry="2.4" fill="rgba(255,255,255,0.55)" transform="rotate(-25 18 8.5)" />
             </svg>
-            <article className="news-clip px-5 py-7 sm:px-9 sm:py-9">
+            <article className="news-clip px-4 py-6 sm:px-9 sm:py-9">
               {/* masthead */}
               <header>
                 <div className="flex items-end justify-between gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
                   <span className="hidden sm:block w-40">Summit Edition</span>
-                  <p className="news-masthead flex-1 text-center text-[30px] sm:text-[46px] normal-case tracking-normal text-[var(--ink)]">
+                  <p className="news-masthead flex-1 text-center text-[20px] xs:text-[26px] sm:text-[38px] md:text-[46px] normal-case tracking-normal text-[var(--ink)] leading-tight">
                     The Bharat Connect Chronicle
                   </p>
                   <span className="hidden sm:block w-40 text-right">Vol. I · No. 2026</span>
