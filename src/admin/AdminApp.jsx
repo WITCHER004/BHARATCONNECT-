@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
-  HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2
+  HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2,
+  ShieldCheck, FileText
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import {
-  listRegistrations, listRegisteredUsers, listQueries, listLogins, decide, toggleFlag, updateQueryStatus,
+  listRegistrations, listRegisteredUsers, listQueries, listTermsConsents, listLogins, decide, toggleFlag, updateQueryStatus,
   subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
 } from '../data/registry';
 import {
@@ -28,6 +29,7 @@ const VIEWS = [
   { id: 'approvals', label: 'Approvals', icon: ClipboardCheck },
   { id: 'users', label: 'Registered Users', icon: Users },
   { id: 'queries', label: 'Query Desk', icon: HelpCircle },
+  { id: 'terms', label: 'Terms & Conditions', icon: ShieldCheck },
   { id: 'registrations', label: 'All Registrations', icon: Database },
   { id: 'signins', label: 'Sign-ins', icon: LogIn },
 ];
@@ -39,6 +41,7 @@ function useRegistry(includeSamples, enabled) {
     registrations: listRegistrations({ includeSamples }),
     users: listRegisteredUsers({ includeSamples }),
     queries: listQueries({ includeSamples }),
+    consents: listTermsConsents({ includeSamples }),
     logins: listLogins({ includeSamples }),
   }), [includeSamples]);
   const [data, setData] = useState(read);
@@ -128,7 +131,7 @@ export default function AdminApp() {
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const { registrations, users = [], queries = [], logins, pulse, error: dataError } = useRegistry(showSamples, unlocked);
+  const { registrations, users = [], queries = [], consents = [], logins, pulse, error: dataError } = useRegistry(showSamples, unlocked);
 
   useEffect(() => {
     try { localStorage.setItem(SAMPLES_KEY, showSamples ? '1' : '0'); } catch { /* storage unavailable */ }
@@ -197,6 +200,11 @@ export default function AdminApp() {
             {v.id === 'queries' && openQueriesCount > 0 && (
               <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-surface-3 border border-line text-gold-text text-xs font-semibold flex items-center justify-center tabular-nums">
                 {openQueriesCount}
+              </span>
+            )}
+            {v.id === 'terms' && (
+              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-surface-3 border border-line text-gold-text text-xs font-semibold flex items-center justify-center tabular-nums">
+                {consents.length}
               </span>
             )}
           </button>
@@ -297,6 +305,7 @@ export default function AdminApp() {
               registrations={registrations}
               users={users}
               queries={queries}
+              consents={consents}
               logins={logins}
               onOpen={setSelected}
               go={go}
@@ -324,6 +333,12 @@ export default function AdminApp() {
               onUpdateStatus={handleUpdateQueryStatus}
             />
           )}
+          {view === 'terms' && (
+            <TermsConsentDesk
+              consents={consents}
+              onOpen={setSelected}
+            />
+          )}
           {view === 'registrations' && (
             <Registrations
               registrations={registrations}
@@ -342,7 +357,7 @@ export default function AdminApp() {
 
       {selected && (
         <Drawer
-          record={[...registrations, ...queries, ...users].find((r) => r.id === selected)}
+          record={[...registrations, ...queries, ...users, ...consents].find((r) => r.id === selected)}
           onClose={() => setSelected(null)}
           onToggleFlag={handleToggleFlag}
           onUpdateStatus={handleUpdateQueryStatus}
@@ -386,7 +401,7 @@ function Card({ title, action, children, className = '', i = 0 }) {
 
 /* ── Overview ─────────────────────────────────────────── */
 
-function Overview({ registrations, users = [], queries = [], logins, onOpen, go }) {
+function Overview({ registrations, users = [], queries = [], consents = [], logins, onOpen, go }) {
   const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending').length;
   const approved = approvable.filter((r) => r.status === 'approved').length;
@@ -400,6 +415,8 @@ function Overview({ registrations, users = [], queries = [], logins, onOpen, go 
 
   const flaggedCount = [...users, ...queries].filter((x) => x.flagged).length;
   const openQueries = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
+  const agreedConsents = consents.filter((c) => c.decision === 'agreed').length;
+  const disagreedConsents = consents.filter((c) => c.decision === 'disagreed').length;
 
   const countries = Object.entries(
     approvable.reduce((acc, r) => {
@@ -411,6 +428,7 @@ function Overview({ registrations, users = [], queries = [], logins, onOpen, go 
   const feed = [
     ...registrations.slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
     ...queries.slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
+    ...consents.slice(0, 8).map((c) => ({ kind: 'consent', at: c.timestamp, c })),
     ...logins.slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
   ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 9);
 
@@ -418,6 +436,7 @@ function Overview({ registrations, users = [], queries = [], logins, onOpen, go 
     { label: 'Registered Users', value: users.length, caption: `${approvable.length} conclave accreditations`, spark: regSpark, onClick: () => go('users') },
     { label: 'Awaiting review', value: pending, caption: pending ? 'need a decision' : 'queue is clear', accent: '#FAB219', onClick: () => go('approvals') },
     { label: 'Query Desk', value: openQueries, suffix: ` / ${queries.length}`, caption: `${openQueries} inquiries pending response`, onClick: () => go('queries'), accent: openQueries ? '#FAB219' : undefined },
+    { label: 'Terms & Conditions', value: `${agreedConsents}/${consents.length}`, caption: `${disagreedConsents} disagreements logged`, onClick: () => go('terms'), accent: disagreedConsents ? '#D03B3B' : '#0CA30C' },
     { label: 'Flagged for review', value: flaggedCount, caption: flaggedCount ? 'requires administrative attention' : 'no flagged items', accent: flaggedCount ? '#FAB219' : undefined, onClick: () => go('users') },
   ];
 
@@ -496,6 +515,20 @@ function Overview({ registrations, users = [], queries = [], logins, onOpen, go 
                       <span className="block text-xs text-fg-3">{timeAgo(f.at)} · <span className="font-mono text-gold-text">{f.q.id}</span></span>
                     </span>
                   </button>
+                ) : f.kind === 'consent' ? (
+                  <div className="flex items-start gap-3">
+                    <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${f.c.decision === 'agreed' ? 'bg-[#0CA30C]' : 'bg-coral'}`} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm text-fg truncate">
+                        {f.c.userName || f.c.userEmail}{' '}
+                        <span className={f.c.decision === 'agreed' ? 'text-[#0CA30C]' : 'text-coral'}>
+                          {f.c.decision === 'agreed' ? 'agreed to terms' : 'disagreed with terms'}
+                        </span>
+                        <span className="text-fg-3"> · {f.c.portalTitle || f.c.portal}</span>
+                      </span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.c.source === 'sample' && <SampleTag />}</span>
+                    </span>
+                  </div>
                 ) : (
                   <div className="flex items-start gap-3">
                     <Activity className="mt-0.5 w-3.5 h-3.5 text-fg-3 shrink-0" strokeWidth={1.5} />
@@ -1231,6 +1264,347 @@ function QueryDesk({ queries, onOpen, onToggleFlag, onUpdateStatus }) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── Terms & Conditions Consent Panel ───────────────── */
+
+function toConsentsCsv(rows) {
+  const cols = ['id', 'userName', 'userEmail', 'decision', 'portal', 'portalTitle', 'timestamp', 'complianceDoc', 'note', 'userAgent'];
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
+}
+
+function TermsConsentDesk({ consents = [], onOpen }) {
+  const [decisionFilter, setDecisionFilter] = useState('all');
+  const [q, setQ] = useState('');
+  const [selectedConsent, setSelectedConsent] = useState(null);
+
+  const agreedCount = consents.filter((c) => c.decision === 'agreed').length;
+  const disagreedCount = consents.filter((c) => c.decision === 'disagreed').length;
+  const agreementRate = consents.length ? Math.round((agreedCount / consents.length) * 100) : 100;
+
+  const rows = consents
+    .filter((c) => decisionFilter === 'all' || c.decision === decisionFilter)
+    .filter((c) => {
+      const term = q.trim().toLowerCase();
+      if (!term) return true;
+      return [c.id, c.userName, c.userEmail, c.portalTitle, c.portal, c.note]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(term);
+    });
+
+  const download = () => {
+    const blob = new Blob([toConsentsCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bharat-connect-terms-consents-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  };
+
+  return (
+    <div className="flex flex-col gap-5 sm:gap-6">
+      {/* Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+          <p className="text-xs text-fg-3 flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-gold-text" />
+            Total Consents Logged
+          </p>
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-fg">
+            <Counter value={consents.length} />
+          </p>
+          <p className="mt-2 text-xs text-fg-3">Tracked legal acknowledgements</p>
+        </div>
+
+        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+          <p className="text-xs text-fg-3 flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-[#0CA30C]" />
+            Agreed Users
+          </p>
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-[#0CA30C]">
+            <Counter value={agreedCount} />
+          </p>
+          <p className="mt-2 text-xs text-fg-3">{agreementRate}% compliance rate</p>
+        </div>
+
+        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+          <p className="text-xs text-fg-3 flex items-center gap-1.5">
+            <AlertCircle className="w-4 h-4 text-coral" />
+            Disagreed Users
+          </p>
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-coral">
+            <Counter value={disagreedCount} />
+          </p>
+          <p className="mt-2 text-xs text-fg-3">
+            {disagreedCount ? 'Action required for pass release' : '0 objections logged'}
+          </p>
+        </div>
+
+        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+          <p className="text-xs text-fg-3 flex items-center gap-1.5">
+            <FileText className="w-4 h-4 text-gold-text" />
+            Master Terms Protocol
+          </p>
+          <p className="mt-3 font-serif text-xl sm:text-2xl leading-none text-fg truncate">
+            CEPA &amp; DPDP v2.6
+          </p>
+          <a
+            href="https://drive.google.com/file/d/1-S5W_tZKOOiem1Q2N8q4hY1hAqc_pkab/view?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 text-xs text-gold-text hover:underline flex items-center gap-1"
+          >
+            <span>View PDF Document</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="ad-card rounded-2xl border border-line bg-surface-0/70 overflow-hidden">
+        {/* Filter & Search Bar */}
+        <div className="p-4 sm:p-5 border-b border-line flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              ['all', `All (${consents.length})`],
+              ['agreed', `Agreed (${agreedCount})`],
+              ['disagreed', `Disagreed (${disagreedCount})`],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setDecisionFilter(id)}
+                className={`h-9 px-3.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+                  decisionFilter === id
+                    ? 'bg-surface-3 text-fg border border-gold-foil/50 font-semibold'
+                    : 'text-fg-2 hover:bg-surface-2 hover:text-fg border border-transparent'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="relative flex-1 sm:w-64">
+              <span className="sr-only">Search terms consents</span>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-3" />
+              <input
+                type="search"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search user, email, portal…"
+                className="w-full h-9 pl-9 pr-3 rounded-xl bg-surface-2 border border-line text-xs text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil/60"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={download}
+              className="h-9 px-3 rounded-xl border border-line text-fg-2 hover:text-fg hover:bg-surface-2 text-xs font-medium flex items-center gap-1.5 cursor-pointer shrink-0"
+              title="Download terms consents CSV"
+            >
+              <Download className="w-3.5 h-3.5 text-gold-text" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Consents Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-fg">
+            <thead>
+              <tr className="border-b border-line bg-surface-2/40 text-[11px] font-mono uppercase tracking-wider text-fg-3">
+                <th className="px-5 py-3 font-medium">User / Registrant</th>
+                <th className="px-3 py-3 font-medium">Protocol Decision</th>
+                <th className="px-3 py-3 font-medium">Portal / Scope</th>
+                <th className="px-5 py-3 font-medium">Agreement Date &amp; Time</th>
+                <th className="px-3 py-3 font-medium">Compliance Ref</th>
+                <th className="px-4 py-3 font-medium text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((c, i) => {
+                const isAgreed = c.decision === 'agreed';
+                return (
+                  <tr
+                    key={c.id + c.timestamp + i}
+                    className="ad-row border-b border-line last:border-0 hover:bg-surface-2/40 transition-colors"
+                    style={{ '--i': Math.min(i, 14) }}
+                  >
+                    {/* User */}
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-full bg-surface-3 border border-line text-xs font-semibold text-fg flex items-center justify-center shrink-0">
+                          {(c.userName || c.userEmail || '?').charAt(0).toUpperCase()}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-medium text-fg truncate flex items-center gap-1.5">
+                            <span>{c.userName || 'Unnamed User'}</span>
+                            {c.source === 'sample' && <SampleTag />}
+                          </p>
+                          <p className="text-[11px] text-fg-3 truncate">{c.userEmail}</p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Decision */}
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      {isAgreed ? (
+                        <span className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#0CA30C] bg-[#0CA30C]/10 border border-[#0CA30C]/30 px-2.5 py-0.5 rounded-full">
+                          <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                          Agreed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-coral bg-coral/10 border border-coral/30 px-2.5 py-0.5 rounded-full">
+                          <X className="w-3.5 h-3.5" strokeWidth={2.5} />
+                          Disagreed
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Portal / Scope */}
+                    <td className="px-3 py-3.5 text-fg-2">
+                      <span className="font-medium text-fg block text-xs">{c.portalTitle || c.portal}</span>
+                      {c.note && <span className="text-[10.5px] text-coral truncate block max-w-xs">{c.note}</span>}
+                    </td>
+
+                    {/* Date & Time */}
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <span className="font-mono text-fg text-xs block">
+                        {new Date(c.timestamp).toLocaleString('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        })}
+                      </span>
+                      <span className="text-[11px] text-fg-3 block">{timeAgo(c.timestamp)}</span>
+                    </td>
+
+                    {/* Compliance Ref */}
+                    <td className="px-3 py-3.5 whitespace-nowrap">
+                      <span className="font-mono text-gold-text text-xs block">{c.id}</span>
+                      <span className="text-[10px] text-fg-3">{c.complianceDoc || 'CEPA v2.6'}</span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedConsent(c)}
+                        className="h-8 px-2.5 rounded-lg border border-line text-xs font-medium text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+                      >
+                        View audit log
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {rows.length === 0 && (
+          <Empty text="No terms and conditions consent records matching your criteria." />
+        )}
+
+        <div className="px-4 py-3 border-t border-line text-xs text-fg-3 flex items-center justify-between">
+          <span>{rows.length} of {consents.length} consent records logged</span>
+          <span className="font-mono text-gold-text">{agreementRate}% Accepted</span>
+        </div>
+      </div>
+
+      {/* Consent Audit Detail Modal */}
+      {selectedConsent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg bg-surface-0 border border-line-strong rounded-2xl shadow-2xl overflow-hidden p-6 animate-slide-up">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-line">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedConsent.decision === 'agreed' ? 'bg-[#0CA30C]/15 text-[#0CA30C]' : 'bg-coral/15 text-coral'}`}>
+                  {selectedConsent.decision === 'agreed' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg text-fg">Terms Consent Audit Record</h3>
+                  <p className="font-mono text-xs text-gold-text">{selectedConsent.id}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedConsent(null)}
+                className="w-8 h-8 rounded-lg text-fg-3 hover:text-fg hover:bg-surface-3 flex items-center justify-center cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3 text-xs">
+              <div className="p-3 rounded-xl bg-surface-2 border border-line flex items-center justify-between">
+                <span className="text-fg-3">Decision Status</span>
+                <span className={`font-semibold px-2.5 py-0.5 rounded-full text-xs ${selectedConsent.decision === 'agreed' ? 'bg-[#0CA30C]/15 text-[#0CA30C]' : 'bg-coral/15 text-coral'}`}>
+                  {selectedConsent.decision === 'agreed' ? 'Agreed to Terms' : 'Disagreed with Terms'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                  <span className="text-fg-3 block text-[11px]">User Name</span>
+                  <span className="font-medium text-fg block mt-0.5 text-xs truncate">{selectedConsent.userName || '—'}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                  <span className="text-fg-3 block text-[11px]">User Email</span>
+                  <span className="font-medium text-fg block mt-0.5 text-xs truncate">{selectedConsent.userEmail || '—'}</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                <span className="text-fg-3 block text-[11px]">Portal &amp; Scope</span>
+                <span className="font-medium text-fg block mt-0.5">{selectedConsent.portalTitle || selectedConsent.portal}</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                <span className="text-fg-3 block text-[11px]">Exact Timestamp (ISO 8601)</span>
+                <span className="font-mono text-fg block mt-0.5 text-xs">{selectedConsent.timestamp}</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                <span className="text-fg-3 block text-[11px]">Compliance Baseline</span>
+                <span className="font-mono text-gold-text block mt-0.5 text-xs">{selectedConsent.complianceDoc || 'CEPA v2.6'}</span>
+              </div>
+
+              {selectedConsent.note && (
+                <div className="p-3 rounded-xl bg-coral/10 border border-coral/30">
+                  <span className="text-coral block text-[11px] font-semibold">Audit Note</span>
+                  <span className="text-fg-2 block mt-0.5 text-xs">{selectedConsent.note}</span>
+                </div>
+              )}
+
+              {selectedConsent.userAgent && (
+                <div className="p-3 rounded-xl bg-surface-2 border border-line">
+                  <span className="text-fg-3 block text-[11px]">Client Device / Browser</span>
+                  <span className="font-mono text-fg-3 block mt-0.5 text-[10.5px] break-all">{selectedConsent.userAgent}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedConsent(null)}
+                className="btn-primary h-9 px-4 text-xs font-semibold rounded-xl cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,7 @@ const TERMS_PORTAL_PAGES = ['register', 'startup', 'collaborate', 'exhibition', 
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
+import PostAuthTermsModal from './components/PostAuthTermsModal';
 import { useAuth } from './auth/AuthContext';
 import TermsConsentModal from './components/TermsConsentModal';
 import { hasAccepted } from './data/terms';
@@ -180,6 +181,9 @@ export default function App() {
 
       {/* Sign in / sign up */}
       <AuthModal />
+
+      {/* Post-Authentication Terms and Conditions Consent Prompt */}
+      <PostAuthTermsModal />
 
       {/* Global Query Desk Floating Concierge */}
       <QueryConciergeModal onNavigate={navigate} />

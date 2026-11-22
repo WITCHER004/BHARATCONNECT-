@@ -7,14 +7,6 @@ export const WHATSAPP_NUMBER = '910000000000';
 const DISMISS_KEY = 'bc-whatsapp-popup-dismissed';
 const SHOW_DELAY_MS = 12000; // after the Instagram card, so the two don't appear at once
 
-// Quick questions: each opens WhatsApp with the message already typed for the bot
-const QUICK = [
-  'Register as a delegate',
-  'Programme and timings',
-  'Venue and travel',
-  'Startup showcase',
-];
-
 const waLink = (text) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 
 export function WhatsAppIcon({ className }) {
@@ -35,7 +27,7 @@ function wasDismissed() {
   }
 }
 
-// Floating WhatsApp bot button, stacked above the Instagram one, with a quick-question card
+// Floating WhatsApp bot button, stacked above the Instagram one, with direct Open WhatsApp action
 export default function WhatsAppPopup() {
   const [open, setOpen] = useState(false);
 
@@ -80,34 +72,15 @@ export default function WhatsAppPopup() {
             </span>
           </div>
 
-          <p className="mt-3 text-[13px] leading-5 text-fg-2">Pick a question to start the chat.</p>
-
-          <ul className="mt-3 flex flex-col gap-1.5">
-            {QUICK.map((q) => (
-              <li key={q}>
-                <a
-                  href={waLink(q)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={close}
-                  className="flex items-center justify-between gap-2 h-9 px-3 rounded-[10px] bg-surface-3 border border-line text-[13px] text-fg-2 hover:text-fg hover:border-line-strong transition-colors duration-150"
-                >
-                  {q}
-                  <ArrowUpRight className="w-3.5 h-3.5 text-fg-3 shrink-0" strokeWidth={1.5} />
-                </a>
-              </li>
-            ))}
-          </ul>
-
           <a
             href={waLink('Hello Bharat Connect')}
             target="_blank"
             rel="noopener noreferrer"
             onClick={close}
-            className="mt-3 btn-secondary h-9 px-3 text-sm w-full justify-center"
+            className="mt-4 btn-primary h-11 px-4 text-sm font-semibold w-full flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
           >
-            Open WhatsApp
-            <ArrowUpRight className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+            <span>Open WhatsApp</span>
+            <ArrowUpRight className="w-4 h-4" strokeWidth={2} />
           </a>
         </div>
       )}

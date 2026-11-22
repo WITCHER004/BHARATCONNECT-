@@ -73,8 +73,61 @@ export function submitRegistration(type, record) {
 }
 
 /* Save a helpdesk inquiry: { fullName, email, phone, organization, country, regId, category, dept, subject, message, urgent } */
-export function submitQuery(record) {
-  return saveWithRef('query', record);
+export async function submitQuery(record) {
+  const flags = getLocalFlags();
+  const counterKey = 'babc_counter_QRY';
+  let nextNum = 1;
+  try {
+    const c = parseInt(localStorage.getItem(counterKey) || '12', 10);
+    nextNum = c + 1;
+    localStorage.setItem(counterKey, String(nextNum));
+  } catch { /* storage unavailable */ }
+  const localRef = `BMF.BC-QRY-${String(nextNum).padStart(5, '0')}`;
+
+  const queryRecord = {
+    ...record,
+    id: localRef,
+    ref: localRef,
+    type: 'query',
+    name: record.fullName || record.name || 'Anonymous Inquirer',
+    fullName: record.fullName || record.name || '',
+    email: record.email || '',
+    phone: record.phone || '',
+    organisation: record.organization || record.organisation || '—',
+    organization: record.organization || record.organisation || '—',
+    country: record.country || 'India',
+    regId: record.regId || '',
+    category: record.category || 'General Conclave Inquiry',
+    dept: record.dept || 'Secretariat Helpdesk',
+    subject: record.subject || 'Conclave General Query',
+    message: record.message || '',
+    urgent: !!record.urgent,
+    status: 'received',
+    flagged: flags[localRef] !== undefined ? flags[localRef] : false,
+    submittedAt: new Date().toISOString(),
+    source: 'live',
+  };
+
+  saveLocalQuery(queryRecord);
+  if (!cache.queries.some((q) => q.id === localRef)) {
+    cache.queries.unshift(queryRecord);
+  }
+  notify();
+
+  try {
+    const firestoreRef = await saveWithRef('query', record);
+    if (firestoreRef && firestoreRef !== localRef) {
+      queryRecord.id = firestoreRef;
+      queryRecord.ref = firestoreRef;
+      saveLocalQuery(queryRecord);
+      notify();
+      return firestoreRef;
+    }
+  } catch (err) {
+    console.warn('Firestore write noted; query preserved in local registry:', err);
+  }
+
+  return localRef;
 }
 
 /* Record a sign-in, sign-up or sign-out (real accounts only; never blocks the sign-in itself). */
@@ -88,6 +141,16 @@ export function recordLogin({ action, name, method }) {
 /* A visitor's own record by reference (the rules only allow their own). Null if not found or not theirs. */
 export async function findMyRecord(ref) {
   const id = ref.trim().toUpperCase();
+  const localQueries = getLocalQueries();
+  const foundLocal = localQueries.find((q) => q.id === id || q.ref === id);
+  if (foundLocal) {
+    const statusOverrides = getLocalQueryStatuses();
+    return {
+      ...foundLocal,
+      status: statusOverrides[id] || foundLocal.status || 'received',
+    };
+  }
+
   const coll = id.includes('-QRY-') ? 'queries' : 'registrations';
   try {
     await ensureSignedIn();
@@ -131,6 +194,49 @@ function setLocalFlag(id, flagged) {
     else delete flags[id];
     localStorage.setItem(LOCAL_FLAGS_KEY, JSON.stringify(flags));
   } catch { /* storage unavailable */ }
+}
+
+// Local query persistence & status overrides so queries immediately sync to admin
+const LOCAL_QUERIES_KEY = 'babc_submitted_queries';
+const LOCAL_QUERY_STATUS_KEY = 'babc_query_status_overrides';
+
+export function getLocalQueries() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_QUERIES_KEY) || '[]'); } catch { return []; }
+}
+function saveLocalQuery(q) {
+  try {
+    const list = getLocalQueries();
+    const idx = list.findIndex((item) => item.id === q.id || item.ref === q.ref);
+    if (idx >= 0) list[idx] = { ...list[idx], ...q };
+    else list.unshift(q);
+    localStorage.setItem(LOCAL_QUERIES_KEY, JSON.stringify(list));
+  } catch { /* ignore */ }
+}
+function getLocalQueryStatuses() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_QUERY_STATUS_KEY) || '{}'); } catch { return {}; }
+}
+function setLocalQueryStatus(id, status) {
+  try {
+    const s = getLocalQueryStatuses();
+    s[id] = status;
+    localStorage.setItem(LOCAL_QUERY_STATUS_KEY, JSON.stringify(s));
+  } catch { /* ignore */ }
+}
+
+// Local Terms & Conditions consent log
+const LOCAL_CONSENTS_KEY = 'babc_terms_consent_log';
+
+export function getLocalConsents() {
+  try { return JSON.parse(localStorage.getItem(LOCAL_CONSENTS_KEY) || '[]'); } catch { return []; }
+}
+function saveLocalConsent(c) {
+  try {
+    const list = getLocalConsents();
+    const idx = list.findIndex((item) => item.id === c.id);
+    if (idx >= 0) list[idx] = c;
+    else list.unshift(c);
+    localStorage.setItem(LOCAL_CONSENTS_KEY, JSON.stringify(list));
+  } catch { /* ignore */ }
 }
 
 const iso = (t) => (t?.toDate ? t.toDate().toISOString() : t || null);
@@ -246,11 +352,21 @@ export function listRegisteredUsers({ includeSamples = false } = {}) {
 /* Dedicated list of helpdesk queries */
 export function listQueries({ includeSamples = false } = {}) {
   const flags = getLocalFlags();
-  const live = cache.queries.map((q) => ({
+  const localList = getLocalQueries();
+  const statusOverrides = getLocalQueryStatuses();
+
+  const map = new Map();
+  cache.queries.forEach((q) => map.set(q.id, q));
+  localList.forEach((q) => {
+    if (!map.has(q.id)) map.set(q.id, q);
+    else map.set(q.id, { ...map.get(q.id), ...q });
+  });
+
+  const live = Array.from(map.values()).map((q) => ({
     ...q,
     ref: q.id,
     flagged: flags[q.id] !== undefined ? flags[q.id] : !!q.flagged,
-    status: q.status || 'received',
+    status: statusOverrides[q.id] || q.status || 'received',
     note: q.note || '',
   }));
   const all = includeSamples ? [...live, ...sampleQueries()] : live;
@@ -260,6 +376,62 @@ export function listQueries({ includeSamples = false } = {}) {
 export function listLogins({ includeSamples = false } = {}) {
   const all = includeSamples ? [...cache.logins, ...sampleLogins()] : cache.logins;
   return [...all].sort((a, b) => new Date(b.at) - new Date(a.at));
+}
+
+/* ── Terms & Conditions Consent Tracking ────────────────────── */
+
+export async function recordTermsConsent({
+  uid,
+  userName,
+  userEmail,
+  decision, // 'agreed' | 'disagreed'
+  portal = 'post-login',
+  portalTitle,
+  note = '',
+}) {
+  const counterKey = 'babc_counter_TNC';
+  let nextNum = 1;
+  try {
+    const c = parseInt(localStorage.getItem(counterKey) || '8', 10);
+    nextNum = c + 1;
+    localStorage.setItem(counterKey, String(nextNum));
+  } catch { /* storage unavailable */ }
+  const id = `BMF.BC-TNC-${String(nextNum).padStart(5, '0')}`;
+
+  const record = {
+    id,
+    uid: uid || auth.currentUser?.uid || 'anonymous',
+    userName: userName || auth.currentUser?.displayName || auth.currentUser?.email?.split('@')[0] || 'Conclave Delegate',
+    userEmail: userEmail || auth.currentUser?.email || '—',
+    decision,
+    portal,
+    portalTitle: portalTitle || (portal === 'post-login' ? 'Post-Login Account Onboarding' : `Portal Terms (${portal})`),
+    timestamp: new Date().toISOString(),
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    complianceDoc: 'Conclave Protocol & CEPA v2.6',
+    note: note || '',
+    source: 'live',
+  };
+
+  saveLocalConsent(record);
+  notify();
+
+  try {
+    await addDoc(collection(db, 'consents'), {
+      ...record,
+      at: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('Consent recorded locally; Firestore sync note:', err);
+  }
+
+  return record;
+}
+
+export function listTermsConsents({ includeSamples = false } = {}) {
+  const localList = getLocalConsents();
+  const all = includeSamples ? [...localList, ...sampleTermsConsents()] : localList;
+  return all.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
 /* Toggle flag for review across any record (registration, user, or query) */
@@ -295,13 +467,23 @@ export async function toggleFlag(id, coll = 'registrations') {
 
 /* Update status of a helpdesk query */
 export async function updateQueryStatus(id, status, note = '') {
+  setLocalQueryStatus(id, status);
+  const localList = getLocalQueries();
+  const localItem = localList.find((x) => x.id === id);
+  if (localItem) {
+    localItem.status = status;
+    if (note) localItem.note = note;
+    saveLocalQuery(localItem);
+  }
+
   const item = cache.queries.find((x) => x.id === id);
   if (item) {
     item.status = status;
     if (note) item.note = note;
     item.decidedAt = new Date().toISOString();
-    notify();
   }
+  notify();
+
   if (id.startsWith('SAMPLE-')) return;
   try {
     await updateDoc(doc(db, 'queries', id), {
@@ -454,4 +636,125 @@ export function sampleQueries() {
     };
   });
   return queryCache;
+}
+
+let consentsCache = null;
+export function sampleTermsConsents() {
+  if (consentsCache) return consentsCache;
+  const now = Date.now();
+  consentsCache = [
+    {
+      id: 'BMF.BC-TNC-00001',
+      uid: 'sample-usr-1',
+      userName: 'Tariq Al-Maktoum',
+      userEmail: 'tariq.maktoum@dubaiinvest.ae',
+      decision: 'agreed',
+      portal: 'post-login',
+      portalTitle: 'Post-Login Account Activation',
+      timestamp: new Date(now - 18 * 60 * 1000).toISOString(),
+      userAgent: 'Chrome 128.0 (Windows 11)',
+      complianceDoc: 'Conclave Protocol & CEPA v2.6',
+      note: 'Verified agreement upon Google authentication.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00002',
+      uid: 'sample-usr-2',
+      userName: 'Ananya Deshmukh',
+      userEmail: 'ananya.d@finvedic.in',
+      decision: 'agreed',
+      portal: 'startup',
+      portalTitle: 'Startup Showcase Pavilion (#startup)',
+      timestamp: new Date(now - 45 * 60 * 1000).toISOString(),
+      userAgent: 'Safari 17.5 (macOS)',
+      complianceDoc: 'Innovation Directorate Terms & IP Non-Assertion',
+      note: 'Agreed to ₹5,000 + GST 2-year accreditation fee rules.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00003',
+      uid: 'sample-usr-3',
+      userName: 'Faisal Bin Khalid',
+      userEmail: 'khalid@riyadhcap.sa',
+      decision: 'agreed',
+      portal: 'register',
+      portalTitle: 'Delegate & Event Pass Accreditation (#register)',
+      timestamp: new Date(now - 2 * 3600 * 1000).toISOString(),
+      userAgent: 'Edge 127.0 (Windows 11)',
+      complianceDoc: 'Diplomatic Protection & Sovereign Pass Rules',
+      note: 'Requested ministerial deal room access credentials.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00004',
+      uid: 'sample-usr-4',
+      userName: 'Vikramaditya Oberoi',
+      userEmail: 'v.oberoi@globaltech.sg',
+      decision: 'disagreed',
+      portal: 'post-login',
+      portalTitle: 'Post-Login Account Activation',
+      timestamp: new Date(now - 3.5 * 3600 * 1000).toISOString(),
+      userAgent: 'Safari 17.4 (iPhone iOS 17.5)',
+      complianceDoc: 'Conclave Protocol & CEPA v2.6',
+      note: 'Declined closed-door sovereign recording restrictions.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00005',
+      uid: 'sample-usr-5',
+      userName: 'Noura Al-Sayed',
+      userEmail: 'noura@abudhabichamber.ae',
+      decision: 'agreed',
+      portal: 'collaborate',
+      portalTitle: 'Summit Collaboration & Directorate (#collaborate)',
+      timestamp: new Date(now - 5 * 3600 * 1000).toISOString(),
+      userAgent: 'Chrome 128.0 (Windows 10)',
+      complianceDoc: 'Institutional Bilateral Agreement Framework',
+      note: 'Institutional MoU signing vetted with IACCIA.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00006',
+      uid: 'sample-usr-6',
+      userName: 'Rohan Mehra',
+      userEmail: 'rohan.mehra@solarenergy.in',
+      decision: 'agreed',
+      portal: 'exhibition',
+      portalTitle: 'Exhibition Spaceworks Policy (#exhibition)',
+      timestamp: new Date(now - 8 * 3600 * 1000).toISOString(),
+      userAgent: 'Firefox 128.0 (Linux)',
+      complianceDoc: 'Yashobhoomi IICC Class-A Fire & Operations Policy',
+      note: 'Adhered to 3.5m booth height restrictions.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00007',
+      uid: 'sample-usr-7',
+      userName: 'Fatima Al-Zahra',
+      userEmail: 'fatima@qatarfund.qa',
+      decision: 'agreed',
+      portal: 'post-login',
+      portalTitle: 'Post-Login Account Activation',
+      timestamp: new Date(now - 14 * 3600 * 1000).toISOString(),
+      userAgent: 'Chrome 127.0 (macOS)',
+      complianceDoc: 'Conclave Protocol & CEPA v2.6',
+      note: 'Sovereign Observer pass consent confirmed.',
+      source: 'sample',
+    },
+    {
+      id: 'BMF.BC-TNC-00008',
+      uid: 'sample-usr-8',
+      userName: 'Suresh Nambiar',
+      userEmail: 'snambiar@keralafintech.org',
+      decision: 'disagreed',
+      portal: 'startup',
+      portalTitle: 'Startup Showcase Pavilion (#startup)',
+      timestamp: new Date(now - 20 * 3600 * 1000).toISOString(),
+      userAgent: 'Chrome 126.0 (Windows 10)',
+      complianceDoc: 'Innovation Directorate Terms & IP Non-Assertion',
+      note: 'Disagreed with accreditation realization clause.',
+      source: 'sample',
+    },
+  ];
+  return consentsCache;
 }

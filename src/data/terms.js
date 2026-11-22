@@ -99,7 +99,35 @@ export const PORTAL_TERMS = {
   },
 };
 
+import { recordTermsConsent } from './registry';
+
 const STORAGE_PREFIX = 'babc_terms_agreed_';
+
+export function hasUserDecidedTerms(uidOrEmail) {
+  if (!uidOrEmail) return false;
+  try {
+    return !!localStorage.getItem(`babc_user_terms_${uidOrEmail}`);
+  } catch {
+    return false;
+  }
+}
+
+export function getUserTermsDecision(uidOrEmail) {
+  if (!uidOrEmail) return null;
+  try {
+    return localStorage.getItem(`babc_user_terms_${uidOrEmail}`) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setUserTermsDecision(uidOrEmail, decision) {
+  if (!uidOrEmail) return;
+  try {
+    localStorage.setItem(`babc_user_terms_${uidOrEmail}`, decision);
+    window.dispatchEvent(new CustomEvent('babc-user-terms-change', { detail: { uidOrEmail, decision } }));
+  } catch { /* storage unavailable */ }
+}
 
 export function hasAccepted(portalId = 'global') {
   try {
@@ -113,25 +141,47 @@ export function hasAcceptedTerms(portalId = 'global') {
   return hasAccepted(portalId);
 }
 
-export function accept(portalId = 'global') {
+export function accept(portalId = 'global', userDetails = null) {
   try {
     localStorage.setItem(`${STORAGE_PREFIX}${portalId}`, 'true');
     // Also trigger custom storage event so active modals update immediately
     window.dispatchEvent(new CustomEvent('babc-terms-change', { detail: { portalId, status: 'agreed' } }));
+    
+    // Log to admin consent registry
+    const portalObj = PORTAL_TERMS[portalId] || PORTAL_TERMS.global;
+    recordTermsConsent({
+      uid: userDetails?.uid,
+      userName: userDetails?.name,
+      userEmail: userDetails?.email,
+      decision: 'agreed',
+      portal: portalId,
+      portalTitle: portalObj?.title || `Portal Terms (${portalId})`,
+    });
     return true;
   } catch {
     return false;
   }
 }
 
-export function acceptTerms(portalId = 'global') {
-  return accept(portalId);
+export function acceptTerms(portalId = 'global', userDetails = null) {
+  return accept(portalId, userDetails);
 }
 
-export function decline(portalId = 'global') {
+export function decline(portalId = 'global', userDetails = null) {
   try {
     localStorage.setItem(`${STORAGE_PREFIX}${portalId}`, 'declined');
     window.dispatchEvent(new CustomEvent('babc-terms-change', { detail: { portalId, status: 'declined' } }));
+
+    // Log to admin consent registry
+    const portalObj = PORTAL_TERMS[portalId] || PORTAL_TERMS.global;
+    recordTermsConsent({
+      uid: userDetails?.uid,
+      userName: userDetails?.name,
+      userEmail: userDetails?.email,
+      decision: 'disagreed',
+      portal: portalId,
+      portalTitle: portalObj?.title || `Portal Terms (${portalId})`,
+    });
     return true;
   } catch {
     return false;
