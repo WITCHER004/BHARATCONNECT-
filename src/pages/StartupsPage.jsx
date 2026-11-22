@@ -39,9 +39,6 @@ export default function StartupsPage({ onNavigate }) {
           <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em] mb-4">
             Registered startups
           </h1>
-          <p className="text-[15px] sm:text-lg text-fg-2 max-w-2xl leading-relaxed">
-            The startups confirmed for the showcase at Yashobhoomi, 18–19 December. Meet them in the pavilion and the deal rooms.
-          </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
             <div>
               <span className="block font-serif text-3xl text-gold-text tabular-nums">{String(startups.length).padStart(2, '0')}</span>
