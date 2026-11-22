@@ -1,9 +1,9 @@
 /*
-  Gold line-art diagrams for the three panels, in the same drawn style as the skyline.
-  Each one shows how its panel is made up; the numbered nodes 01–06 match the seat cards below.
-  - Advisory: a council table with six seats, the Chair at the head
+  Gold line-art diagrams for the panels, in the same drawn style as the skyline.
+  Each one shows how its panel is made up; the numbered nodes match the seat cards below.
+  - Advisory & Expert, Strategic Partners: a council table, the lead seat at the head
   - Investor: six kinds of capital flowing into startups and ventures, over a rising line
-  - Expert: six sector hexagons networked around the conclave
+  - Startup: six hexagons networked like an ecosystem
   Strokes draw in with pathLength="1" (see .panel-art in index.css).
 */
 
@@ -61,11 +61,11 @@ const hexPath = (cx, cy, r) => {
 };
 
 /* ── Advisory: council table ─────────────────────────────── */
-function Advisory() {
+function Advisory({ count = 6 }) {
   const cx = 260;
   const cy = 158;
-  const seats = Array.from({ length: 6 }, (_, i) => {
-    const a = ((-90 + 60 * i) * Math.PI) / 180;
+  const seats = Array.from({ length: count }, (_, i) => {
+    const a = ((-90 + (360 / count) * i) * Math.PI) / 180;
     return {
       x: cx + 200 * Math.cos(a),
       y: cy + 102 * Math.sin(a),
@@ -193,9 +193,9 @@ function Expert() {
   );
 }
 
-const ART = { advisory: Advisory, investor: Investor, expert: Expert };
+const ART = { advisory: Advisory, investor: Investor, 'startup-panel': Expert, partners: Advisory };
 
-export default function PanelArt({ panelId, className = '' }) {
+export default function PanelArt({ panelId, count, className = '' }) {
   const Art = ART[panelId] || Advisory;
   return (
     <svg
@@ -205,7 +205,7 @@ export default function PanelArt({ panelId, className = '' }) {
       preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
     >
-      <Art />
+      <Art count={count} />
     </svg>
   );
 }

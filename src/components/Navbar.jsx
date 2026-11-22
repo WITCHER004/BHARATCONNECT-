@@ -54,7 +54,7 @@ function AccountMenu({ onSignIn }) {
     return (
       <button
         onClick={() => { onSignIn?.(); openAuth({ mode: 'signin' }); }}
-        className="h-10 px-4 rounded-xl text-sm font-medium text-fg-2 hover:text-fg border border-transparent hover:border-gold-foil/40 transition-colors cursor-pointer"
+        className="h-11 px-3 sm:px-4 rounded-xl text-sm sm:text-[15px] font-medium text-fg-2 hover:text-fg border border-transparent hover:border-gold-foil/40 transition-colors cursor-pointer"
       >
         Sign in
       </button>
@@ -117,7 +117,7 @@ function RegisterDropdown({ onNavigate }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="btn-primary !rounded-xl h-10 px-4 text-xs sm:text-sm font-medium flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
+        className="btn-primary !rounded-xl h-11 px-3.5 sm:px-5 text-sm sm:text-[15px] font-medium flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -213,7 +213,7 @@ function PanelsDropdown({ activePage, onNavigate }) {
         onClick={() => setOpen(!open)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className={`group relative h-10 px-3.5 text-[13.5px] font-medium tracking-[0.01em] flex items-center gap-1 transition-colors duration-200 cursor-pointer ${
+        className={`group relative h-11 px-2.5 text-[15px] font-medium tracking-[0.01em] flex items-center gap-1 transition-colors duration-200 cursor-pointer ${
           isActive ? 'text-gold-text' : 'text-fg-2 hover:text-fg'
         }`}
       >
@@ -255,6 +255,7 @@ const NAV_ITEMS = [
   { id: 'home', label: 'Overview' },
   { id: 'schedule', label: 'Programme' },
   { id: 'exhibition', label: 'Exhibition' },
+  { id: 'startups', label: 'Startups' },
   { id: 'experience', label: 'Venue' },
   { id: 'collaborate', label: 'Collaboration' },
   { id: 'query', label: 'Inquiries' },
@@ -280,7 +281,7 @@ export default function Navbar({ activePage, onNavigate }) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3">
       <div
-        className={`relative max-w-7xl mx-auto rounded-2xl border transition-all duration-300 ${
+        className={`relative max-w-[1440px] mx-auto rounded-2xl border transition-all duration-300 ${
           solid
             ? 'bg-surface-0/80 backdrop-blur-xl backdrop-saturate-150 border-gold-foil/20 shadow-[0_18px_40px_-18px_rgb(0_0_0/0.8),inset_0_1px_0_rgb(255_255_255/0.05)]'
             : 'bg-black/20 backdrop-blur-sm border-white/[0.06]'
@@ -294,25 +295,25 @@ export default function Navbar({ activePage, onNavigate }) {
           aria-hidden="true"
         />
 
-        <div className="h-[60px] pl-2.5 pr-2.5 sm:pl-3 flex items-center justify-between gap-4 lg:gap-6">
+        <div className="h-[76px] pl-3 pr-3 sm:pl-4 flex items-center justify-between gap-4 lg:gap-6">
           {/* Brand */}
           <button
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-3 text-left cursor-pointer group shrink-0"
             aria-label="Bharat Connect homepage"
           >
-            <div className="h-10 px-2 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 group-hover:ring-gold-foil shadow-[0_4px_14px_-6px_rgb(217_179_106/0.5)] flex items-center justify-center transition-all duration-200">
+            <div className="h-10 sm:h-12 px-2 sm:px-2.5 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 group-hover:ring-gold-foil shadow-[0_4px_14px_-6px_rgb(217_179_106/0.5)] flex items-center justify-center transition-all duration-200">
               <img
                 src={`${import.meta.env.BASE_URL}brand/logo.png`}
                 alt="Bharat Connect"
-                className="h-7 w-auto object-contain"
+                className="h-7 sm:h-9 w-auto object-contain"
               />
             </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-serif text-[15px] font-medium text-fg tracking-[0.16em] leading-4 uppercase">
+            <div className="hidden sm:flex xl:hidden 2xl:flex flex-col">
+              <span className="font-serif text-[17px] font-medium text-fg tracking-[0.16em] leading-5 uppercase">
                 Bharat Connect
               </span>
-              <span className="mt-1 flex items-center gap-1.5 text-[10px] font-mono text-gold-text tracking-[0.14em] uppercase leading-3">
+              <span className="mt-1 flex items-center gap-1.5 text-[11px] font-mono text-gold-text tracking-[0.14em] uppercase leading-3">
                 <span className="w-1 h-1 rotate-45 bg-gold-foil" aria-hidden="true" />
                 18–19 Dec · New Delhi
               </span>
@@ -320,7 +321,7 @@ export default function Navbar({ activePage, onNavigate }) {
           </button>
 
           {/* Desktop navigation */}
-          <nav className="hidden lg:flex items-center" aria-label="Main">
+          <nav className="hidden xl:flex items-center" aria-label="Main">
             {NAV_ITEMS.map((item) => {
               const isActive = activePage === item.id;
               return (
@@ -328,14 +329,14 @@ export default function Navbar({ activePage, onNavigate }) {
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`group relative h-10 px-3.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors duration-200 cursor-pointer ${
+                  className={`group relative h-11 px-2.5 text-[15px] font-medium tracking-[0.01em] transition-colors duration-200 cursor-pointer ${
                     isActive ? 'text-gold-text' : 'text-fg-2 hover:text-fg'
                   }`}
                 >
                   {item.label}
                   {/* hover underline */}
                   <span
-                    className={`absolute left-3.5 right-3.5 bottom-1.5 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent origin-center transition-transform duration-300 ${
+                    className={`absolute left-2.5 right-2.5 bottom-1.5 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent origin-center transition-transform duration-300 ${
                       isActive ? 'scale-x-0' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
                     aria-hidden="true"
@@ -351,7 +352,7 @@ export default function Navbar({ activePage, onNavigate }) {
           </nav>
 
           {/* Right action area */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <RegisterDropdown onNavigate={handleNavClick} />
 
             <AccountMenu onSignIn={() => setMobileMenuOpen(false)} />
@@ -359,7 +360,7 @@ export default function Navbar({ activePage, onNavigate }) {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+              className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
@@ -374,7 +375,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden px-3 pb-5 pt-3 border-t border-line animate-slide-up">
+          <div className="xl:hidden px-3 pb-5 pt-3 border-t border-line animate-slide-up">
             <div className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;

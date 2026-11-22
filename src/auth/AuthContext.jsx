@@ -158,7 +158,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!user) return;
     const ms = user.exp * 1000 - Date.now();
-    const id = setTimeout(() => setUser(null), Math.max(0, ms));
+    // setTimeout fires at once for delays over ~24.8 days, so cap it
+    const id = setTimeout(() => setUser(null), Math.min(Math.max(0, ms), 2147483647));
     return () => clearTimeout(id);
   }, [user]);
 

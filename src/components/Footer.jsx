@@ -10,10 +10,12 @@ const PAGES = [
   { id: 'experience', label: 'Venue and Delhi' },
   { id: 'register', label: 'Event registration' },
   { id: 'startup', label: 'Register a startup' },
+  { id: 'startups', label: 'Registered startups' },
   { id: 'collaborate', label: 'Summit Collaboration' },
-  { id: 'advisory', label: 'Advisory Panel' },
+  { id: 'advisory', label: 'Advisory & Expert Panel' },
   { id: 'investor', label: 'Investor Panel' },
-  { id: 'expert', label: 'Expert Panel' },
+  { id: 'startup-panel', label: 'Startup Panel' },
+  { id: 'partners', label: 'Strategic Partners' },
   { id: 'query', label: 'Inquiries and Helpdesk' },
 ];
 

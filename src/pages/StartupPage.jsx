@@ -6,6 +6,8 @@ import {
   TERMS_TEXT, DECLARATION_AUTHORITY, DECLARATION_DATA, ENTRY, VALIDATION,
 } from '../data/startupForm';
 import SignInGate from '../auth/SignInGate';
+import { useAuth } from '../auth/AuthContext';
+import StartupHub from '../components/StartupHub';
 
 const DRAFT_KEY = 'bc-startup-draft';
 const ICON = { className: 'w-4 h-4', strokeWidth: 1.5 };
@@ -339,6 +341,9 @@ function OptionalImage({ src, alt, className, fallback = null }) {
 /* ── the portal ─────────────────────────────────────── */
 
 export default function StartupPage({ onNavigate }) {
+  const { user } = useAuth();
+  // the form opens on request, or straight away if there is an unfinished draft
+  const [formOpen, setFormOpen] = useState(() => !!loadDraft());
   const [values, setValues] = useState(() => loadDraft() ?? EMPTY);
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState({});
@@ -428,9 +433,15 @@ export default function StartupPage({ onNavigate }) {
           brandNames: values.brandNames,
           founderName: values.fullName,
           email: values.commEmail || values.email,
+          accountEmail: user?.email || '',
           phone: values.phone,
           utr: values.transactionId,
           amount: values.amountPaid,
+          // public profile, shown in the startup directory once approved
+          sectors: values.sectors.map((s) => (s === 'Other' && values.sectorOther ? values.sectorOther : s)),
+          stage: values.stage,
+          website: values.website,
+          pitch: values.pitch,
         });
         localStorage.setItem('bc-startup-history', JSON.stringify(past));
       } catch { /* storage unavailable */ }
@@ -896,7 +907,17 @@ export default function StartupPage({ onNavigate }) {
           title="Sign in to register your startup"
           reason="Startup registration needs a Google account, so your application, payment details and unique Registration ID [BMF.BC-SEO-numbers] stay tied to you."
         >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
+        <StartupHub
+          email={user?.email}
+          formOpen={formOpen}
+          refreshKey={status}
+          onRegister={() => {
+            setFormOpen(true);
+            requestAnimationFrame(() => document.getElementById('startup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+          }}
+        />
+        {formOpen && (
+        <div id="startup-form" className="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
           <aside className="lg:sticky lg:top-24 self-start">
             <p className="lg:hidden text-sm text-fg-2 mb-2">
@@ -1096,6 +1117,7 @@ export default function StartupPage({ onNavigate }) {
             )}
           </div>
         </div>
+        )}
         </SignInGate>
       </section>
     </div>

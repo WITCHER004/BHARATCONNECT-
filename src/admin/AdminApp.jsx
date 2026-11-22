@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
-  Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu,
+  Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
 } from 'lucide-react';
+import { currentEvent } from '../data/events';
 import {
   listRegistrations, listLogins, decide, subscribe, TYPES, TYPE_ORDER, STATUS,
 } from '../data/registry';
@@ -594,6 +595,29 @@ function Registrations({ registrations, onOpen }) {
 
   const typeOpts = [...TYPE_ORDER, 'query'];
 
+  // Reminder for the next event to every registered (not declined) startup, blind-copied.
+  // shortcut: opens the admin's mail app; long lists can exceed mailto limits, so switch to a
+  // scheduled Cloud Function + email service once Firebase is connected.
+  const event = currentEvent();
+  const startupEmails = [...new Set(registrations
+    .filter((r) => r.type === 'startup' && r.source !== 'sample' && r.status !== 'declined' && r.email)
+    .map((r) => r.email.toLowerCase()))];
+  const remindStartups = () => {
+    const when = new Date(event.start).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
+    const subject = `Reminder: ${event.name} on ${when}`;
+    const body = `Dear founder,
+
+This is a reminder that ${event.name} (${event.subtitle}) begins on ${when} at ${event.venue}.
+
+${event.startupNote}
+
+Sign in to your startup page on the Bharat Connect website for your registration details, the programme and live updates during the event.
+
+Regards,
+Bharat Connect Secretariat`;
+    window.location.href = `mailto:?bcc=${encodeURIComponent(startupEmails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -610,6 +634,16 @@ function Registrations({ registrations, onOpen }) {
         </div>
         <div className="flex gap-2 items-center">
           <SearchBox value={q} onChange={setQ} />
+          {event && (
+            <button
+              onClick={remindStartups}
+              disabled={!startupEmails.length}
+              title={startupEmails.length ? `Email a reminder for ${event.name} to ${startupEmails.length} startup${startupEmails.length === 1 ? '' : 's'}` : 'No registered startups yet'}
+              className="btn-secondary h-10 px-3.5 text-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <BellRing className="w-4 h-4 text-fg-3" strokeWidth={1.5} /> Remind startups ({startupEmails.length})
+            </button>
+          )}
           <button onClick={download} className="btn-secondary h-10 px-3.5 text-sm shrink-0">
             <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} /> CSV
           </button>

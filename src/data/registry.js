@@ -105,10 +105,13 @@ function fromLegacy() {
     type: 'startup',
     name: s.founderName || '',
     email: s.email || '',
+    accountEmail: s.accountEmail || '',
     organisation: s.entityName || s.brandNames || '',
     country: 'India',
     detail: s.brandNames ? `Brand: ${s.brandNames}` : 'Startup showcase',
     payment: s.amount ? `₹${s.amount} · UTR ${s.utr || '—'}` : '',
+    sector: (s.sectors || []).join(', '),
+    profile: { brand: s.brandNames || s.entityName || '', sectors: s.sectors || [], stage: s.stage || '', website: s.website || '', pitch: s.pitch || '' },
     submittedAt: s.timestamp,
   }));
   const collabs = readAll(LEGACY.collaborations).map((c) => ({
@@ -196,7 +199,7 @@ const DETAILS = {
   delegate: ['Corporate Delegate', 'Sovereign Wealth / Investor', 'Exhibitor Representative', 'Government Official'],
   startup: ['Startup showcase'],
   collaboration: ['Country pavilion', 'Industry co-host', 'Deal-room sponsor', 'Knowledge partner'],
-  panel: ['Advisory Panel', 'Investor Panel', 'Expert Panel'],
+  panel: ['Advisory & Expert Panel', 'Investor Panel', 'Startup Panel', 'Strategic Partners'],
 };
 const CODES = { delegate: 'DGO', startup: 'SEO', collaboration: 'CBC', panel: 'PNL' };
 

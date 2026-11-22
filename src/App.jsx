@@ -11,9 +11,10 @@ import StartupPage from './pages/StartupPage';
 import CollaborationPage from './pages/CollaborationPage';
 import QueryPage from './pages/QueryPage';
 import PanelsPage from './pages/PanelsPage';
+import StartupsPage from './pages/StartupsPage';
 import { PANEL_IDS } from './data/panels';
 
-const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'collaborate', 'query', ...PANEL_IDS];
+const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'startups', 'collaborate', 'query', ...PANEL_IDS];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
@@ -126,6 +127,8 @@ export default function App() {
         )}
 
         {activePage === 'startup' && <StartupPage onNavigate={navigate} />}
+
+        {activePage === 'startups' && <StartupsPage onNavigate={navigate} />}
 
         {activePage === 'collaborate' && <CollaborationPage onNavigate={navigate} />}
 

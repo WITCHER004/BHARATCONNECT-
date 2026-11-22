@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ArrowUpRight, UserPlus, MapPin } from 'lucide-react';
+import { X, ArrowUpRight, MapPin } from 'lucide-react';
 
 /*
   Panel member cards and profile pop-up.
@@ -60,7 +60,7 @@ function Backdrop({ panelId }) {
     );
   }
 
-  if (panelId === 'expert') {
+  if (panelId === 'startup-panel') {
     const cells = [];
     const r = 20;
     const w = r * Math.sqrt(3);
@@ -104,10 +104,27 @@ function Backdrop({ panelId }) {
 export function MemberPortrait({ panelId, seat, index, size = 'card' }) {
   const [broken, setBroken] = useState(false);
   const hasPhoto = seat.photo && !broken;
+  const hasLogo = seat.logo && !broken;
+  // organisations (logo, or just a name) sit on a white tile like a partner wall
+  const isOrg = hasLogo || (seat.name && !hasPhoto);
 
   return (
-    <div className={`pm-portrait relative overflow-hidden bg-[#0B0F0E] ${size === 'card' ? 'aspect-square' : 'aspect-[4/5] sm:aspect-auto sm:h-full'}`}>
-      {hasPhoto ? (
+    <div className={`pm-portrait relative overflow-hidden ${isOrg ? 'bg-white' : 'bg-[#0B0F0E]'} ${size === 'card' ? 'w-[38%] shrink-0 self-stretch min-h-[190px]' : 'aspect-[4/5] sm:aspect-auto sm:h-full'}`}>
+      {hasLogo ? (
+        <img
+          src={`${import.meta.env.BASE_URL}${seat.logo}`}
+          alt={`${seat.name} logo`}
+          onError={() => setBroken(true)}
+          className="pm-photo absolute inset-0 w-full h-full object-contain p-[14%]"
+          loading="lazy"
+        />
+      ) : isOrg ? (
+        <span className="pm-photo absolute inset-0 flex items-center justify-center p-6">
+          <span className="w-20 h-20 rounded-full border-2 border-[#B98A3A] flex items-center justify-center font-serif text-3xl text-[#8A6420]">
+            {seat.name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}
+          </span>
+        </span>
+      ) : hasPhoto ? (
         <img
           src={`${import.meta.env.BASE_URL}${seat.photo}`}
           alt={seat.name || seat.title}
@@ -135,7 +152,7 @@ export function MemberPortrait({ panelId, seat, index, size = 'card' }) {
       )}
 
       {/* bottom fade + seat badge */}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />
+      {!isOrg && <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/75 to-transparent pointer-events-none" />}
       <span className="absolute top-3 left-3 font-mono text-[11px] text-[#E6C47F] bg-black/50 backdrop-blur-sm border border-[#D9B36A]/40 rounded-md px-1.5 py-0.5">
         {pad(index + 1)}
       </span>
@@ -180,12 +197,12 @@ function MemberCard({ panelId, seat, index, onOpen }) {
       ref={ref}
       type="button"
       onClick={() => onOpen(index)}
-      className={`pm-card pm-reveal ${shown ? 'is-in' : ''} group text-left rounded-2xl overflow-hidden bg-surface-2 border border-line hover:border-gold-foil/60 cursor-pointer flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/60`}
+      className={`pm-card pm-reveal ${shown ? 'is-in' : ''} group text-left rounded-2xl overflow-hidden bg-surface-2 border border-line hover:border-gold-foil/60 cursor-pointer flex flex-row focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/60`}
       style={{ '--i': index }}
       aria-label={`${seat.title}: ${seat.name || 'seat open'}. View profile`}
     >
       <MemberPortrait panelId={panelId} seat={seat} index={index} />
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-5 flex flex-col flex-1 min-w-0">
         <span className="text-[11px] font-mono uppercase tracking-[0.12em] text-gold-text">{seat.title}</span>
         <span className={`mt-1.5 font-serif text-xl leading-tight ${seat.name ? 'text-fg' : 'text-fg-3 italic'}`}>
           {seat.name || 'To be announced'}
@@ -210,7 +227,7 @@ function MemberCard({ panelId, seat, index, onOpen }) {
   );
 }
 
-function ProfileModal({ panel, index, onClose, onNominate, onStep }) {
+function ProfileModal({ panel, index, onClose, onStep }) {
   const seat = panel.seats[index];
   const closeRef = useRef(null);
 
@@ -253,9 +270,9 @@ function ProfileModal({ panel, index, onClose, onNominate, onStep }) {
             </button>
           </div>
 
-          <h3 className="mt-3 font-serif text-3xl text-fg leading-tight">{seat.title}</h3>
-          <p className={`mt-1 text-[15px] ${seat.name ? 'text-fg' : 'text-fg-3 italic'}`}>
-            {seat.name || 'Member to be announced'}
+          <h3 className="mt-3 font-serif text-3xl text-fg leading-tight">{seat.name || seat.title}</h3>
+          <p className={`mt-1 text-[15px] ${seat.name ? 'text-fg-2' : 'text-fg-3 italic'}`}>
+            {seat.name ? seat.title : 'Member to be announced'}
           </p>
           {(seat.position || seat.organisation || seat.country) && (
             <p className="mt-1 text-sm text-fg-3 flex flex-wrap items-center gap-x-2">
@@ -266,32 +283,34 @@ function ProfileModal({ panel, index, onClose, onNominate, onStep }) {
             </p>
           )}
 
-          <h4 className="mt-6 text-xs font-medium text-fg">About</h4>
-          <p className="mt-1.5 text-sm text-fg-2 leading-relaxed">
-            {seat.bio || 'The profile will be published here once the member for this seat is confirmed.'}
-          </p>
+          {(seat.bio || !seat.name) && (
+            <>
+              <h4 className="mt-6 text-xs font-medium text-fg">About</h4>
+              <p className="mt-1.5 text-sm text-fg-2 leading-relaxed">
+                {seat.bio || 'The profile will be published here once the member for this seat is confirmed.'}
+              </p>
+            </>
+          )}
 
           <h4 className="mt-5 text-xs font-medium text-fg">Role on the panel</h4>
           <p className="mt-1.5 text-sm text-fg-2 leading-relaxed">{seat.role}</p>
 
-          <h4 className="mt-5 text-xs font-medium text-fg">Focus areas</h4>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {seat.focus.map((f) => (
-              <span key={f} className="text-xs text-fg-2 bg-surface-3 border border-line rounded-full px-2.5 py-1">{f}</span>
-            ))}
-          </div>
+          {seat.focus.length > 0 && (
+            <>
+              <h4 className="mt-5 text-xs font-medium text-fg">Focus areas</h4>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {seat.focus.map((f) => (
+                  <span key={f} className="text-xs text-fg-2 bg-surface-3 border border-line rounded-full px-2.5 py-1">{f}</span>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="mt-8 pt-5 border-t border-line flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-1">
               <button onClick={() => onStep(-1)} className="h-9 px-3 rounded-lg text-sm text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer">← Previous</button>
               <button onClick={() => onStep(1)} className="h-9 px-3 rounded-lg text-sm text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer">Next →</button>
             </div>
-            {!seat.name && (
-              <button onClick={() => onNominate(seat)} className="btn-primary h-10 px-4 text-sm">
-                <UserPlus className="w-4 h-4" strokeWidth={1.5} />
-                Nominate for this seat
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -300,7 +319,7 @@ function ProfileModal({ panel, index, onClose, onNominate, onStep }) {
   );
 }
 
-export default function PanelMembers({ panel, onNominate }) {
+export default function PanelMembers({ panel }) {
   const [openIndex, setOpenIndex] = useState(null);
   const count = panel.seats.length;
 
@@ -312,9 +331,9 @@ export default function PanelMembers({ panel, onNominate }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {panel.seats.map((seat, i) => (
-          <MemberCard key={`${panel.id}-${seat.title}`} panelId={panel.id} seat={seat} index={i} onOpen={setOpenIndex} />
+          <MemberCard key={`${panel.id}-${i}`} panelId={panel.id} seat={seat} index={i} onOpen={setOpenIndex} />
         ))}
       </div>
       {openIndex !== null && (
@@ -323,10 +342,6 @@ export default function PanelMembers({ panel, onNominate }) {
           index={openIndex}
           onClose={close}
           onStep={step}
-          onNominate={(seat) => {
-            setOpenIndex(null);
-            onNominate(seat);
-          }}
         />
       )}
     </>

@@ -209,7 +209,7 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
         </section>
 
         {/* Itinerary */}
-        <section id="itinerary-section" className="py-20 sm:py-24 bg-surface-1 scroll-mt-16">
+        <section id="itinerary-section" className="py-20 sm:py-24 bg-surface-1 scroll-mt-24">
           <div className="max-w-4xl mx-auto px-4 sm:px-8">
 
             <div className="mb-12">
@@ -266,7 +266,7 @@ export default function ExperiencePage({ onNavigate, onOpenRegister }) {
         </section>
 
         {/* Hotels and visa */}
-        <section id="hotel-section" className="py-20 sm:py-24 bg-surface-1 border-t border-line scroll-mt-16">
+        <section id="hotel-section" className="py-20 sm:py-24 bg-surface-1 border-t border-line scroll-mt-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-8">
 
             <div className="max-w-2xl mb-12">

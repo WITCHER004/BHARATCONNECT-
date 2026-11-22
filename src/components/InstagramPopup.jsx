@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ArrowUpRight } from 'lucide-react';
 import { InstagramIcon, INSTAGRAM_URL, INSTAGRAM_HANDLE } from './InstagramIcon';
+import WhatsAppPopup from './WhatsAppPopup';
 
 const DISMISS_KEY = 'bc-instagram-popup-dismissed';
 const SHOW_DELAY_MS = 6000;
@@ -37,6 +38,7 @@ export default function InstagramPopup() {
       className="fixed left-4 sm:left-6 z-40 flex flex-col items-start gap-3"
       style={{ bottom: 'max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))' }}
     >
+      <WhatsAppPopup />
       {open && (
         <div
           role="dialog"

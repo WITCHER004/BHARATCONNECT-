@@ -225,7 +225,7 @@ function NationsAndChambers({ regions }) {
   }, []);
 
   return (
-    <section id="nations" className="relative overflow-hidden py-20 sm:py-28 border-t border-line bg-surface-1 scroll-mt-16">
+    <section id="nations" className="relative overflow-hidden py-20 sm:py-28 border-t border-line bg-surface-1 scroll-mt-24">
       <div
         className="absolute left-1/2 top-24 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-[radial-gradient(circle,rgba(217,179,106,0.07),transparent_60%)] pointer-events-none"
         aria-hidden="true"
@@ -440,7 +440,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
       </section>
 
       {/* Registration: startups, event and business summit collaboration */}
-      <section id="registration" className="theme-ivory !bg-white py-20 sm:py-24 scroll-mt-16">
+      <section id="registration" className="theme-ivory !bg-white py-20 sm:py-24 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader
             title="Registration & Summit Collaboration"

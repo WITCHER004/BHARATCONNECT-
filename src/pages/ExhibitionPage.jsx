@@ -221,7 +221,7 @@ export default function ExhibitionPage({ onOpenRegister, onSelectTier }) {
       </section>
 
       {/* Stall packages */}
-      <section id="stall-tiers" className="py-20 sm:py-24 bg-surface-0 border-y border-line scroll-mt-16">
+      <section id="stall-tiers" className="py-20 sm:py-24 bg-surface-0 border-y border-line scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <SectionHeader
             title="Stall packages"
@@ -275,7 +275,7 @@ export default function ExhibitionPage({ onOpenRegister, onSelectTier }) {
       </section>
 
       {/* Cost estimator */}
-      <section id="cost-calculator" className="py-20 sm:py-24 scroll-mt-16">
+      <section id="cost-calculator" className="py-20 sm:py-24 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-7 space-y-8">

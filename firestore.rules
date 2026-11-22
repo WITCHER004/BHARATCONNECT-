@@ -1,0 +1,211 @@
+rules_version = '2';
+
+/*
+  Firestore security rules for Bharat Connect 2026.
+
+  Collections (everything not listed here is denied):
+
+    registrations/{autoId}    delegate passes, startup showcase and collaboration requests
+                              (the "registrations" the admin panel approves or declines)
+    queries/{autoId}          helpdesk inquiries (Inquiries page and the Query desk pop-up)
+    logins/{autoId}           sign-in / sign-up / sign-out log shown in the admin panel
+    startupDirectory/{regId}  public profile of each APPROVED startup (the Startups page)
+
+  Who is who:
+    - Visitors are signed in with Firebase Auth. Inquiries and collaboration requests can be sent
+      without an account, so the site signs those visitors in anonymously behind the scenes.
+    - Delegate and startup registration need a real (Google or email) account, as the site already asks.
+    - Admins carry the custom claim  admin: true , set once per admin with the Firebase Admin SDK.
+      This replaces the browser-side passcode in src/admin/AdminApp.jsx, which is not real security.
+
+  What the rules guarantee:
+    - Nobody but an admin can read other people's submissions, the sign-in log, or change a status.
+    - A visitor can create a submission only as themselves, only with status "pending"/"received",
+      only with the server's timestamp, and only with the known fields at sane sizes.
+    - Submissions cannot be edited or deleted by the person who sent them (the admin panel is the record).
+    - The startup directory is public but holds only public fields, and only admins write it.
+
+  Not covered by rules (do these elsewhere):
+    - Reference numbers (BMF.BC-DGO-00001 …) must be issued by a Cloud Function: a public counter
+      would let anyone skip or reuse numbers. Only admins (or the function) may set `ref`.
+    - Spam / flooding: turn on Firebase App Check for Firestore.
+*/
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ─────────────────────────────────────────
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // a Google or email account, not an anonymous visitor
+    function hasAccount() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function str(v, max) {
+      return v is string && v.size() <= max;
+    }
+
+    function filled(v, max) {
+      return str(v, max) && v.size() > 0;
+    }
+
+    function isEmail(v) {
+      return str(v, 254) && v.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$');
+    }
+
+    function optStr(d, k, max) {
+      return !(k in d) || str(d[k], max);
+    }
+
+    function optBool(d, k) {
+      return !(k in d) || d[k] is bool;
+    }
+
+    // ── Registrations: delegate, startup, collaboration ───
+
+    function validProfile(p) {
+      return p is map
+        && p.keys().hasOnly(['brand', 'sectors', 'stage', 'website', 'pitch'])
+        && optStr(p, 'brand', 200)
+        && (!('sectors' in p) || (p.sectors is list && p.sectors.size() <= 12))
+        && optStr(p, 'stage', 60)
+        && optStr(p, 'website', 300)
+        && optStr(p, 'pitch', 1000);
+    }
+
+    function validNewRegistration(d) {
+      return d.keys().hasOnly([
+          'type', 'uid', 'status', 'submittedAt',
+          'name', 'email', 'organisation', 'country', 'detail', 'sector', 'phone', 'message',
+          // delegate
+          'designation', 'dealSize', 'b2b', 'visaLetter',
+          // startup
+          'payment', 'utr', 'amount', 'profile',
+          // collaboration
+          'liaisonTitle', 'track', 'delegationSize', 'objectives', 'mouSigning', 'urgentProtocol'
+        ])
+        && d.type in ['delegate', 'startup', 'collaboration']
+        && d.uid == request.auth.uid
+        && d.status == 'pending'
+        && d.submittedAt == request.time
+        // delegate and startup registration need a real account; collaboration may be anonymous
+        && (d.type == 'collaboration' || hasAccount())
+        && filled(d.name, 120)
+        && isEmail(d.email)
+        && optStr(d, 'organisation', 200)
+        && optStr(d, 'country', 80)
+        && optStr(d, 'detail', 200)
+        && optStr(d, 'sector', 300)
+        && optStr(d, 'phone', 30)
+        && optStr(d, 'message', 2000)
+        && optStr(d, 'designation', 120)
+        && optStr(d, 'dealSize', 60)
+        && optBool(d, 'b2b')
+        && optBool(d, 'visaLetter')
+        && optStr(d, 'payment', 120)
+        && optStr(d, 'utr', 40)
+        && optStr(d, 'amount', 20)
+        && (!('profile' in d) || validProfile(d.profile))
+        && optStr(d, 'liaisonTitle', 120)
+        && optStr(d, 'track', 60)
+        && optStr(d, 'delegationSize', 60)
+        && optStr(d, 'objectives', 3000)
+        && optBool(d, 'mouSigning')
+        && optBool(d, 'urgentProtocol');
+    }
+
+    // an admin approves or declines; nothing else on the record changes
+    function validDecision() {
+      let d = request.resource.data;
+      return d.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'decidedAt', 'decidedBy', 'ref'])
+        && d.status in ['pending', 'approved', 'declined']
+        && d.decidedAt == request.time
+        && d.decidedBy == request.auth.uid
+        && optStr(d, 'note', 1000)
+        && optStr(d, 'ref', 40);
+    }
+
+    match /registrations/{regId} {
+      // the admin panel lists everything; a visitor sees only their own (query with where uid == their uid)
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn() && validNewRegistration(request.resource.data);
+      allow update: if isAdmin() && validDecision();
+      allow delete: if isAdmin();
+    }
+
+    // ── Helpdesk inquiries ─────────────────────────────
+
+    function validNewQuery(d) {
+      return d.keys().hasOnly([
+          'uid', 'status', 'submittedAt',
+          'fullName', 'email', 'phone', 'organization', 'country', 'regId',
+          'category', 'dept', 'subject', 'message', 'urgent'
+        ])
+        && d.uid == request.auth.uid
+        && d.status == 'received'
+        && d.submittedAt == request.time
+        && filled(d.fullName, 120)
+        && isEmail(d.email)
+        && filled(d.message, 5000)
+        && optStr(d, 'phone', 30)
+        && optStr(d, 'organization', 200)
+        && optStr(d, 'country', 80)
+        && optStr(d, 'regId', 40)
+        && optStr(d, 'category', 80)
+        && optStr(d, 'dept', 120)
+        && optStr(d, 'subject', 200)
+        && optBool(d, 'urgent');
+    }
+
+    match /queries/{queryId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn() && validNewQuery(request.resource.data);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'note', 'decidedAt', 'decidedBy', 'ref'])
+        && request.resource.data.status in ['received', 'in-progress', 'answered', 'closed']
+        && optStr(request.resource.data, 'note', 1000)
+        && optStr(request.resource.data, 'ref', 40);
+      allow delete: if isAdmin();
+    }
+
+    // ── Sign-in log ─────────────────────────────────────
+
+    match /logins/{loginId} {
+      allow read, delete: if isAdmin();
+      // a visitor can only log their own sign-in, with their own verified email, at server time
+      allow create: if hasAccount()
+        && request.resource.data.keys().hasOnly(['uid', 'action', 'name', 'email', 'method', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.action in ['sign-in', 'sign-up', 'sign-out']
+        && request.resource.data.method in ['Google', 'Email']
+        && str(request.resource.data.name, 120)
+        && request.resource.data.at == request.time;
+    }
+
+    // ── Public startup directory ────────────────────────
+
+    match /startupDirectory/{regId} {
+      allow read: if true;
+      // written by an admin when approving a startup; public fields only, never contact details
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'sectors', 'stage', 'website', 'pitch', 'ref', 'approvedAt'])
+        && filled(request.resource.data.name, 200)
+        && (!('sectors' in request.resource.data) || (request.resource.data.sectors is list && request.resource.data.sectors.size() <= 12))
+        && optStr(request.resource.data, 'stage', 60)
+        && (!('website' in request.resource.data) || request.resource.data.website == ''
+            || (str(request.resource.data.website, 300) && request.resource.data.website.matches('^https?://.+')))
+        && optStr(request.resource.data, 'pitch', 1000)
+        && optStr(request.resource.data, 'ref', 40);
+      allow delete: if isAdmin();
+    }
+  }
+}
