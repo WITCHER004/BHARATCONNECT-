@@ -516,6 +516,17 @@ export async function decide(id, status, note = '') {
   }
 }
 
+/* Permanently delete a registration or inquiry (admins only). A deleted startup also leaves the public directory. */
+export async function deleteRecord(id) {
+  const r = cache.registrations.find((x) => x.id === id);
+  if (r) {
+    await deleteDoc(doc(db, 'registrations', id));
+    if (r.type === 'startup') await deleteDoc(doc(db, 'startupDirectory', id));
+    return;
+  }
+  if (cache.queries.some((q) => q.id === id)) await deleteDoc(doc(db, 'queries', id));
+}
+
 // keep in step with the list in isAdmin() in firestore.rules, which is what actually grants access
 const ADMIN_EMAILS = ['aryamansaxena04@gmail.com', 'surishri03@gmail.com'];
 

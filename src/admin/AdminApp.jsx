@@ -3,13 +3,13 @@ import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
   HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2,
-  ShieldCheck, FileText
+  ShieldCheck, FileText, Trash2
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import {
-  listRegistrations, listRegisteredUsers, listQueries, listTermsConsents, listLogins, decide, toggleFlag, updateQueryStatus,
+  listRegistrations, listRegisteredUsers, listQueries, listTermsConsents, listLogins, decide, toggleFlag, updateQueryStatus, deleteRecord,
   subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
 } from '../data/registry';
 import {
@@ -2017,8 +2017,43 @@ function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
           {r.source === 'sample' && (
             <p className="mt-6 text-xs text-fg-3 leading-relaxed">This is a sample record for demonstration, not a real person.</p>
           )}
+
+          {r.source === 'live' && TYPES[r.type] && <DeleteRecord record={r} onDeleted={onClose} />}
         </div>
       </aside>
+    </div>
+  );
+}
+
+// permanent delete, behind a confirmation that names the record
+function DeleteRecord({ record, onDeleted }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const remove = async () => {
+    const what = record.type === 'query' ? 'inquiry' : 'registration';
+    if (!window.confirm(`Delete ${what} ${record.id} from ${record.name || 'this person'}?
+
+This cannot be undone.`)) return;
+    setBusy(true);
+    setError('');
+    try {
+      await deleteRecord(record.id);
+      onDeleted();
+    } catch {
+      setError('Could not delete. Check your connection and that you are signed in as an admin.');
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mt-8 pt-5 border-t border-line">
+      <button
+        onClick={remove}
+        disabled={busy}
+        className="inline-flex items-center gap-2 h-9 px-3 rounded-lg border border-[#D03B3B]/50 text-sm text-[#E66767] hover:bg-[#D03B3B]/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Trash2 className="w-4 h-4" strokeWidth={1.5} /> {busy ? 'Deleting…' : `Delete ${record.type === 'query' ? 'inquiry' : 'registration'}`}
+      </button>
+      {error && <p className="mt-2 text-xs text-[#E66767]" role="alert">{error}</p>}
     </div>
   );
 }
