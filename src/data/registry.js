@@ -517,7 +517,7 @@ export async function decide(id, status, note = '') {
 }
 
 // keep in step with the list in isAdmin() in firestore.rules, which is what actually grants access
-const ADMIN_EMAILS = ['aryamansaxena04@gmail.com'];
+const ADMIN_EMAILS = ['aryamansaxena04@gmail.com', 'surishri03@gmail.com'];
 
 /* Is this signed-in account an admin? (listed above, or an admins/{email} document added in the Firebase console) */
 export async function isAdminAccount(user) {
