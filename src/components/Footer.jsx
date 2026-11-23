@@ -1,39 +1,10 @@
-import { useState } from 'react';
-import { Phone, MapPin, Download, ArrowUp, ArrowRight } from 'lucide-react';
+import { Phone, MapPin, Download, ArrowUp } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-
-const PAGES = [
-  { id: 'home', label: 'Overview' },
-  { id: 'schedule', label: 'Programme' },
-  { id: 'exhibition', label: 'Exhibition and floorplan' },
-  { id: 'experience', label: 'Venue and Delhi' },
-  { id: 'register', label: 'Event registration' },
-  { id: 'startup', label: 'Register a startup' },
-  { id: 'startups', label: 'Registered startups' },
-  { id: 'collaborate', label: 'Summit Collaboration' },
-  { id: 'advisory', label: 'Advisory & Expert Panel' },
-  { id: 'investor', label: 'Investor Panel' },
-  { id: 'startup-panel', label: 'Startup Panel' },
-  { id: 'partners', label: 'Strategic Partners' },
-  { id: 'query', label: 'Inquiries and Helpdesk' },
-];
 
 const icon = 'w-4 h-4 text-fg-3 shrink-0';
 
 
 export default function Footer({ onNavigate, onOpenRegister }) {
-  const [emailSub, setEmailSub] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (emailSub.trim()) {
-      setSubscribed(true);
-      setTimeout(() => setSubscribed(false), 5000);
-      setEmailSub('');
-    }
-  };
-
   const handleDownloadMediaKit = () => {
     const content = `========================================================================
 BHARAT CONNECT 2026 — BHARAT-ARAB BUSINESS CONCLAVE
@@ -92,7 +63,7 @@ SECRETARIAT & ACCREDITATION:
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12 border-b border-line">
 
           {/* Brand */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-7">
             <div className="flex items-center gap-3">
               <BrandLogo variant="badge" className="py-1 px-3" />
               <span className="flex flex-col">
@@ -106,25 +77,8 @@ SECRETARIAT & ACCREDITATION:
             <p className="mt-6 ref-line">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi</p>
           </div>
 
-          {/* Pages */}
-          <nav className="lg:col-span-2" aria-label="Footer">
-            <h4 className="text-sm font-medium text-fg">Conclave</h4>
-            <ul className="mt-4 flex flex-col gap-3 text-sm text-fg-2">
-              {PAGES.map((p) => (
-                <li key={p.id}>
-                  <button
-                    onClick={() => onNavigate(p.id)}
-                    className="hover:text-fg transition-colors duration-150 cursor-pointer text-left"
-                  >
-                    {p.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
           {/* Secretariat */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-5">
             <h4 className="text-sm font-medium text-fg">Secretariat</h4>
             <ul className="mt-4 flex flex-col gap-3 text-sm text-fg-2">
               <li className="flex items-start gap-3">
@@ -151,38 +105,6 @@ SECRETARIAT & ACCREDITATION:
             </button>
           </div>
 
-          {/* Newsletter */}
-          <div className="lg:col-span-3">
-            <h4 className="text-sm font-medium text-fg">Trade digest</h4>
-            <p className="mt-4 text-sm leading-[22px] text-fg-2">
-              India-Arab CEPA regulatory updates, sector papers and procurement briefs
-            </p>
-            <form onSubmit={handleSubscribe} className="mt-4 flex gap-2">
-              <label htmlFor="footer-email" className="sr-only">Email</label>
-              <input
-                id="footer-email"
-                type="email"
-                required
-                placeholder="Email"
-                value={emailSub}
-                onChange={(e) => setEmailSub(e.target.value)}
-                className="flex-1 min-w-0 h-9 px-3 rounded-[10px] bg-surface-3 border border-line text-sm text-fg placeholder:text-fg-3 transition-colors duration-150 focus:border-line-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-coral/60"
-              />
-              <button type="submit" className="btn-secondary h-9 px-3 text-sm shrink-0">
-                Subscribe
-              </button>
-            </form>
-            <p className="mt-2 h-5 text-sm text-fg-3" aria-live="polite">
-              {subscribed ? 'Subscribed' : ''}
-            </p>
-            <button
-              onClick={() => onNavigate('startup')}
-              className="mt-2 inline-flex items-center gap-2 text-sm text-fg-2 hover:text-fg transition-colors duration-150 cursor-pointer"
-            >
-              Register a startup
-              <ArrowRight className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
-            </button>
-          </div>
         </div>
 
         {/* Bottom row */}
