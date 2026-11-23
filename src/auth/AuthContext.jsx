@@ -26,7 +26,8 @@ const MESSAGES = {
   'auth/email-already-in-use': 'An account with this email already exists. Sign in instead.',
   'auth/weak-password': 'Use at least 8 characters for your password.',
   'auth/invalid-email': 'Please enter a valid email address.',
-  'auth/popup-blocked': 'Your browser blocked the Google window. Allow pop-ups for this site and try again.',
+  'auth/popup-blocked': 'Your browser blocked the sign-in window. Allow pop-ups for this site and try again.',
+  'auth/unauthorized-domain': 'Sign-in is not enabled on this web address yet. Please use bharatconnect-aa30d.web.app or contact the Secretariat.',
   'auth/too-many-requests': 'Too many attempts. Please wait a minute and try again.',
   'auth/network-request-failed': 'No connection. Check your internet and try again.',
   'auth/operation-not-allowed': 'This sign-in method is not switched on yet. Please use another option or contact the Secretariat.',
@@ -48,7 +49,10 @@ function providerFor(name) {
 const methodOf = (u) => (u.providerData.some((p) => p.providerId === 'google.com') ? 'Google'
   : u.providerData.some((p) => p.providerId === 'apple.com') ? 'Apple' : 'Email');
 
-const friendly = (e) => MESSAGES[e?.code] || 'Sign-in failed. Please try again.';
+const friendly = (e) => {
+  if (!MESSAGES[e?.code]) console.warn('Sign-in failed:', e?.code || e);
+  return MESSAGES[e?.code] || 'Sign-in failed. Please try again.';
+};
 const QUIET = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
 
 export function AuthProvider({ children }) {

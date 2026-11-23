@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 
 /*
-  The Bharat Connect launch film: 300 rendered frames (public/film/000–299.webp, 1280×720)
-  played on a canvas at 30 fps. India lights up, routes run to Dubai and London, and the
-  film ends holding on the Bharat Connect logo.
+  The Bharat Connect launch film: 300 frames (public/film/000–299.webp, 1280×720; film-m is 960×540
+  for phones) played on a canvas at 30 fps. A gold globe turns, the BC logo forms, trade routes run
+  to Dubai and London, and the film holds on the Bharat Connect · Business & Investment Summit card.
+  The frames were built from 50 stills: 5 motion-interpolated (optical flow) in-betweens per still.
 */
 
 export const FRAME_COUNT = 300;

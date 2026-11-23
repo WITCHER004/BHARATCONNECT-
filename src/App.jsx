@@ -172,7 +172,7 @@ export default function App() {
 
       {/* Page-Specific Terms and Conditions Consent Modal */}
       <TermsConsentModal
-        key={`${activePage}-${termsAgreedNonce}`}
+        key={activePage}
         portalId={activePage}
         isOpen={TERMS_PORTAL_PAGES.includes(activePage) && !hasAccepted(activePage)}
         onAgree={() => setTermsAgreedNonce((n) => n + 1)}
