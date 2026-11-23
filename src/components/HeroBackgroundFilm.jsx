@@ -150,7 +150,7 @@ export default function HeroBackgroundFilm({
           }
         }
 
-        // When the film reaches the final frame (frame 299: the Bharat Connect emblem with all routes lit)
+        // When the film reaches the final frame (the Bharat Connect · Business & Investment Summit card)
         if (target === FRAME_COUNT - 1 && shown === FRAME_COUNT - 1) {
           // Hold on the emblem for HOLD_SECONDS_ON_LOGO, then cycle smoothly back
           if (!holdTimer) {
@@ -229,7 +229,7 @@ export default function HeroBackgroundFilm({
 
   return (
     <div className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none ${className}`}>
-      {/* 1. Underlying Cinematic 300-Frame Movie Canvas */}
+      {/* 1. Underlying Cinematic Launch Film Canvas */}
       <canvas
         ref={canvasRef}
         className="block absolute inset-0 w-full h-full object-cover"

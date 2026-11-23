@@ -5,4 +5,4 @@
   window stays centred throughout.
 */
 export const FILM_CROP = 0.58;
-export const FILM_FOCUS = new Array(300).fill(0.5);
+export const FILM_FOCUS = new Array(360).fill(0.5);

@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 
 /*
-  The Bharat Connect launch film: 300 frames (public/film/000–299.webp, 1280×720; film-m is 960×540
+  The Bharat Connect launch film: 360 frames (public/film/000–359.webp, 1280×720; film-m is 960×540
   for phones) played on a canvas at 30 fps. A gold globe turns, the BC logo forms, trade routes run
   to Dubai and London, and the film holds on the Bharat Connect · Business & Investment Summit card.
-  The frames were built from 50 stills: 5 motion-interpolated (optical flow) in-betweens per still.
+  The frames were built from 50 stills: motion-interpolated (optical flow) in-betweens, shared out by
+  how far the picture moves so the speed stays even, then lightly blended with their neighbours.
 */
 
-export const FRAME_COUNT = 300;
+export const FRAME_COUNT = 360;
 const FPS = 30;
 const BUFFER_AHEAD = 45; // frames that must be decoded before playback starts
 /*
@@ -31,7 +32,7 @@ export const POSTER_SRC = frameSrc(FRAME_COUNT - 1);
 /*
   One shared cache, so the hero and the opening never download a frame twice.
   Frames load in playback order a few at a time (so the opening seconds arrive first instead
-  of competing with all 300 requests), and a frame only counts as ready once the browser has
+  of competing with all 360 requests), and a frame only counts as ready once the browser has
   decoded it, so drawing it never stalls the animation.
 */
 const PARALLEL = 6;
