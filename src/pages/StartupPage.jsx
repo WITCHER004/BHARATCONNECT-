@@ -439,7 +439,7 @@ export default function StartupPage({ onNavigate }) {
     } catch { /* clipboard blocked */ }
   };
 
-  const upiLink = `upi://pay?pa=${encodeURIComponent(FEE.upiId)}&pn=${encodeURIComponent(FEE.payee)}&am=${FEE.total}&cu=INR&tn=${encodeURIComponent('Bharat Connect startup registration')}`;
+  const upiLink = `upi://pay?pa=${encodeURIComponent(FEE.upiId)}&pn=${encodeURIComponent(FEE.payee)}&tr=${FEE.upiRef}&am=${FEE.total}&cu=INR&tn=${encodeURIComponent('Bharat Connect startup registration')}`;
   const v = values;
   const descWords = words(v.description);
 
@@ -713,7 +713,7 @@ export default function StartupPage({ onNavigate }) {
                 <div className="mt-6 pt-6 border-t border-line">
                   <p className="text-sm text-fg-3">Official UPI ID</p>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="font-mono text-lg text-fg">{FEE.upiId}</span>
+                    <span className="font-mono text-base sm:text-lg text-fg break-all">{FEE.upiId}</span>
                     <button type="button" onClick={copyUpi} className="btn-secondary h-9 px-3 text-sm">
                       {copied ? <Check {...ICON} /> : <Copy {...ICON} />}
                       {copied ? 'Copied' : 'Copy'}
@@ -726,7 +726,7 @@ export default function StartupPage({ onNavigate }) {
                   responsibility for payments made to any other account.
                 </p>
               </div>
-              <div className="lg:col-span-2 surface-card rounded-2xl p-6 flex items-center justify-center">
+              <div className="lg:col-span-2 surface-card rounded-2xl p-6 flex flex-col items-center justify-center gap-3">
                 <OptionalImage
                   src={FEE.qrSrc}
                   alt={`Official payment QR code of ${FEE.payee}`}
@@ -738,6 +738,10 @@ export default function StartupPage({ onNavigate }) {
                     </p>
                   }
                 />
+                <p className="text-xs text-fg-3 text-center leading-relaxed">
+                  Scan with any UPI app (BHIM, Google Pay, PhonePe, Paytm, CRED).<br />
+                  Payee shown: <span className="text-fg-2">M/S. Bharat Mahotsav Festivals LLP</span> · ICICI Bank
+                </p>
               </div>
             </div>
 

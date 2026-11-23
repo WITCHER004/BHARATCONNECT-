@@ -42,9 +42,10 @@ export const FEE = {
   base: 5000,
   total: 5900,
   words: 'Five thousand nine hundred only',
-  upiId: '9266368100@ptaxis',
+  // from the organiser's ICICI eazypay QR (Downloads/733335368100_QRCode.pdf)
+  upiId: 'MSBHARATMAHOTSAVFESTIVALSLLP.eazypay@icici',
+  upiRef: 'EZYS9266368100',
   payee: 'Bharat Mahotsav Festivals LLP',
-  // Drop the official QR image from the Google Form at public/startup/payment-qr.png to show it here
   qrSrc: '/startup/payment-qr.png',
   posterSrc: '/startup/showcase-poster.jpg',
 };

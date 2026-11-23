@@ -146,7 +146,7 @@ export function accept(portalId = 'global', userDetails = null) {
     localStorage.setItem(`${STORAGE_PREFIX}${portalId}`, 'true');
     // Also trigger custom storage event so active modals update immediately
     window.dispatchEvent(new CustomEvent('babc-terms-change', { detail: { portalId, status: 'agreed' } }));
-    
+
     // Log to admin consent registry
     const portalObj = PORTAL_TERMS[portalId] || PORTAL_TERMS.global;
     recordTermsConsent({
