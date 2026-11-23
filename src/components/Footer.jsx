@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Download, ArrowUp, ArrowRight } from 'lucide-react';
+import { Phone, MapPin, Download, ArrowUp, ArrowRight } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-import { InstagramIcon, INSTAGRAM_URL } from './InstagramIcon';
 
 const PAGES = [
   { id: 'home', label: 'Overview' },
@@ -69,9 +68,8 @@ STRATEGIC VERTICALS:
 6. Tourism, Hospitality & Cultural Exchange (MICE Corridors, Heritage Diplomacy)
 
 SECRETARIAT & ACCREDITATION:
-- Formal Protocol Desk: protocol@iaccia-conclave.org
-- Media Center: media@iaccia-conclave.org
-- Direct Telephone: +91 11 4987 6000 / +971 4 298 7000
+- Office: 250, Ground Floor, Kailash Hills, East of Kailash, New Delhi, Delhi 110065
+- Telephone: +91 92174 00624
 - Official Portal: (Simulated Preview)
 ========================================================================`;
 
@@ -132,33 +130,15 @@ SECRETARIAT & ACCREDITATION:
               <li className="flex items-start gap-3">
                 <MapPin className={`${icon} mt-0.5`} strokeWidth={1.5} />
                 <span>
-                  Palash Hall, 6th floor<br />
-                  Yashobhoomi (IICC), Sector 25, Dwarka<br />
-                  New Delhi 110077
+                  250, Ground Floor, Kailash Hills<br />
+                  East of Kailash, New Delhi<br />
+                  Delhi 110065
                 </span>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className={icon} strokeWidth={1.5} />
-                <a href="mailto:secretariat@iaccia-conclave.org" className="hover:text-fg transition-colors duration-150 break-all">
-                  secretariat@iaccia-conclave.org
-                </a>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className={`${icon} mt-0.5`} strokeWidth={1.5} />
-                <span className="font-mono text-[13px] tabular-nums leading-5">
-                  +91 11 4987 6000<br />+971 4 298 7000
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <InstagramIcon className={icon} />
-                <a
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-fg transition-colors duration-150"
-                  aria-label="Bharat Connect on Instagram"
-                >
-                  @_bharatconnect
+                <Phone className={icon} strokeWidth={1.5} />
+                <a href="tel:+919217400624" className="font-mono text-[13px] tabular-nums hover:text-fg transition-colors duration-150">
+                  +91 92174 00624
                 </a>
               </li>
             </ul>
