@@ -24,6 +24,7 @@ import {
 import { ARAB_NATIONS } from '../data/conclaveData';
 import { useAuth } from '../auth/AuthContext';
 import SignInGate from '../auth/SignInGate';
+import ApplicationGate from '../components/ApplicationGate';
 import { submitRegistration } from '../data/registry';
 
 const COLLAB_TRACKS = [
@@ -372,6 +373,7 @@ PARTNERSHIP DIRECTORATE:
                   title="Sign in to submit your collaboration request"
                   reason="Collaboration requests need an account, so your docket, protocol requests and Secretariat replies stay tied to you."
                 >
+                <ApplicationGate type="collaboration">
                 <form
                   onSubmit={handleSubmit}
                   className="surface-card rounded-2xl p-6 sm:p-10 border border-line shadow-sm"
@@ -700,6 +702,7 @@ PARTNERSHIP DIRECTORATE:
                     </div>
                   </div>
                 </form>
+                </ApplicationGate>
                 </SignInGate>
               </div>
 

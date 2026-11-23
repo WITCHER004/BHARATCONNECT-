@@ -3,6 +3,7 @@ import { ARAB_NATIONS, STRATEGIC_VERTICALS } from '../data/conclaveData';
 import HolographicSummitPass from '../components/HolographicSummitPass';
 import { Check, ArrowLeft, ArrowRight, Printer, RotateCcw, ShieldCheck } from 'lucide-react';
 import SignInGate from '../auth/SignInGate';
+import ApplicationGate from '../components/ApplicationGate';
 import { submitRegistration } from '../data/registry';
 
 const INITIAL_FORM = {
@@ -161,6 +162,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
             title="Sign in to register"
             reason="Event registration needs an account, so your badge, visa letter request and deal-room bookings are tied to you."
           >
+          <ApplicationGate type="delegate">
 
           {!isCompleted ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -516,6 +518,7 @@ export default function RegistrationPage({ defaultRole = 'Corporate Delegate' })
               </div>
             </div>
           )}
+          </ApplicationGate>
           </SignInGate>
 
         </div>

@@ -6,6 +6,7 @@ import {
   TERMS_TEXT, DECLARATION_AUTHORITY, DECLARATION_DATA, ENTRY, VALIDATION,
 } from '../data/startupForm';
 import SignInGate from '../auth/SignInGate';
+import ApplicationGate from '../components/ApplicationGate';
 import { useAuth } from '../auth/AuthContext';
 import StartupHub from '../components/StartupHub';
 import { submitRegistration } from '../data/registry';
@@ -891,6 +892,7 @@ export default function StartupPage({ onNavigate }) {
             requestAnimationFrame(() => document.getElementById('startup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
           }}
         />
+        <ApplicationGate type="startup" onAnother={() => setFormOpen(true)}>
         {formOpen && (
         <div id="startup-form" className="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
@@ -1128,6 +1130,7 @@ export default function StartupPage({ onNavigate }) {
           </div>
         </div>
         )}
+        </ApplicationGate>
         </SignInGate>
       </section>
     </div>

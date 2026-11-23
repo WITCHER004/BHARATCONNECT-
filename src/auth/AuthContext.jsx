@@ -6,6 +6,8 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import { recordLogin } from '../data/registry';
+import { sendEmail } from '../data/mailer';
+import { welcomeEmail } from '../data/emails';
 
 /*
   Sign-in with Firebase Authentication: Google, Apple, or email and password.
@@ -75,6 +77,7 @@ export function AuthProvider({ children }) {
       const cred = await signInWithPopup(auth, providerFor(name));
       const isNew = getAdditionalUserInfo(cred)?.isNewUser;
       recordLogin({ action: isNew ? 'sign-up' : 'sign-in', name: cred.user.displayName, method: name });
+      if (isNew) sendEmail(cred.user.email, welcomeEmail({ name: cred.user.displayName }));
       rememberMethod(name);
       done();
       return '';
@@ -91,6 +94,7 @@ export function AuthProvider({ children }) {
         await updateProfile(cred.user, { displayName: name.trim() });
         setUser(toUser({ ...cred.user, displayName: name.trim() }));
         recordLogin({ action: 'sign-up', name: name.trim(), method: 'Email' });
+        sendEmail(cred.user.email, welcomeEmail({ name: name.trim() }));
       } else {
         const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
         recordLogin({ action: 'sign-in', name: cred.user.displayName, method: 'Email' });

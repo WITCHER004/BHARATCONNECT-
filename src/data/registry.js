@@ -16,6 +16,8 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import { db, auth, ensureSignedIn } from '../firebase';
+import { sendEmail } from './mailer';
+import { receivedEmail, adminAlertEmail, decisionEmail } from './emails';
 
 /* ── Registration types ─────────────────────────────── */
 
@@ -68,8 +70,13 @@ async function saveWithRef(kind, record) {
   { name, email, organisation, country, detail, sector, phone, payment, profile }
   and `details` holds the complete form, shown in full in the admin panel.
 */
-export function submitRegistration(type, record) {
-  return saveWithRef(type, { ...record, accountEmail: auth.currentUser?.email || '' });
+export async function submitRegistration(type, record) {
+  const ref = await saveWithRef(type, { ...record, accountEmail: auth.currentUser?.email || '' });
+  // confirmation to the applicant and an alert to the admins; neither blocks the confirmation screen
+  const r = { ...record, type, ref };
+  sendEmail(record.email, receivedEmail(r));
+  sendEmail(ADMIN_EMAILS, adminAlertEmail(r));
+  return ref;
 }
 
 /* Save a helpdesk inquiry: { fullName, email, phone, organization, country, regId, category, dept, subject, message, urgent } */
@@ -502,6 +509,9 @@ export async function decide(id, status, note = '') {
   const r = cache.registrations.find((x) => x.id === id);
   if (!r) return; // sample records are not stored anywhere
   await updateDoc(doc(db, 'registrations', id), { status, note, decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid || 'admin' });
+  if (status !== r.status && (status === 'approved' || status === 'declined')) {
+    sendEmail(r.email, decisionEmail({ ...r, ref: id, status, note }));
+  }
   if (r.type !== 'startup') return;
   const card = doc(db, 'startupDirectory', id);
   if (status === 'approved') {

@@ -147,11 +147,6 @@ function YourStartup({ regs, event, now, onRegister, formOpen }) {
           </article>
         );
       })}
-      {!formOpen && (
-        <button type="button" onClick={onRegister} className="self-start text-sm text-fg-2 hover:text-fg underline underline-offset-4 cursor-pointer">
-          Register another startup
-        </button>
-      )}
     </div>
   );
 }
