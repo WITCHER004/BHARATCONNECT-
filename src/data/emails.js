@@ -6,33 +6,26 @@
 export const FROM = 'Bharat Connect <info@bharatconnect.live>';
 export const SITE = 'https://bharatconnect-aa30d.web.app';
 export const ADMIN_URL = `${SITE}/admin`;
-export const TERMS_URL = 'https://drive.google.com/file/d/1-S5W_tZKOOiem1Q2N8q4hY1hAqc_pkab/view?usp=sharing';
+export const TERMS_URL = `${SITE}/terms/Bharat-Mahotsav-Festivals-LLP-Registration-Terms-and-Conditions-v1-04Nov2026.pdf`;
 
 const WHAT = { delegate: 'event registration', startup: 'startup registration', collaboration: 'collaboration request' };
 const PORTAL = { delegate: 'register', startup: 'startup', collaboration: 'collaborate' };
 
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// The letterhead (logo, skyline, footer) lives in the EmailJS template: email-templates/emailjs-letterhead.html.
+// Each email here is only the message that goes inside it.
+const NAVY = '#12306b';
+const ORANGE = '#ef7d1a';
+
 function layout(title, bodyHtml) {
-  return `<!doctype html><html><body style="margin:0;background:#f5f1e8;font-family:Arial,Helvetica,sans-serif;color:#1c1a17">
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px"><tr><td align="center">
-<table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fffdf8;border:1px solid #e6dcc6;border-radius:14px">
-<tr><td style="padding:22px 28px;border-bottom:3px solid #b98a3a">
-<div style="font-family:Georgia,serif;font-size:20px;letter-spacing:2px;color:#1c1a17">BHARAT CONNECT</div>
-<div style="font-size:11px;letter-spacing:1.5px;color:#8a6420;margin-top:4px">18–19 DEC 2026 · YASHOBHOOMI, NEW DELHI</div></td></tr>
-<tr><td style="padding:28px">
-<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:24px;margin:0 0 16px">${title}</h1>
-${bodyHtml}
-</td></tr>
-<tr><td style="padding:18px 28px;border-top:1px solid #e6dcc6;font-size:12px;color:#7a7364;line-height:1.6">
-Bharat Connect 2026 · Bharat-Arab Business Conclave<br>Organised by IACCIA with Bharat Mahotsav Festivals LLP<br>
-<a href="${TERMS_URL}" style="color:#8a6420">Terms and Conditions</a> · Questions? Reply to this email.
-</td></tr></table></td></tr></table></body></html>`;
+  return `<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:24px;color:${NAVY};margin:0 0 16px">${title}</h1>
+${bodyHtml}`;
 }
 
 const p = (html) => `<p style="font-size:15px;line-height:1.6;margin:0 0 14px">${html}</p>`;
-const button = (href, label) => `<p style="margin:22px 0"><a href="${href}" style="display:inline-block;background:#d9604a;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:15px">${label}</a></p>`;
-const refBox = (ref) => `<div style="margin:18px 0;padding:14px 16px;background:#f5f1e8;border-radius:10px"><div style="font-size:12px;color:#7a7364">Your reference</div><div style="font-family:Consolas,monospace;font-size:18px;font-weight:bold;color:#8a6420">${esc(ref)}</div></div>`;
+const button = (href, label) => `<p style="margin:22px 0"><a href="${href}" style="display:inline-block;background:${ORANGE};color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;font-size:15px">${label}</a></p>`;
+const refBox = (ref) => `<div style="margin:18px 0;padding:14px 16px;background:#f3f6fb;border-left:4px solid ${ORANGE};border-radius:8px"><div style="font-size:12px;color:#6b7184">Your reference</div><div style="font-family:Consolas,monospace;font-size:18px;font-weight:bold;color:${NAVY}">${esc(ref)}</div></div>`;
 
 /* 1. A new account: welcome, and the terms they agreed to by creating it. */
 export function welcomeEmail({ name }) {
@@ -42,7 +35,7 @@ export function welcomeEmail({ name }) {
     html: layout('Welcome to Bharat Connect', [
       p(hello),
       p('Thank you for creating your Bharat Connect account. You can now register for Bharat Connect 2026, showcase your startup, propose a collaboration and follow your applications in one place.'),
-      p(`By creating your account, you agreed to all of Bharat Connect's <a href="${TERMS_URL}" style="color:#8a6420">Terms and Conditions</a>.`),
+      p(`By creating your account, you agreed to all of Bharat Connect's <a href="${TERMS_URL}" style="color:${ORANGE}">Terms and Conditions</a>.`),
       button(SITE, 'Go to Bharat Connect'),
       p('If you did not create this account, reply to this email and we will remove it.'),
     ].join('')),
@@ -65,7 +58,7 @@ export function receivedEmail(r) {
 <li>Until it is approved, your page on the website shows <i>Waiting for approval</i>.</li>
 <li>We email you as soon as a decision is made.</li></ol>`,
       button(`${SITE}/#${PORTAL[r.type] || ''}`, 'Check your status'),
-      p(`You agreed to the Bharat Connect <a href="${TERMS_URL}" style="color:#8a6420">Terms and Conditions</a> when you submitted this application.`),
+      p(`You agreed to the Bharat Connect <a href="${TERMS_URL}" style="color:${ORANGE}">Terms and Conditions</a> when you submitted this application.`),
     ].join('')),
     text: `Dear ${r.name || 'applicant'},\n\nWe have received your ${what}. Reference: ${r.ref}\n\nThe Secretariat will review it. Until it is approved, your page shows "Waiting for approval", and we will email you with the decision.\n\nCheck your status: ${SITE}/#${PORTAL[r.type] || ''}`,
   };

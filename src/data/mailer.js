@@ -8,7 +8,7 @@ import emailjs from '@emailjs/browser';
     2. Email Templates → Create template:
          To email:  {{to_email}}      From name: Bharat Connect      Reply to: info@bharatconnect.live
          Subject:   {{subject}}
-         Content:   switch the editor to code view and enter only  {{{html}}}
+         Content:   code view (< >) → paste email-templates/emailjs-letterhead.html (it contains {{{html}}})
        → copy the Template ID.
     3. Account → General → copy the Public Key.
     4. Account → Security → allow only your website's domains, so other sites can't use your quota.

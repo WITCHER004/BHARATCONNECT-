@@ -3,7 +3,10 @@
   Centralized terms definition, storage, and acceptance checking across all portals.
 */
 
-export const TERMS_LINK = 'https://drive.google.com/file/d/1-S5W_tZKOOiem1Q2N8q4hY1hAqc_pkab/view?usp=sharing';
+import { VERSION, TERMS_PDF } from './registrationTerms';
+
+// the official Registration Terms and Conditions (Version 1, 04 Nov 2026), served by the site
+export const TERMS_LINK = TERMS_PDF;
 export const TERMS_URL = TERMS_LINK;
 
 export const PORTAL_TERMS = {
@@ -101,12 +104,12 @@ export const PORTAL_TERMS = {
 
 import { recordTermsConsent } from './registry';
 
-const STORAGE_PREFIX = 'babc_terms_agreed_';
+const STORAGE_PREFIX = `babc_terms_agreed_${VERSION}_`;
 
 export function hasUserDecidedTerms(uidOrEmail) {
   if (!uidOrEmail) return false;
   try {
-    return !!localStorage.getItem(`babc_user_terms_${uidOrEmail}`);
+    return !!localStorage.getItem(`babc_user_terms_${VERSION}_${uidOrEmail}`);
   } catch {
     return false;
   }
@@ -115,7 +118,7 @@ export function hasUserDecidedTerms(uidOrEmail) {
 export function getUserTermsDecision(uidOrEmail) {
   if (!uidOrEmail) return null;
   try {
-    return localStorage.getItem(`babc_user_terms_${uidOrEmail}`) || null;
+    return localStorage.getItem(`babc_user_terms_${VERSION}_${uidOrEmail}`) || null;
   } catch {
     return null;
   }
@@ -124,7 +127,7 @@ export function getUserTermsDecision(uidOrEmail) {
 export function setUserTermsDecision(uidOrEmail, decision) {
   if (!uidOrEmail) return;
   try {
-    localStorage.setItem(`babc_user_terms_${uidOrEmail}`, decision);
+    localStorage.setItem(`babc_user_terms_${VERSION}_${uidOrEmail}`, decision);
     window.dispatchEvent(new CustomEvent('babc-user-terms-change', { detail: { uidOrEmail, decision } }));
   } catch { /* storage unavailable */ }
 }

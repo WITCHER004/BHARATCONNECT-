@@ -1353,7 +1353,7 @@ function TermsConsentDesk({ consents = [], onOpen }) {
             CEPA &amp; DPDP v2.6
           </p>
           <a
-            href="https://drive.google.com/file/d/1-S5W_tZKOOiem1Q2N8q4hY1hAqc_pkab/view?usp=sharing"
+            href="/terms/Bharat-Mahotsav-Festivals-LLP-Registration-Terms-and-Conditions-v1-04Nov2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-xs text-gold-text hover:underline flex items-center gap-1"

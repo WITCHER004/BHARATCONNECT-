@@ -12,7 +12,7 @@ export const GOOGLE_FORM = {
   pageCount: 9,
 };
 
-export const TERMS_URL = 'https://drive.google.com/file/d/1-S5W_tZKOOiem1Q2N8q4hY1hAqc_pkab/view?usp=sharing';
+export { TERMS_PDF as TERMS_URL } from './registrationTerms';
 
 export const ORGANISER = {
   name: 'Bharat Mahotsav Festivals LLP',

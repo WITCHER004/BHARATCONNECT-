@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  ShieldCheck, Check, X, ExternalLink, ArrowRight, RotateCcw, Home, AlertCircle, FileText
+  ShieldCheck, Check, X, ArrowRight, RotateCcw, Home, AlertCircle
 } from 'lucide-react';
-import { PORTAL_TERMS, TERMS_LINK, hasAccepted, accept, decline } from '../data/terms';
+import { PORTAL_TERMS, hasAccepted, accept, decline } from '../data/terms';
+import TermsDocument from './TermsDocument';
 
 export default function TermsConsentModal({
   portalId = 'global',
@@ -75,19 +76,19 @@ export default function TermsConsentModal({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-mono text-[11px] uppercase tracking-wider text-gold-text bg-surface-3 px-2 py-0.5 rounded-full border border-line">
-                Protocol &amp; Accreditations
+                Terms and Conditions
               </span>
               <span className="text-[11px] font-mono text-fg-3">
-                Palash Hall, Yashobhoomi
+                Version 1 · 04 Nov 2026
               </span>
             </div>
             <h2 id="terms-title" className="mt-1.5 font-serif text-xl sm:text-2xl text-fg font-medium">
-              {declinedState ? 'Terms & Conditions Declined' : terms.title}
+              {declinedState ? 'Terms and Conditions declined' : 'Registration Terms and Conditions'}
             </h2>
             <p className="mt-1 text-xs sm:text-sm text-fg-2 leading-relaxed">
               {declinedState
-                ? 'You have chosen to decline the conclave terms for this portal.'
-                : terms.subtitle}
+                ? 'You chose not to accept the Registration Terms and Conditions.'
+                : 'Bharat Mahotsav Festivals LLP. Please read and accept these terms to continue.'}
             </p>
           </div>
         </div>
@@ -98,8 +99,8 @@ export default function TermsConsentModal({
             /* Declined View */
             <div className="py-4 space-y-4 text-center sm:text-left">
               <div className="p-4 rounded-xl border border-coral/30 bg-coral/10 text-fg-2 text-xs sm:text-sm leading-relaxed">
-                <p className="font-medium text-fg mb-1">Agreement Required for Portal Access</p>
-                Participation in the Bharat Connect Conclave, sovereign networking plenaries, startup accreditation, and deal-room scheduling requires accepting the official Conclave Protocol &amp; Security Terms.
+                <p className="font-medium text-fg mb-1">Acceptance is required to continue</p>
+                Registering with Bharat Mahotsav Festivals LLP, including for Bharat Connect, requires acceptance of its Registration Terms and Conditions.
               </div>
 
               <p className="text-xs text-fg-3 leading-relaxed">
@@ -107,46 +108,8 @@ export default function TermsConsentModal({
               </p>
             </div>
           ) : (
-            /* Standard Terms Bullets View */
-            <>
-              <div className="text-xs font-mono uppercase tracking-wider text-fg-3 mb-1">
-                Key Accreditations &amp; Compliance Clauses
-              </div>
-
-              <ul className="space-y-3">
-                {terms.bullets.map((b, i) => (
-                  <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-surface-2/60 border border-line/60">
-                    <span className="mt-0.5 w-4 h-4 rounded-full bg-gold-foil/20 text-gold-text flex items-center justify-center shrink-0 text-[10px] font-mono font-bold">
-                      {i + 1}
-                    </span>
-                    <span className="text-xs sm:text-[13px] text-fg-2 leading-relaxed">
-                      {b}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Master Terms External Document Link */}
-              <div className="pt-2 flex items-center justify-between gap-4 p-3 rounded-xl bg-surface-3/50 border border-line text-xs">
-                <div className="flex items-center gap-2 text-fg-2">
-                  <FileText className="w-4 h-4 text-gold-text shrink-0" />
-                  <span>Full Legal Master Terms (Bharat Mahotsav Festivals LLP)</span>
-                </div>
-                <a
-                  href={TERMS_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-gold-text hover:text-fg font-medium hover:underline shrink-0"
-                >
-                  <span>View PDF</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              <p className="text-[11px] text-fg-3 leading-relaxed italic border-t border-line/60 pt-3">
-                {terms.legalNotice}
-              </p>
-            </>
+            /* The official Registration Terms and Conditions, in full */
+            <TermsDocument />
           )}
         </div>
 

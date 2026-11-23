@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  ShieldCheck, Check, X, ExternalLink, ArrowRight, RotateCcw, AlertCircle, FileText, LogOut
+  ShieldCheck, Check, X, RotateCcw, AlertCircle, LogOut
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
+import TermsDocument from './TermsDocument';
 import { recordTermsConsent } from '../data/registry';
 import {
-  TERMS_LINK, hasUserDecidedTerms, getUserTermsDecision, setUserTermsDecision
+  getUserTermsDecision, setUserTermsDecision
 } from '../data/terms';
 
 export default function PostAuthTermsModal() {
@@ -60,8 +61,8 @@ export default function PostAuthTermsModal() {
       userEmail: user.email,
       decision: 'agreed',
       portal: 'post-login',
-      portalTitle: 'Post-Login Account Activation',
-      note: 'User accepted Conclave Terms & Protocol post-authentication.',
+      portalTitle: 'Registration Terms and Conditions v1 (after sign-in)',
+      note: 'Accepted the Registration Terms and Conditions (v1, 04 Nov 2026) after sign-in.',
     });
     setUserTermsDecision(user.uid || user.email, 'agreed');
     setDecision('agreed');
@@ -77,8 +78,8 @@ export default function PostAuthTermsModal() {
       userEmail: user.email,
       decision: 'disagreed',
       portal: 'post-login',
-      portalTitle: 'Post-Login Account Activation',
-      note: 'User selected Disagree on post-login terms screen.',
+      portalTitle: 'Registration Terms and Conditions v1 (after sign-in)',
+      note: 'Declined the Registration Terms and Conditions (v1, 04 Nov 2026) after sign-in.',
     });
     setUserTermsDecision(user.uid || user.email, 'disagreed');
     setDecision('disagreed');
@@ -109,7 +110,7 @@ export default function PostAuthTermsModal() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-[11px] uppercase tracking-wider text-gold-text bg-surface-3 px-2.5 py-0.5 rounded-full border border-line">
-                Protocol &amp; Accreditations
+                Terms and Conditions
               </span>
               <span className="text-[11px] font-mono text-fg-3">
                 Account Activation · Step 2 of 2
@@ -117,13 +118,13 @@ export default function PostAuthTermsModal() {
             </div>
             <h2 id="post-auth-terms-title" className="mt-1.5 font-serif text-xl sm:text-2xl text-fg font-medium">
               {declinedView
-                ? 'Conclave Terms Declined'
+                ? 'Terms and Conditions declined'
                 : `Welcome, ${user.name || user.email?.split('@')[0] || 'Delegate'}`}
             </h2>
             <p className="mt-1 text-xs sm:text-sm text-fg-2 leading-relaxed">
               {declinedView
-                ? 'You have chosen to disagree with the Bharat Connect 2026 Protocol.'
-                : 'Please review and accept the Conclave Terms & Protocol Note to activate your accreditation, passes, and deal-room access.'}
+                ? 'You chose not to accept the Registration Terms and Conditions.'
+                : 'Before you continue, please read and accept the Registration Terms and Conditions of Bharat Mahotsav Festivals LLP.'}
             </p>
           </div>
         </div>
@@ -135,16 +136,13 @@ export default function PostAuthTermsModal() {
             <div className="py-4 space-y-4 text-center sm:text-left">
               <div className="p-4 rounded-xl border border-coral/30 bg-coral/10 text-fg-2 text-xs sm:text-sm leading-relaxed">
                 <p className="font-semibold text-coral text-sm mb-1.5">
-                  Notice: Access Restricted Without Protocol Consent
+                  You can't register until you accept the Terms
                 </p>
                 <p>
-                  As an international bilateral business conclave hosting ministerial and diplomatic delegations,
-                  issuance of sovereign accreditation IDs (BMF.BC-DGO-, -SEO-, -CBC-), security clearance badges, and private
-                  B2B deal-room reservations strictly requires compliance with the Conclave Protocol.
+                  Registering with Bharat Mahotsav Festivals LLP, including for Bharat Connect, requires acceptance of its
+                  Registration Terms and Conditions. You can read them again and accept them at any time.
                 </p>
-                <p className="mt-2 text-xs text-fg-3">
-                  Your decision (Disagreed) has been logged with the Secretariat. You can re-review the protocol at any time to activate your account.
-                </p>
+                <p className="mt-2 text-xs text-fg-3">Your decision has been recorded.</p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
@@ -171,61 +169,8 @@ export default function PostAuthTermsModal() {
               </div>
             </div>
           ) : (
-            /* Active Consent View */
-            <>
-              <div className="rounded-xl border border-line bg-surface-1/50 p-4 space-y-3">
-                <div className="text-xs font-mono uppercase tracking-wider text-gold-text">
-                  Conclave Code of Conduct &amp; Legal Framework
-                </div>
-                <ul className="space-y-2.5 text-xs sm:text-[13px] text-fg-2">
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-gold-text shrink-0 mt-0.5" strokeWidth={2} />
-                    <span>
-                      <strong className="text-fg font-medium">Non-Transferable Credentials: </strong>
-                      Official accreditation badges and unique IDs (BMF.BC-00001 onwards) are issued to registered individuals and cannot be transferred or shared without Secretariat approval.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-gold-text shrink-0 mt-0.5" strokeWidth={2} />
-                    <span>
-                      <strong className="text-fg font-medium">Diplomatic &amp; Bilateral Decorum: </strong>
-                      Participants agree to maintain professional business conduct during ministerial plenaries, sector roundtables, and high-level Arab delegation meetings at Yashobhoomi.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-gold-text shrink-0 mt-0.5" strokeWidth={2} />
-                    <span>
-                      <strong className="text-fg font-medium">CEPA Corridor Confidentiality: </strong>
-                      Discussions and documents shared inside private B2B deal rooms are protected under standard sovereign bilateral non-disclosure protocols.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-gold-text shrink-0 mt-0.5" strokeWidth={2} />
-                    <span>
-                      <strong className="text-fg font-medium">Data Protection &amp; Security: </strong>
-                      Account information is securely processed in accordance with the Digital Personal Data Protection (DPDP) Act of India and conclave compliance standards.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* View Complete Legal PDF Link */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-line text-xs">
-                <div className="flex items-center gap-2 text-fg-2">
-                  <FileText className="w-4 h-4 text-gold-text shrink-0" strokeWidth={1.5} />
-                  <span>Official Secretariat Terms &amp; Conditions Document</span>
-                </div>
-                <a
-                  href={TERMS_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-gold-text hover:text-gold-light hover:underline font-mono text-[11px] font-medium"
-                >
-                  <span>Read PDF</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </div>
-            </>
+            /* Active Consent View: the official document, in full */
+            <TermsDocument />
           )}
         </div>
 
@@ -233,7 +178,7 @@ export default function PostAuthTermsModal() {
         {!declinedView && (
           <div className="p-4 sm:p-5 border-t border-line bg-surface-1/80 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-[11px] text-fg-3 text-center sm:text-left">
-              Your decision will be recorded with timestamp for conclave accreditation records.
+              Your decision is recorded with the date and time, as clause 18.3 describes.
             </p>
             <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
               <button
@@ -253,7 +198,7 @@ export default function PostAuthTermsModal() {
                 className="flex-1 sm:flex-none btn-primary h-11 px-6 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <Check className="w-4 h-4" strokeWidth={2.25} />
-                <span>{saving ? 'Recording…' : 'I Agree to Terms'}</span>
+                <span>{saving ? 'Recording…' : 'I agree'}</span>
               </button>
             </div>
           </div>
