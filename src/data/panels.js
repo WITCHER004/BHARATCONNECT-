@@ -40,6 +40,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Sameer Modi',
+        photo: 'panels/advisory/sameer-modi.webp',
       },
       {
         title: 'Panel member',
@@ -47,6 +48,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Amit Dubey',
+        photo: 'panels/advisory/amit-dubey.webp',
       },
       {
         title: 'Panel member',
@@ -54,6 +56,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Vijay Goel',
+        photo: 'panels/advisory/vijay-goel.webp',
       },
       {
         title: 'Panel member',
@@ -61,6 +64,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Vijay Mehta',
+        photo: 'panels/advisory/vijay-mehta.webp',
       },
       {
         title: 'Panel member',
@@ -68,6 +72,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Ramesh Arora',
+        photo: 'panels/advisory/ramesh-arora.webp',
       },
       {
         title: 'Panel member',
@@ -89,6 +94,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Rima Sen',
+        photo: 'panels/advisory/rima-sen.webp',
       },
       {
         title: 'Panel member',
@@ -96,6 +102,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Puran Jaeswani',
+        photo: 'panels/advisory/puran-jaeswani.webp',
       },
       {
         title: 'Panel member',
@@ -103,6 +110,7 @@ export const PANELS = [
         focus: [],
         ...VACANT,
         name: 'Richard Thompson',
+        photo: 'panels/advisory/richard-thompson.webp',
       },
       {
         title: 'Panel member',

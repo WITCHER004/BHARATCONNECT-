@@ -82,7 +82,7 @@ export default function ExhibitionPage({ onOpenRegister, onSelectTier }) {
             Exhibition stalls and floorplan
           </h1>
           <p className="text-lg text-fg-2 leading-7 max-w-2xl mt-4">
-            Show your organisation to 500+ ministerial and institutional decision makers in 34,065 sq ft of column-free hall space.
+            Show your organisation to 22+ ministerial and institutional decision makers in 34,065 sq ft of column-free hall space.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 mt-8">
             <button

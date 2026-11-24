@@ -47,7 +47,7 @@ export default function SummitSpotlightHUD({ onNavigate }) {
             <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Arab Nations</span>
           </div>
           <div className="glass-edge glass-edge-sm p-2 rounded-lg bg-white/[0.03] border">
-            <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">$500B</span>
+            <span className="font-serif text-xl sm:text-2xl font-medium text-fg figure block">₹100 Cr+</span>
             <span className="text-[10px] font-mono text-fg-3 uppercase tracking-wider block mt-0.5">Bilateral Goal</span>
           </div>
           <div className="glass-edge glass-edge-sm p-2 rounded-lg bg-white/[0.03] border">

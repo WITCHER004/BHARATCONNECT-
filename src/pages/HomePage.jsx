@@ -419,8 +419,8 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
             </h1>
 
             <p className="mt-5 text-base sm:text-lg leading-[1.6] text-fg-2 max-w-xl">
-              Two days of ministerial plenaries, sector deal rooms and 100+ exhibition stalls, working towards
-              a $500B bilateral trade target. Organised by IACCIA in New Delhi.
+              Two days of ministerial plenaries, sector deal rooms and 50+ exhibition stalls, working towards
+              a ₹100 Cr+ bilateral trade target. Organised by IACCIA in New Delhi.
             </p>
 
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3">

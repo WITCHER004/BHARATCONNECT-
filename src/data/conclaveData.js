@@ -49,7 +49,7 @@ export const ARAB_NATIONS = [
 
 export const EXECUTIVE_METRICS = [
   {
-    value: "$500B",
+    value: "₹100 Cr+",
     label: "Bilateral Trade Vision",
     description: "Targeted bilateral merchandise & services trade corridor by 2030 through CEPA pacts.",
     badge: "Vision 2030"
@@ -61,19 +61,19 @@ export const EXECUTIVE_METRICS = [
     badge: "Sovereign Alliances"
   },
   {
-    value: "500+",
+    value: "22+",
     label: "High-Level Delegates",
     description: "Cabinet ministers, ambassadors, CEOs, family office principals, and sovereign fund directors.",
     badge: "VIP Conclave"
   },
   {
-    value: "10,000+",
+    value: "1,000+",
     label: "Visitors & B2B Meetings",
     description: "Structured matchmaking deal rooms, procurement syndicates, and investor roundtables.",
     badge: "Deal Making"
   },
   {
-    value: "100+",
+    value: "50+",
     label: "Stalls & Pavilions",
     description: "State pavilions, sovereign investment boards, conglomerates, and frontier innovators.",
     badge: "Palash Hall"
@@ -226,7 +226,7 @@ export const AGENDA_DATA = {
       {
         time: "09:30 - 11:15",
         track: "Plenary & Diplomacy",
-        title: "Inaugural Plenary: The Bharat-Arab Economic Corridor: $500B Roadmap",
+        title: "Inaugural Plenary: The Bharat-Arab Economic Corridor: ₹100 Cr+ Roadmap",
         location: "Plenary Hall (Main Stage)",
         badge: "Flagship Keynote",
         description: "Lighting of the Conclave Lamp followed by addresses by the Union Minister of Commerce & Industry (Govt. of India), Secretary General of the Union of Arab Chambers, and visiting Arab Trade Ministers.",
@@ -375,7 +375,7 @@ export const AGENDA_DATA = {
         title: "Valedictory Plenary: Adoption of the 'New Delhi Bharat-Arab Declaration 2026'",
         location: "Plenary Hall",
         badge: "Official Communiqué",
-        description: "Presentation of conclave outcomes, announcement of the institutional Bilateral Trade Target of $500B by 2030, and handover ceremony for Bharat Connect 2027.",
+        description: "Presentation of conclave outcomes, announcement of the institutional Bilateral Trade Target of ₹100 Cr+ by 2030, and handover ceremony for Bharat Connect 2027.",
         speakers: [
           "President, IACCIA",
           "Dean of the Arab Diplomatic Corps in New Delhi",

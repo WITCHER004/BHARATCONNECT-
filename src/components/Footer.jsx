@@ -23,11 +23,11 @@ EVENT DETAILS:
 - Strategic Scope: Advancing Partnerships across India and all 22 Member States of the Arab League
 
 KEY ECONOMIC BENCHMARKS:
-- Target Bilateral Trade Vision: $500 Billion by 2030 (via CEPA and GCC FTA frameworks)
+- Target Bilateral Trade Vision: ₹100 Crore+ by 2030 (via CEPA and GCC FTA frameworks)
 - Confirmed Participating Arab Nations: 22 (GCC, North Africa, Levant, Horn of Africa)
-- High-Level Accreditation: 500+ Ministerial, Sovereign Wealth & C-Suite Delegates
-- Projected Footfall & Matchmaking: 10,000+ Business Executives & B2B/G2B Deal Rooms
-- Exhibition Footprint: 34,065 sq. ft. Column-Free Hall with 100+ Stalls & Sovereign Pavilions
+- High-Level Accreditation: 22+ Ministerial, Sovereign Wealth & C-Suite Delegates
+- Projected Footfall & Matchmaking: 1,000+ Business Executives & B2B/G2B Deal Rooms
+- Exhibition Footprint: 34,065 sq. ft. Column-Free Hall with 50+ Stalls & Sovereign Pavilions
 - Dedicated Matchmaking Facility: 7,000 sq. ft. Executive B2B Deal Lounge with 24 Meeting Rooms
 
 STRATEGIC VERTICALS:
