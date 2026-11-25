@@ -194,6 +194,23 @@ function RegisterDropdown({ onNavigate }) {
               type="button"
               onClick={() => {
                 setOpen(false);
+                onNavigate('aimf');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  AIMF Cultural Portal
+                </div>
+                <div className="text-[11px] text-fg-3">Complimentary artist & cultural accreditation</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
                 onNavigate('collaborate');
               }}
               className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"

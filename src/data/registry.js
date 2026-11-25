@@ -24,12 +24,13 @@ import { receivedEmail, adminAlertEmail, decisionEmail } from './emails';
 export const TYPES = {
   delegate: { label: 'Delegate pass', short: 'Delegates', color: '#5B8DEF', approvable: true },
   startup: { label: 'Startup showcase', short: 'Startups', color: '#D9604A', approvable: true },
+  aimf: { label: 'AIMF accreditation', short: 'AIMF', color: '#B98A3A', approvable: true },
   collaboration: { label: 'Collaboration', short: 'Collaborations', color: '#2FA58C', approvable: true },
   panel: { label: 'Panel application', short: 'Panels', color: '#B98A3A', approvable: true },
   query: { label: 'Inquiry', short: 'Inquiries', color: '#8A9E97', approvable: false },
 };
 
-export const TYPE_ORDER = ['delegate', 'startup', 'collaboration', 'panel'];
+export const TYPE_ORDER = ['delegate', 'startup', 'aimf', 'collaboration', 'panel'];
 
 export const STATUS = {
   pending: { label: 'Pending', color: '#FAB219' },
@@ -37,7 +38,7 @@ export const STATUS = {
   declined: { label: 'Declined', color: '#D03B3B' },
 };
 
-const REF_CODES = { delegate: 'DGO', startup: 'SEO', collaboration: 'CBC', query: 'QRY' };
+const REF_CODES = { delegate: 'DGO', startup: 'SEO', aimf: 'AMF', collaboration: 'CBC', query: 'QRY' };
 
 /* ── Writing (called by the site) ──────────────────── */
 

@@ -17,7 +17,7 @@ import LoginPage from './pages/LoginPage';
 import { PANEL_IDS } from './data/panels';
 
 const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', ...PANEL_IDS];
-const TERMS_PORTAL_PAGES = ['register', 'startup', 'collaborate', 'exhibition', 'query'];
+const TERMS_PORTAL_PAGES = ['register', 'startup', 'aimf', 'collaborate', 'exhibition', 'query'];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';

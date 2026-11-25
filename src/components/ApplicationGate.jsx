@@ -12,7 +12,7 @@ import { watchMyRegistrations } from '../data/registry';
   With no application yet, the portal (children) shows as normal.
 */
 
-const LABEL = { delegate: 'event registration', startup: 'startup registration', collaboration: 'collaboration request' };
+const LABEL = { delegate: 'event registration', startup: 'startup registration', aimf: 'AIMF accreditation', collaboration: 'collaboration request' };
 
 const fmt = (iso) => new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' });
 
