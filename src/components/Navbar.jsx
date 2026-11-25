@@ -383,7 +383,7 @@ export default function Navbar({ activePage, onNavigate }) {
               </span>
               <span className="mt-1 flex items-center gap-1.5 text-[11px] font-mono text-gold-text tracking-[0.14em] uppercase leading-3">
                 <span className="w-1 h-1 rotate-45 bg-gold-foil" aria-hidden="true" />
-                18–19 Dec · New Delhi
+                New Delhi
               </span>
             </div>
           </button>
