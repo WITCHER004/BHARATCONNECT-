@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, LogOut, ChevronDown, LogIn } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
 import { PANELS, PANEL_IDS } from '../data/panels';
@@ -33,8 +33,8 @@ function Avatar({ user, size = 28 }) {
   );
 }
 
-function AccountMenu({ onSignIn }) {
-  const { user, signOut, openAuth } = useAuth();
+function UserMenu() {
+  const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -50,17 +50,7 @@ function AccountMenu({ onSignIn }) {
     };
   }, [open]);
 
-  if (!user) {
-    return (
-      <button
-        onClick={() => { onSignIn?.(); openAuth({ mode: 'signin' }); }}
-        className="btn-primary !rounded-xl h-10 sm:h-11 px-4 sm:px-5 text-sm sm:text-[15px] font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-      >
-        <LogIn className="w-4 h-4" strokeWidth={2} />
-        <span>Login</span>
-      </button>
-    );
-  }
+  if (!user) return null;
 
   return (
     <div ref={ref} className="relative">
@@ -69,28 +59,171 @@ function AccountMenu({ onSignIn }) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Account: ${user.name}`}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer"
+        className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-2 transition-colors cursor-pointer border border-gold-foil/30"
       >
-        <Avatar user={user} />
+        <Avatar user={user} size={30} />
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-xl p-2 shadow-[0_16px_40px_-12px_rgb(0_0_0/0.5)] animate-fade-in z-50">
+        <div role="menu" className="absolute right-0 mt-2 w-64 surface-card rounded-2xl p-2.5 shadow-[0_16px_40px_-12px_rgb(0_0_0/0.8)] border border-line-strong animate-fade-in z-50">
           <div className="px-3 py-2 flex items-center gap-3">
-            <Avatar user={user} size={32} />
+            <Avatar user={user} size={34} />
             <div className="min-w-0">
-              <p className="text-sm text-fg truncate">{user.name}</p>
-              <p className="text-xs text-fg-3 truncate">{user.email}</p>
+              <p className="text-sm font-medium text-fg truncate">{user.name}</p>
+              <p className="text-xs text-fg-3 truncate font-mono">{user.email}</p>
             </div>
           </div>
-          <div className="my-1 border-t border-line" />
+          <div className="my-1.5 border-t border-line" />
           <button
             role="menuitem"
             onClick={() => { setOpen(false); signOut(); }}
-            className="w-full h-9 px-3 rounded-lg flex items-center gap-2 text-sm text-fg-2 hover:text-fg hover:bg-surface-3 transition-colors cursor-pointer"
+            className="w-full h-9 px-3 rounded-xl flex items-center gap-2 text-sm text-coral hover:bg-surface-3 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" strokeWidth={1.5} />
-            Sign out
+            <span>Sign out</span>
           </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RegisterDropdown({ onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="btn-primary !rounded-xl h-10 sm:h-11 px-4 sm:px-5 text-sm sm:text-[15px] font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
+      >
+        <span>Register</span>
+        <ChevronDown className={`w-3.5 h-3.5 opacity-80 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 mt-2 w-80 surface-card rounded-2xl p-3 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.8),0_0_0_1px_rgba(217,179,106,0.3)] animate-fade-in z-50 border border-gold-foil/30"
+        >
+          {/* Top Login Section - User Request: "when we CLICK the register it will show the login option and when clicked it should redirect to another page and then they should sign in" */}
+          <div className="p-3.5 rounded-xl bg-gradient-to-b from-surface-3 to-surface-2 border border-gold-foil/40 shadow-inner">
+            <div className="flex items-center justify-between text-[11px] font-mono text-gold-text uppercase tracking-wider mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil" />
+                Already Registered?
+              </span>
+              <span className="text-fg-3">Member Portal</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('login');
+              }}
+              className="w-full h-11 px-3.5 rounded-xl bg-coral hover:bg-coral-light text-white font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-md transition-all active:scale-[0.98] group"
+            >
+              <LogIn className="w-4 h-4" strokeWidth={2} />
+              <span>Login to your account</span>
+              <ArrowRight className="w-4 h-4 ml-auto group-hover:translate-x-0.5 transition-transform" />
+            </button>
+            <p className="text-[11px] text-fg-3 mt-2 text-center leading-tight">
+              Redirects to sign-in page to access your pass, documents & deal rooms
+            </p>
+          </div>
+
+          <div className="my-2.5 border-t border-line/60" />
+
+          {/* Registration Options */}
+          <div className="px-1 text-[11px] font-mono text-fg-3 uppercase tracking-wider mb-1.5">
+            New Registrations & Passes
+          </div>
+
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('register');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  Delegate Pass
+                </div>
+                <div className="text-[11px] text-fg-3">Corporate, Government & Trade passes</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('startup');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  Startup Showcase
+                </div>
+                <div className="text-[11px] text-fg-3">Register your startup for exhibition & pitch</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('collaborate');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  Summit Collaboration
+                </div>
+                <div className="text-[11px] text-fg-3">Bilateral partnership & MoU proposals</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('exhibition');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  Exhibition Stalls
+                </div>
+                <div className="text-[11px] text-fg-3">Book enterprise, country & startup stalls</div>
+              </div>
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -164,13 +297,14 @@ const NAV_ITEMS = [
   { id: 'schedule', label: 'Programme' },
   { id: 'exhibition', label: 'Exhibition' },
   { id: 'startups', label: 'Startups' },
+  { id: 'aimf', label: 'AIMF' },
   { id: 'experience', label: 'Venue' },
   { id: 'collaborate', label: 'Collaboration' },
   { id: 'query', label: 'Inquiries' },
 ];
 
 export default function Navbar({ activePage, onNavigate }) {
-  const { user, signOut, openAuth } = useAuth();
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -269,8 +403,23 @@ export default function Navbar({ activePage, onNavigate }) {
           </nav>
 
           {/* Right action area */}
-          <div className="flex items-center gap-2 shrink-0">
-            <AccountMenu onSignIn={() => setMobileMenuOpen(false)} />
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Direct Login Link for Desktop if unauthenticated */}
+            {!user && (
+              <button
+                type="button"
+                onClick={() => handleNavClick('login')}
+                className="hidden sm:flex text-sm text-fg-2 hover:text-fg font-medium px-2 py-1.5 transition-colors cursor-pointer"
+              >
+                Sign in
+              </button>
+            )}
+
+            {/* Register Dropdown Button (User Request: clicking Register shows the Login option which redirects to another page) */}
+            <RegisterDropdown onNavigate={handleNavClick} />
+
+            {/* User Account Menu when authenticated */}
+            {user && <UserMenu />}
 
             {/* Mobile Hamburger Button */}
             <button
@@ -331,23 +480,32 @@ export default function Navbar({ activePage, onNavigate }) {
 
             <div className="mt-4 pt-4 border-t border-line/60 flex flex-col gap-2.5 pb-2">
               {!user ? (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    openAuth({ mode: 'signin' });
-                  }}
-                  className="w-full btn-primary min-h-[44px] text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-                >
-                  <LogIn className="w-4 h-4" strokeWidth={2} />
-                  <span>Login to Bharat Connect</span>
-                </button>
+                <div className="space-y-2">
+                  {/* Login button redirecting to dedicated login page */}
+                  <button
+                    onClick={() => handleNavClick('login')}
+                    className="w-full btn-primary min-h-[44px] text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                  >
+                    <LogIn className="w-4 h-4" strokeWidth={2} />
+                    <span>Login to Bharat Connect</span>
+                  </button>
+
+                  {/* Register delegate button */}
+                  <button
+                    onClick={() => handleNavClick('register')}
+                    className="w-full btn-secondary min-h-[44px] text-sm font-medium flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+                  >
+                    <span>Register for Delegate Pass</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               ) : (
                 <div className="p-3 rounded-xl bg-surface-2 border border-line flex items-center justify-between">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Avatar user={user} size={30} />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-fg truncate">{user.name}</p>
-                      <p className="text-xs text-fg-3 truncate">{user.email}</p>
+                      <p className="text-xs text-fg-3 truncate font-mono">{user.email}</p>
                     </div>
                   </div>
                   <button

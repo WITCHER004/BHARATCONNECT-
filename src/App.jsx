@@ -12,9 +12,11 @@ import CollaborationPage from './pages/CollaborationPage';
 import QueryPage from './pages/QueryPage';
 import PanelsPage from './pages/PanelsPage';
 import StartupsPage from './pages/StartupsPage';
+import AimfPage from './pages/AimfPage';
+import LoginPage from './pages/LoginPage';
 import { PANEL_IDS } from './data/panels';
 
-const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'register', 'startup', 'startups', 'collaborate', 'query', ...PANEL_IDS];
+const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', ...PANEL_IDS];
 const TERMS_PORTAL_PAGES = ['register', 'startup', 'collaborate', 'exhibition', 'query'];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
@@ -143,6 +145,19 @@ export default function App() {
         {activePage === 'startup' && <StartupPage onNavigate={navigate} />}
 
         {activePage === 'startups' && <StartupsPage onNavigate={navigate} />}
+
+        {activePage === 'aimf' && (
+          <AimfPage
+            onNavigate={navigate}
+            onOpenRegister={handleOpenRegister}
+          />
+        )}
+
+        {activePage === 'login' && (
+          <LoginPage
+            onNavigate={navigate}
+          />
+        )}
 
         {activePage === 'collaborate' && <CollaborationPage onNavigate={navigate} />}
 

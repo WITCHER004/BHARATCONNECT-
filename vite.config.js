@@ -9,7 +9,9 @@ export default defineConfig({
     react(),
   ],
   server: {
-    port: 3000,
+    host: '127.0.0.1',
+    port: 3001,
+    strictPort: false,
     open: false,
   },
   // two pages: the public site (index.html) and the admin panel (admin.html)
