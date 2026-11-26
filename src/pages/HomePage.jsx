@@ -571,12 +571,12 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                       Atal Innovation Multilateral Forum
                     </h3>
                     <p className="mt-3 sm:mt-4 text-[13px] sm:text-[14px] xl:text-[13px] 2xl:text-[13.5px] text-fg-2 leading-relaxed min-h-0 sm:min-h-[84px] xl:min-h-[108px]">
-                      Complimentary accreditation for artists, cultural ensembles, cinema studios, and creative economy leaders. Verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-AMF-00001</span> onwards) granting access to Grand Auditorium symphonies and plenaries.
+                      Complimentary accreditation for artists, cultural ensembles, cinema studios, and creative economy leaders. Verified unique accreditation ID (<span className="font-mono text-gold-text">BC.AIMF-00001</span> onwards) granting access to Grand Auditorium symphonies and plenaries.
                     </p>
                     <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-[11px] sm:text-xs xl:text-[11px] 2xl:text-[12.5px] border-t border-line/80 pt-4 sm:pt-5">
                       <div><dt className="text-fg-3">Admission</dt><dd className="mt-1 text-gold-text font-medium">Complimentary</dd></div>
                       <div><dt className="text-fg-3">Corridors</dt><dd className="mt-1 text-fg font-medium">23 Nations</dd></div>
-                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-AMF</dd></div>
+                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BC.AIMF</dd></div>
                     </dl>
                   </div>
                   <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">

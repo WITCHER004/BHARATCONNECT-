@@ -79,15 +79,15 @@ service cloud.firestore {
 
     // the record's reference must be the number the counter was moved to in the same write
     function takesNextRef(ref, code) {
-      return ref.matches('^BMF\\.BC-' + code + '-[0-9]{5}$')
-        && getAfter(/databases/$(database)/documents/counters/$(code)).data.n == int(ref.split('-')[2]);
+      return (code == 'AIMF' ? ref.matches('^BC\\.AIMF-[0-9]{5}$') : ref.matches('^BMF\\.BC-' + code + '-[0-9]{5}$'))
+        && getAfter(/databases/$(database)/documents/counters/$(code)).data.n == int(code == 'AIMF' ? ref.split('-')[1] : ref.split('-')[2]);
     }
 
     // ── Reference counters ──────────────────────────────
 
     match /counters/{code} {
-      allow get: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY'];
-      allow create: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY']
+      allow get: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY', 'AIMF', 'EVA'];
+      allow create: if signedIn() && code in ['DGO', 'SEO', 'CBC', 'QRY', 'AIMF', 'EVA']
         && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
       allow update: if signedIn()
         && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == resource.data.n + 1;
@@ -111,9 +111,9 @@ service cloud.firestore {
           'name', 'email', 'organisation', 'country', 'detail', 'sector', 'phone',
           'designation', 'dealSize', 'b2b', 'visaLetter', 'payment', 'profile', 'details'
         ])
-        && d.type in ['delegate', 'startup', 'collaboration']
+        && d.type in ['delegate', 'startup', 'collaboration', 'aimf', 'event_app']
         && d.ref == ref
-        && takesNextRef(ref, {'delegate': 'DGO', 'startup': 'SEO', 'collaboration': 'CBC'}[d.type])
+        && takesNextRef(ref, {'delegate': 'DGO', 'startup': 'SEO', 'collaboration': 'CBC', 'aimf': 'AIMF', 'event_app': 'EVA'}[d.type])
         && d.uid == request.auth.uid
         && d.status == 'pending'
         && d.submittedAt == request.time

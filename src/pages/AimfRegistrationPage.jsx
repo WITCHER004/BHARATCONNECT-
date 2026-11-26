@@ -454,7 +454,7 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <Text id="commEmail" label="Email address for communication" required type="email" autoComplete="email"
-                  hint="Your official Accreditation ID [BMF.BC-AMF-numbers] and passes will be sent here"
+                  hint="Your official Accreditation ID [BC.AIMF-numbers] and passes will be sent here"
                   value={v.commEmail} onChange={set('commEmail')} error={errors.commEmail} />
                 <Text id="phone" label="Phone / WhatsApp number" required type="tel" autoComplete="tel" placeholder="+91 98765 43210"
                   hint="Include the international country code" value={v.phone} onChange={set('phone')} error={errors.phone} />
@@ -704,8 +704,8 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
                     <h4 className="text-sm font-medium text-fg">Official Accreditation ID Allocation</h4>
                     <p className="mt-1 text-xs text-fg-2 leading-relaxed">
                       Upon submission, you will be assigned an alphanumeric Accreditation ID formatted as{' '}
-                      <span className="font-mono text-gold-text font-semibold">[BMF.BC-AMF-numbers]</span> (starting sequentially from{' '}
-                      <span className="font-mono text-fg font-semibold">BMF.BC-AMF-00001</span>). This accreditation is complimentary and guarantees consideration for auditorium stage programming and pavilion showcase spaces.
+                      <span className="font-mono text-gold-text font-semibold">[BC.AIMF-numbers]</span> (starting sequentially from{' '}
+                      <span className="font-mono text-fg font-semibold">BC.AIMF-00001</span>). This accreditation is complimentary and guarantees consideration for auditorium stage programming and pavilion showcase spaces.
                     </p>
                   </div>
                 </div>
@@ -746,7 +746,7 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
           <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4 text-sm">
             <div><dt className="text-fg-3">Accreditation</dt><dd className="mt-1 text-gold-text font-medium">Complimentary (₹0)</dd></div>
             <div><dt className="text-fg-3">Corridors</dt><dd className="mt-1 text-fg">India + 22 Arab Nations</dd></div>
-            <div><dt className="text-fg-3">Reference Prefix</dt><dd className="mt-1 text-fg font-mono text-gold-text">BMF.BC-AMF</dd></div>
+            <div><dt className="text-fg-3">Reference Prefix</dt><dd className="mt-1 text-fg font-mono text-gold-text">BC.AIMF</dd></div>
             <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg">8 minutes</dd></div>
           </dl>
         </div>
@@ -759,7 +759,7 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
               {/* Sign in gate protects the portal */}
               <SignInGate
                 title="Sign in to apply for AIMF accreditation"
-                reason="AIMF registration needs an account (Google, Apple, or email), so your creative showcase, credentials, and unique Accreditation ID [BMF.BC-AMF-numbers] stay tied to you."
+                reason="AIMF registration needs an account (Google, Apple, or email), so your creative showcase, credentials, and unique Accreditation ID [BC.AIMF-numbers] stay tied to you."
               >
                 <AimfHub
                   uid={user?.uid}

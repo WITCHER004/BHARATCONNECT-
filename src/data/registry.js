@@ -38,7 +38,7 @@ export const STATUS = {
   declined: { label: 'Declined', color: '#D03B3B' },
 };
 
-const REF_CODES = { delegate: 'DGO', startup: 'SEO', aimf: 'AMF', collaboration: 'CBC', query: 'QRY', event_app: 'EVA' };
+const REF_CODES = { delegate: 'DGO', startup: 'SEO', aimf: 'AIMF', collaboration: 'CBC', query: 'QRY', event_app: 'EVA' };
 
 /* ── Writing (called by the site) ──────────────────── */
 
@@ -52,7 +52,9 @@ async function saveWithRef(kind, record) {
     const counter = doc(db, 'counters', code);
     const snap = await tx.get(counter);
     const n = (snap.exists() ? snap.data().n : 0) + 1;
-    const ref = `BMF.BC-${code}-${String(n).padStart(5, '0')}`;
+    const ref = kind === 'aimf'
+      ? `BC.AIMF-${String(n).padStart(5, '0')}`
+      : `BMF.BC-${code}-${String(n).padStart(5, '0')}`;
     tx.set(counter, { n });
     tx.set(doc(db, coll, ref), {
       ...record,
