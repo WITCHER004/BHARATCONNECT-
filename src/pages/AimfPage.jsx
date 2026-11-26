@@ -261,114 +261,10 @@ function StepTitle({ title, intro }) {
   );
 }
 
-/* ── AIMF Pillars & Data for Presentation ───────────── */
-
-const AIMF_PILLARS = [
-  {
-    icon: Globe2,
-    tag: 'Diplomacy & Heritage',
-    title: 'Sovereign Cultural & Ministerial Conclave',
-    description: 'High-level roundtables uniting ministers of culture, heritage authorities, and bilateral cultural councils from India and the 22 Arab League nations.',
-    highlights: [
-      'Joint cultural diplomacy communique for 2026–2030',
-      'Mutual heritage preservation & museum artefact loans',
-      'Fast-track cultural exchange visas for creative practitioners'
-    ]
-  },
-  {
-    icon: Music,
-    tag: 'Performing Arts',
-    title: 'Arab-India Music & Heritage Conclave',
-    description: 'A vibrant cross-pollination of ancient and contemporary musical traditions, celebrating shared modal frameworks, maqam, raga, Sufi poetry, and orchestral grandeur.',
-    highlights: [
-      'Gala symphony with traditional Oud, Sitar, Nay & Sarod ensembles',
-      'The Silk Route Sufi & Qawwali bridge performance',
-      'Masterclasses on Indo-Arab rhythmic cycles and microtonality'
-    ]
-  },
-  {
-    icon: Film,
-    tag: 'Creative Economy',
-    title: 'Arab-India Media, Cinema & Streaming Summit (AIMES)',
-    description: 'Bridging the booming content engines of Bollywood, Indian regional industries, and GCC media capitals (Riyadh, Dubai, Abu Dhabi, Doha, and Cairo).',
-    highlights: [
-      '₹1,500+ Cr co-production pacts & location incentive frameworks',
-      'Cross-corridor OTT licensing and localization for Arab & Indian audiences',
-      'AI in animation, gaming studio joint-ventures, and immersive VFX'
-    ]
-  },
-  {
-    icon: Palette,
-    tag: 'Artisan & Design',
-    title: 'Creative Tech & Luxury Artisan Exposition',
-    description: 'Curated gallery pavilions highlighting Islamic calligraphy, Indian handloom silks, bespoke fragrances, architecture, and contemporary bilateral design.',
-    highlights: [
-      'Heritage craftsmanship deal room for high-end retail exports',
-      'Architectural conservation and sustainable venue aesthetics',
-      'Digital preservation of shared maritime trade and linguistic history'
-    ]
-  }
-];
-
-const SCHEDULE_HIGHLIGHTS = [
-  {
-    day: 'Day 1 · 18 Dec 2026',
-    stage: 'Yashobhoomi Grand Auditorium',
-    time: '11:30 – 13:00',
-    title: 'Plenary: The Civilizational Tapestry — Indo-Arab Cultural Diplomacy',
-    speakers: 'Ministers of Culture (India & GCC States), ICCR Leadership, IACCIA Cultural Chair',
-    badge: 'Ministerial Plenary'
-  },
-  {
-    day: 'Day 1 · 18 Dec 2026',
-    stage: 'Cultural Pavilion (Hall 4)',
-    time: '15:00 – 17:00',
-    title: 'Cinema & Streaming Corridors: Co-producing for 1.8 Billion Consumers',
-    speakers: 'Studio Heads from Mumbai, Riyadh Media City, Dubai Studio City & Doha',
-    badge: 'Media Summit'
-  },
-  {
-    day: 'Day 1 Evening · 18 Dec 2026',
-    stage: 'Open-Air Amphitheatre',
-    time: '19:30 – 21:30',
-    title: 'The Sovereign Symphony: Maqam meets Raga Fusion Gala',
-    speakers: 'Renowned Oud & Sitar Maestros, Royal Symphonic Ensembles, Sufi Vocalists',
-    badge: 'Cultural Gala'
-  },
-  {
-    day: 'Day 2 · 19 Dec 2026',
-    stage: 'Deal Room & Bilateral Suites',
-    time: '10:00 – 12:30',
-    title: 'Entertainment & Gaming IP Investment Round: Signing of Bilateral MoUs',
-    speakers: 'Sovereign Wealth Media Funds, VCs, Studio Producers, Creative Directors',
-    badge: 'MoU Signing'
-  },
-  {
-    day: 'Day 2 · 19 Dec 2026',
-    stage: 'Yashobhoomi Grand Auditorium',
-    time: '14:30 – 16:30',
-    title: 'Youth Creative Vanguard: Digital Influencers, OTT Creators & Animation Studios',
-    speakers: 'Leading Digital Media Pioneers from India, UAE, Saudi Arabia & Egypt',
-    badge: 'Creative Tech'
-  }
-];
-
-const DELEGATION_BODIES = [
-  { country: 'India', entity: 'Ministry of Culture & Indian Council for Cultural Relations (ICCR)', focus: 'Cultural Diplomacy & Performing Arts' },
-  { country: 'United Arab Emirates', entity: 'Ministry of Culture & Abu Dhabi Music & Arts Foundation (ADMAF)', focus: 'Global Creative Exchange & Orchestral Heritage' },
-  { country: 'Kingdom of Saudi Arabia', entity: 'Ministry of Culture, Film Commission & Music Commission', focus: 'Creative Infrastructure & Media Co-productions' },
-  { country: 'Arab Republic of Egypt', entity: 'Ministry of Culture & Cairo International Arts Council', focus: 'Cinematic History, Literature & Performing Arts' },
-  { country: 'State of Qatar', entity: 'Qatar Museums & Doha Film Institute', focus: 'Heritage Conservation & Screen Industries' },
-  { country: 'Sultanate of Oman', entity: 'Ministry of Heritage and Tourism', focus: 'Maritime Silk Route & Maritime Cultural Ties' },
-  { country: 'State of Kuwait', entity: 'National Council for Culture, Arts and Letters (NCCAL)', focus: 'Theatre, Literary Translation & Publishing' },
-  { country: 'Kingdom of Bahrain', entity: 'Bahrain Authority for Culture and Antiquities', focus: 'Archaeology & Pearl Heritage Exchange' },
-];
-
 /* ── MAIN AIMF PAGE & PORTAL COMPONENT ──────────────── */
 
 export default function AimfPage({ onNavigate, onOpenRegister }) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('portal'); // 'portal' | 'pillars' | 'programme' | 'delegations' | 'secretariat'
 
   // Form State
   const [formOpen, setFormOpen] = useState(() => !!loadDraft());
@@ -877,7 +773,6 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <button
                 onClick={() => {
-                  setActiveTab('portal');
                   setFormOpen(true);
                   requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
                 }}
@@ -888,10 +783,10 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
               </button>
 
               <button
-                onClick={() => setActiveTab('programme')}
+                onClick={() => onNavigate('schedule')}
                 className="btn-secondary !rounded-xl h-12 px-6 text-base font-medium flex items-center gap-2 cursor-pointer active:scale-[0.98]"
               >
-                <span>Explore Galas & Programme</span>
+                <span>Conclave Schedule</span>
               </button>
             </div>
           </div>
@@ -900,67 +795,8 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
 
       {/* Main Body Section in Ivory Theme (matching all Conclave pages) */}
       <section className="theme-ivory flex-1 py-12 sm:py-16">
-        {/* Navigation Tabs */}
-        <div className="sticky top-[76px] sm:top-[88px] z-30 bg-surface-1/95 backdrop-blur-md border-b border-line shadow-sm -mt-12 sm:-mt-16 mb-10 sm:mb-12 py-3">
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center gap-2 sm:gap-4 overflow-x-auto scrollbar-none">
-            <button
-              onClick={() => setActiveTab('portal')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'portal'
-                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
-                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-              }`}
-            >
-              AIMF Portal & Registration
-            </button>
-            <button
-              onClick={() => setActiveTab('pillars')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'pillars'
-                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
-                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-              }`}
-            >
-              Strategic Pillars
-            </button>
-            <button
-              onClick={() => setActiveTab('programme')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'programme'
-                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
-                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-              }`}
-            >
-              Programme & Galas
-            </button>
-            <button
-              onClick={() => setActiveTab('delegations')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'delegations'
-                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
-                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-              }`}
-            >
-              Participating Delegations
-            </button>
-            <button
-              onClick={() => setActiveTab('secretariat')}
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'secretariat'
-                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
-                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-              }`}
-            >
-              Protocol & Secretariat
-            </button>
-          </div>
-        </div>
-
-        {/* Content Container */}
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          {/* TAB 1: AIMF PORTAL */}
-          {activeTab === 'portal' && (
-            <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
               {/* Sign in gate protects the portal */}
               <SignInGate
                 title="Sign in to apply for AIMF accreditation"
@@ -1195,211 +1031,6 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
                 </ApplicationGate>
               </SignInGate>
             </div>
-          )}
-
-        {/* TAB 2: Strategic Pillars */}
-        {activeTab === 'pillars' && (
-          <div className="space-y-12 animate-fade-in">
-            <div className="max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-[0.14em] text-gold-text">Foundational Frameworks</span>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
-                Four Pillars of the Atal Innovation Multilateral Forum
-              </h2>
-              <p className="mt-2 text-sm sm:text-base text-fg-3">
-                Crafted to bridge ancient civilizational kinship with the modern multi-billion dollar creative economy.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {AIMF_PILLARS.map((pillar, idx) => {
-                const Icon = pillar.icon;
-                return (
-                  <div 
-                    key={idx}
-                    className="surface-card p-6 sm:p-8 rounded-2xl border border-line-strong hover:border-gold-foil/40 transition-all flex flex-col justify-between group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-surface-3 border border-line-strong flex items-center justify-center text-gold-text group-hover:scale-105 transition-transform">
-                          <Icon className="w-6 h-6" strokeWidth={1.5} />
-                        </div>
-                        <span className="text-xs font-mono uppercase tracking-wider text-fg-3 bg-surface-2 px-2.5 py-1 rounded-md border border-line">
-                          {pillar.tag}
-                        </span>
-                      </div>
-
-                      <h3 className="font-serif text-xl sm:text-2xl font-medium text-fg group-hover:text-gold-text transition-colors">
-                        {pillar.title}
-                      </h3>
-
-                      <p className="mt-3 text-sm sm:text-[15px] text-fg-2 leading-relaxed">
-                        {pillar.description}
-                      </p>
-
-                      <div className="mt-6 pt-5 border-t border-line/60 space-y-2.5">
-                        {pillar.highlights.map((h, i) => (
-                          <div key={i} className="flex items-start gap-2 text-xs sm:text-sm text-fg-3">
-                            <CheckCircle2 className="w-4 h-4 text-gold-foil shrink-0 mt-0.5" />
-                            <span>{h}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-8 pt-4">
-                      <button 
-                        onClick={() => {
-                          setActiveTab('portal');
-                          setFormOpen(true);
-                          requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-                        }}
-                        className="text-xs font-mono uppercase tracking-wider text-gold-text hover:text-gold-foil flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <span>Apply for Accreditation</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: Programme */}
-        {activeTab === 'programme' && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-[0.14em] text-gold-text">Curated Schedule</span>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
-                AIMF Sessions & Cultural Galas
-              </h2>
-              <p className="mt-2 text-sm sm:text-base text-fg-3">
-                Experience intellectual plenaries, bilateral deal sessions, and evening symphonic galas.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {SCHEDULE_HIGHLIGHTS.map((item, idx) => (
-                <div 
-                  key={idx}
-                  className="surface-card p-5 sm:p-6 rounded-2xl border border-line hover:border-gold-foil/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-surface-3 text-gold-text border border-gold-foil/20">
-                        {item.badge}
-                      </span>
-                      <span className="text-xs font-mono text-fg-3">{item.day}</span>
-                      <span className="text-xs font-mono text-fg-3">•</span>
-                      <span className="text-xs font-mono text-fg-3">{item.time}</span>
-                    </div>
-
-                    <h3 className="font-serif text-lg sm:text-xl font-medium text-fg">
-                      {item.title}
-                    </h3>
-
-                    <div className="text-xs sm:text-sm text-fg-3 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-gold-foil shrink-0" />
-                      <span>{item.stage}</span>
-                      <span className="mx-1">•</span>
-                      <Users className="w-3.5 h-3.5 text-fg-3 shrink-0" />
-                      <span className="truncate">{item.speakers}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => onNavigate('schedule')}
-                    className="shrink-0 btn-secondary !rounded-xl h-10 px-4 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <span>Full Schedule</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: Delegations */}
-        {activeTab === 'delegations' && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-[0.14em] text-gold-text">Diplomatic Convergence</span>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
-                Accredited Cultural & Media Delegations
-              </h2>
-              <p className="mt-2 text-sm sm:text-base text-fg-3">
-                Official representations joining the Atal Innovation Multilateral Forum at Yashobhoomi.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {DELEGATION_BODIES.map((del, idx) => (
-                <div key={idx} className="surface-card p-5 rounded-xl border border-line flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil" />
-                      <span className="text-sm font-semibold text-fg">{del.country}</span>
-                    </div>
-                    <p className="text-xs font-medium text-gold-text">{del.entity}</p>
-                    <p className="mt-2 text-xs text-fg-3">{del.focus}</p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-line/60 text-[11px] font-mono text-fg-3 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    <span>Protocol Confirmed</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 5: Secretariat */}
-        {activeTab === 'secretariat' && (
-          <div className="space-y-8 animate-fade-in max-w-4xl">
-            <div className="max-w-2xl">
-              <span className="text-xs font-mono uppercase tracking-[0.14em] text-gold-text">Governance & Accreditation</span>
-              <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
-                AIMF Secretariat & Organizing Bodies
-              </h2>
-              <p className="mt-2 text-sm sm:text-base text-fg-3">
-                Administered under the auspices of Bharat Mahotsav Festivals LLP in strategic alliance with IACCIA.
-              </p>
-            </div>
-
-            <div className="surface-card p-6 sm:p-8 rounded-2xl border border-line-strong space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-mono uppercase tracking-wider text-gold-text mb-2">Bharat Mahotsav Festivals LLP</h4>
-                  <p className="text-sm text-fg-2 leading-relaxed">
-                    Lead convening entity for cultural, heritage, and creative economy forums celebrating Indian civilizational depth and international diplomatic alliances across global corridors.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-mono uppercase tracking-wider text-gold-text mb-2">IACCIA Diplomatic Secretariat</h4>
-                  <p className="text-sm text-fg-2 leading-relaxed">
-                    India-Arab Chamber of Commerce and Industry protocol office managing bilateral ministerial itineraries, ambassadorial escorts, and formal bilateral MoUs.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-6 border-t border-line flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <div className="text-sm font-medium text-fg">Have an official cultural proposal?</div>
-                  <div className="text-xs text-fg-3">Submit your delegation query to the AIMF Protocol Desk.</div>
-                </div>
-                <button
-                  onClick={() => onNavigate('query')}
-                  className="btn-primary !rounded-xl h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Contact Protocol Desk</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
         </div>
       </section>
     </div>

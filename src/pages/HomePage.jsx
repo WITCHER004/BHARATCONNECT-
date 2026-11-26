@@ -588,7 +588,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                       onClick={() => onNavigate('aimf')}
                       className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
-                      AIMF Galas &amp; Framework
+                      AIMF Guidelines &amp; Portal
                     </button>
                   </div>
                 </div>
