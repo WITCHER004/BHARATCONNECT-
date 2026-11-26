@@ -30,7 +30,7 @@ export const TYPES = {
   query: { label: 'Inquiry', short: 'Inquiries', color: '#8A9E97', approvable: false },
 };
 
-export const TYPE_ORDER = ['delegate', 'startup', 'aimf', 'collaboration', 'panel'];
+export const TYPE_ORDER = ['delegate', 'startup', 'aimf', 'collaboration', 'panel', 'event_app'];
 
 export const STATUS = {
   pending: { label: 'Pending', color: '#FAB219' },
@@ -38,7 +38,7 @@ export const STATUS = {
   declined: { label: 'Declined', color: '#D03B3B' },
 };
 
-const REF_CODES = { delegate: 'DGO', startup: 'SEO', aimf: 'AMF', collaboration: 'CBC', query: 'QRY' };
+const REF_CODES = { delegate: 'DGO', startup: 'SEO', aimf: 'AMF', collaboration: 'CBC', query: 'QRY', event_app: 'EVA' };
 
 /* ── Writing (called by the site) ──────────────────── */
 
@@ -138,6 +138,14 @@ export async function submitQuery(record) {
   return localRef;
 }
 
+/* Submit an application for an upcoming conclave event / pitch / deal-room slot */
+export async function submitEventApplication(record) {
+  return submitRegistration('event_app', {
+    ...record,
+    detail: `Event Application: ${record.eventName || 'Conclave Session'} · ${record.track || 'Founder Showcase'}`,
+  });
+}
+
 /* Record a sign-in, sign-up or sign-out (real accounts only; never blocks the sign-in itself). */
 export function recordLogin({ action, name, method }) {
   const u = auth.currentUser;
@@ -227,6 +235,58 @@ export function watchMyStartups(user, cb) {
           snap.docs.forEach((d) => {
             const rec = toRecord(d, 'registrations');
             if (rec.type === 'startup') map.set(d.id, rec);
+          });
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  return () => {
+    unsubs.forEach((u) => u());
+  };
+}
+
+/* Event applications belonging specifically to the signed-in user */
+export function watchMyEventApplications(user, cb) {
+  if (!user || (!user.uid && !user.email)) {
+    cb([]);
+    return () => {};
+  }
+
+  const unsubs = [];
+  const map = new Map();
+
+  const emit = () => {
+    const list = Array.from(map.values()).filter((r) => r.type === 'event_app');
+    cb(list);
+  };
+
+  if (user.uid) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('uid', '==', user.uid)),
+        (snap) => {
+          snap.docs.forEach((d) => {
+            const rec = toRecord(d, 'registrations');
+            if (rec.type === 'event_app') map.set(d.id, rec);
+          });
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  if (user.email) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('accountEmail', '==', user.email)),
+        (snap) => {
+          snap.docs.forEach((d) => {
+            const rec = toRecord(d, 'registrations');
+            if (rec.type === 'event_app') map.set(d.id, rec);
           });
           emit();
         },
