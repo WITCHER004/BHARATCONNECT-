@@ -194,7 +194,7 @@ function RegisterDropdown({ onNavigate }) {
               type="button"
               onClick={() => {
                 setOpen(false);
-                onNavigate('aimf');
+                onNavigate('aimf-register');
               }}
               className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
             >

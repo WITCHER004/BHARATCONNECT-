@@ -62,6 +62,19 @@ export const PORTAL_TERMS = {
     legalNotice: 'By clicking "I Agree", you confirm adherence to the AIMF Participation Guidelines and Yashobhoomi venue security protocols.',
   },
 
+  'aimf-register': {
+    portalId: 'aimf-register',
+    title: 'AIMF Cultural & Creative Accreditation Terms',
+    subtitle: 'Guidelines for artists, cultural troupes, creative studios, and sovereign delegations.',
+    bullets: [
+      'AIMF accreditation is complimentary (₹0 fee / No payment required) and grants a unique Accreditation ID (BMF.BC-AMF-00001 onwards).',
+      'Accreditation grants access to the AIMF Cultural Pavilion, Grand Auditorium symphonic galas, and bilateral creative deal rooms.',
+      'Stage allocations and exhibition spaces are subject to curatorial scheduling by the Secretariat and IACCIA Cultural Directorate.',
+      'Artists, performers, and creative enterprises retain 100% intellectual property and copyright over all works, performances, and recordings.',
+    ],
+    legalNotice: 'By clicking "I Agree", you confirm adherence to the AIMF Participation Guidelines and Yashobhoomi venue security protocols.',
+  },
+
   collaborate: {
     portalId: 'collaborate',
     title: 'Summit Collaboration & Sovereign Directorate Agreement',

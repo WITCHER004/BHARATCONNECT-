@@ -13,11 +13,12 @@ import QueryPage from './pages/QueryPage';
 import PanelsPage from './pages/PanelsPage';
 import StartupsPage from './pages/StartupsPage';
 import AimfPage from './pages/AimfPage';
+import AimfRegistrationPage from './pages/AimfRegistrationPage';
 import LoginPage from './pages/LoginPage';
 import { PANEL_IDS } from './data/panels';
 
-const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', ...PANEL_IDS];
-const TERMS_PORTAL_PAGES = ['register', 'startup', 'aimf', 'collaborate', 'exhibition', 'query'];
+const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'aimf-register', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', ...PANEL_IDS];
+const TERMS_PORTAL_PAGES = ['register', 'startup', 'aimf', 'aimf-register', 'collaborate', 'exhibition', 'query'];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
 import AuthModal from './auth/AuthModal';
@@ -81,6 +82,7 @@ export default function App() {
     startup: 'Sign in or sign up to register your startup',
     register: 'Sign in or sign up to register for the event',
     collaborate: 'Sign in or sign up to submit a collaboration request',
+    'aimf-register': 'Sign in or sign up to apply for AIMF accreditation',
   };
 
   const navigate = (pageId) => {
@@ -148,6 +150,13 @@ export default function App() {
 
         {activePage === 'aimf' && (
           <AimfPage
+            onNavigate={navigate}
+            onOpenRegister={handleOpenRegister}
+          />
+        )}
+
+        {activePage === 'aimf-register' && (
+          <AimfRegistrationPage
             onNavigate={navigate}
             onOpenRegister={handleOpenRegister}
           />

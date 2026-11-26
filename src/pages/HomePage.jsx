@@ -580,7 +580,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                     </dl>
                   </div>
                   <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('aimf')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
+                    <button onClick={() => onNavigate('aimf-register')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Register for AIMF
                       <ArrowRight {...ICON} />
                     </button>
@@ -588,7 +588,7 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
                       onClick={() => onNavigate('aimf')}
                       className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
-                      AIMF Guidelines &amp; Portal
+                      AIMF Overview &amp; Pavilion
                     </button>
                   </div>
                 </div>
