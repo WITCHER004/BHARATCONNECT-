@@ -1,5 +1,5 @@
 /*
-  AIMF (Arab-India Multilateral Forum & Cultural Pavilion) Accreditation Form.
+  AIMF (Atal Innovation Multilateral Forum & Cultural Pavilion) Accreditation Form.
   Organised by Bharat Mahotsav Festivals LLP in strategic alliance with IACCIA.
   Complimentary accreditation for artists, cultural organizations, creative studios,
   media producers, and sovereign delegates. No registration fee / payment required.
@@ -18,7 +18,7 @@ export const ORGANISER = {
 };
 
 export const EVENT = {
-  title: 'Arab-India Multilateral Forum (AIMF): Cultural Diplomacy, Music & Creative Economy Conclave',
+  title: 'Atal Innovation Multilateral Forum (AIMF): Cultural Diplomacy, Music & Creative Economy Conclave',
   byline: 'Bharat Connect x IACCIA, an initiative of Bharat Mahotsav Festivals LLP',
   venue: 'Yashobhoomi (IICC), Dwarka, New Delhi',
   dates: '18 and 19 December 2026',
@@ -109,7 +109,7 @@ export const HEARD_FROM = [
 ];
 
 export const TERMS_TEXT =
-  'I have read and agree to the Participation Guidelines of the Arab-India Multilateral Forum (AIMF) under Bharat Mahotsav Festivals LLP and IACCIA Secretariat. I understand that AIMF accreditation is complimentary, subject to scheduling, protocol approvals, stage curation, and Yashobhoomi venue security guidelines.';
+  'I have read and agree to the Participation Guidelines of the Atal Innovation Multilateral Forum (AIMF) under Bharat Mahotsav Festivals LLP and IACCIA Secretariat. I understand that AIMF accreditation is complimentary, subject to scheduling, protocol approvals, stage curation, and Yashobhoomi venue security guidelines.';
 
 export const DECLARATION_AUTHORITY =
   'I confirm that I am authorised to submit this accreditation application on behalf of the artist, cultural troupe, or organization, and that all portfolio materials, credentials, and information provided are authentic, true and complete.';

@@ -147,8 +147,12 @@ service cloud.firestore {
     }
 
     match /registrations/{ref} {
-      // the admin panel lists everything; a visitor reads only their own (query with where uid == their uid)
-      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      // the admin panel lists everything; a visitor reads only their own (by UID or linked email)
+      allow read: if isAdmin() || (signedIn() && (
+        resource.data.uid == request.auth.uid
+        || (request.auth.token.email != null && resource.data.accountEmail == request.auth.token.email)
+        || (request.auth.token.email != null && resource.data.email == request.auth.token.email)
+      ));
       allow create: if signedIn() && validNewRegistration(ref, request.resource.data);
       allow update: if isAdmin() && validDecision(['pending', 'approved', 'declined']);
       allow delete: if isAdmin();

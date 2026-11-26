@@ -188,6 +188,58 @@ export function watchStartupDirectory(cb) {
   );
 }
 
+/* Startups belonging specifically to the signed-in user (filtered by UID / linked account email) */
+export function watchMyStartups(user, cb) {
+  if (!user || (!user.uid && !user.email)) {
+    cb([]);
+    return () => {};
+  }
+
+  const unsubs = [];
+  const map = new Map();
+
+  const emit = () => {
+    const list = Array.from(map.values()).filter((r) => r.type === 'startup');
+    cb(list);
+  };
+
+  if (user.uid) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('uid', '==', user.uid)),
+        (snap) => {
+          snap.docs.forEach((d) => {
+            const rec = toRecord(d, 'registrations');
+            if (rec.type === 'startup') map.set(d.id, rec);
+          });
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  if (user.email) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('accountEmail', '==', user.email)),
+        (snap) => {
+          snap.docs.forEach((d) => {
+            const rec = toRecord(d, 'registrations');
+            if (rec.type === 'startup') map.set(d.id, rec);
+          });
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  return () => {
+    unsubs.forEach((u) => u());
+  };
+}
+
 /* ── Reading (used by the admin panel) ─────────────── */
 
 // Local flag overrides so review flags persist instantly even for sample records

@@ -94,7 +94,7 @@ export default function LoginPage({ onNavigate }) {
                 </div>
                 <h3 className="font-serif text-base font-medium text-fg">AIMF Cultural Galas</h3>
                 <p className="mt-1 text-xs text-fg-3 leading-relaxed">
-                  Reserve VIP seating for the Arab-India Multilateral Forum symphonies and ministerial plenaries.
+                  Reserve VIP seating for the Atal Innovation Multilateral Forum symphonies and ministerial plenaries.
                 </p>
               </div>
             </div>

@@ -28,8 +28,8 @@ function Ornament() {
    fading out at both ends with a small gold diamond at its centre. */
 function CardDivider() {
   return (
-    <div className="relative flex items-center justify-center lg:py-10" aria-hidden="true">
-      <span className="block w-full h-[2px] lg:w-[2px] lg:h-full rounded-full bg-gradient-to-r lg:bg-gradient-to-b from-transparent via-[#B8893A]/80 to-transparent" />
+    <div className="relative flex md:hidden xl:flex items-center justify-center py-2 xl:py-8 2xl:py-10" aria-hidden="true">
+      <span className="block w-full h-[2px] xl:w-[2px] xl:h-full rounded-full bg-gradient-to-r xl:bg-gradient-to-b from-transparent via-[#B8893A]/80 to-transparent" />
       <span className="absolute w-2 h-2 rotate-45 bg-[#B8893A] ring-4 ring-surface-1" />
     </div>
   );
@@ -441,43 +441,43 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
       {/* Registration: startups, event and business summit collaboration */}
       <section id="registration" className="theme-ivory !bg-white py-20 sm:py-24 scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-4 sm:px-8">
           <SectionHeader
             title="Registration & Summit Collaboration"
-            intro="Bring your startup to the Startup Pavilion, register to attend the conclave, or partner directly with the business summit."
+            intro="Bring your startup to the Startup Pavilion, register for conclave delegates, accredit for the Atal Innovation Multilateral Forum (AIMF), or partner directly with the business summit."
           />
 
           <div className="relative">
-            {/* cards and their dividers share one grid: card | line | card | line | card */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-6 lg:gap-x-4 xl:gap-x-6 items-stretch">
+            {/* cards and their dividers share one grid: 1 col on mobile, 2x2 on tablet/laptop, 4 in a row on desktop */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] gap-6 xl:gap-x-3 2xl:gap-x-4 items-stretch">
               {/* Box 1: Startup Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-5 2xl:p-6 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       Startup Pavilion · 18–19 Dec 2026 · Yashobhoomi
                     </p>
-                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[22px] xl:text-[21px] 2xl:text-[24px] font-medium text-fg leading-tight min-h-0 sm:min-h-[56px] xl:min-h-[58px] flex items-center">
                       Want to register a startup?
                     </h3>
-                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
+                    <p className="mt-3 sm:mt-4 text-[13px] sm:text-[14px] xl:text-[13px] 2xl:text-[13.5px] text-fg-2 leading-relaxed min-h-0 sm:min-h-[84px] xl:min-h-[108px]">
                       Present your venture to investors and key stakeholders at the Bharat Connect Startup Showcase. Each registration
                       receives a verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-SEO-00001</span> onwards) valid for 2 years across 5 flagship events of Bharat Mahotsav Festivals LLP.
                     </p>
-                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-[11px] sm:text-xs xl:text-[11px] 2xl:text-[12.5px] border-t border-line/80 pt-4 sm:pt-5">
                       <div><dt className="text-fg-3">Fee</dt><dd className="mt-1 text-fg font-mono figure font-medium">₹5,900 incl.</dd></div>
                       <div><dt className="text-fg-3">Valid for</dt><dd className="mt-1 text-fg font-medium">2 yrs / 5 evts</dd></div>
                       <div><dt className="text-fg-3">Takes about</dt><dd className="mt-1 text-fg font-medium">10 mins</dd></div>
                     </dl>
                   </div>
                   <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('startup')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
+                    <button onClick={() => onNavigate('startup')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Register now
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('query')}
-                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Startup Showcase FAQ
                     </button>
@@ -489,32 +489,32 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
               {/* Box 2: Event Registration */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-5 2xl:p-6 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       500 Accreditations · 18–19 Dec 2026 · Yashobhoomi
                     </p>
-                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[22px] xl:text-[21px] 2xl:text-[24px] font-medium text-fg leading-tight min-h-0 sm:min-h-[56px] xl:min-h-[58px] flex items-center">
                       Event &amp; delegate registration
                     </h3>
-                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
+                    <p className="mt-3 sm:mt-4 text-[13px] sm:text-[14px] xl:text-[13px] 2xl:text-[13.5px] text-fg-2 leading-relaxed min-h-0 sm:min-h-[84px] xl:min-h-[108px]">
                       Attend plenary keynotes, private B2B deal rooms, the 7,000 sq ft Yashobhoomi lounge, bilateral
                       networking lunches, and the inaugural gala dinner and leadership awards with 22 Arab delegations.
                     </p>
-                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-[11px] sm:text-xs xl:text-[11px] 2xl:text-[12.5px] border-t border-line/80 pt-4 sm:pt-5">
                       <div><dt className="text-fg-3">Access</dt><dd className="mt-1 text-fg font-medium">Plenary &amp; B2B</dd></div>
                       <div><dt className="text-fg-3">Capacity</dt><dd className="mt-1 text-fg font-mono figure font-medium">500 Passes</dd></div>
                       <div><dt className="text-fg-3">Accreditation</dt><dd className="mt-1 text-fg font-medium">Instant E-Badge</dd></div>
                     </dl>
                   </div>
                   <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('register')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
+                    <button onClick={() => onNavigate('register')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Register for the event
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('exhibition')}
-                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Book an exhibition stall
                     </button>
@@ -524,35 +524,71 @@ export default function HomePage({ onNavigate, onOpenRegister }) {
 
               <CardDivider />
 
-              {/* Box 3: Collaboration for Business Summit (New Portal) */}
+              {/* Box 3: Collaboration for Business Summit */}
               <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-8 flex flex-col justify-between">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-5 2xl:p-6 flex flex-col justify-between">
                   <div>
                     <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
                       Bilateral Directorate · Strategic Partnerships · 2026
                     </p>
-                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[24px] xl:text-[26px] font-medium text-fg leading-tight min-h-0 sm:min-h-[58px] flex items-center">
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[22px] xl:text-[21px] 2xl:text-[24px] font-medium text-fg leading-tight min-h-0 sm:min-h-[56px] xl:min-h-[58px] flex items-center">
                       Collaboration through Bharat Connect
                     </h3>
-                    <p className="mt-3 sm:mt-4 text-[13.5px] sm:text-[14.5px] text-fg-2 leading-relaxed min-h-0 lg:min-h-[96px]">
+                    <p className="mt-3 sm:mt-4 text-[13px] sm:text-[14px] xl:text-[13px] 2xl:text-[13.5px] text-fg-2 leading-relaxed min-h-0 sm:min-h-[84px] xl:min-h-[108px]">
                       Partner with the conclave as a country pavilion, industry co-host, sovereign deal-room sponsor, or knowledge think-tank. Dedicated portal for institutions seeking strategic bilateral collaboration.
                     </p>
-                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 text-xs sm:text-[13px] border-t border-line/80 pt-5">
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-[11px] sm:text-xs xl:text-[11px] 2xl:text-[12.5px] border-t border-line/80 pt-4 sm:pt-5">
                       <div><dt className="text-fg-3">Track</dt><dd className="mt-1 text-fg font-medium">Country / Sponsor</dd></div>
                       <div><dt className="text-fg-3">Fast-track</dt><dd className="mt-1 text-fg font-medium">Direct Desk</dd></div>
                       <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-CBC</dd></div>
                     </dl>
                   </div>
                   <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
-                    <button onClick={() => onNavigate('collaborate')} className="btn-primary min-h-[44px] h-12 px-5 text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
+                    <button onClick={() => onNavigate('collaborate')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
                       Collaborate with summit
                       <ArrowRight {...ICON} />
                     </button>
                     <button
                       onClick={() => onNavigate('query')}
-                      className="min-h-[44px] h-12 px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[14px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                      className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
                     >
                       Partnership Prospectus
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <CardDivider />
+
+              {/* Box 4: AIMF Registration & Accreditation */}
+              <article className="theme-dark bg-[#0b0b0b] border border-line-strong rounded-2xl p-2 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.18),0_4px_12px_-2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(184,137,58,0.2)] hover:shadow-[0_20px_48px_-6px_rgba(0,0,0,0.26),0_6px_16px_-2px_rgba(0,0,0,0.12),0_0_0_1px_rgba(184,137,58,0.35)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
+                <div className="h-full rounded-xl border border-[#B8893A]/50 p-5 sm:p-7 xl:p-5 2xl:p-6 flex flex-col justify-between">
+                  <div>
+                    <p className="ref-line text-gold-text text-xs tracking-wider min-h-0 sm:min-h-[22px] flex items-center">
+                      Cultural Pavilion · 18–19 Dec 2026 · Yashobhoomi
+                    </p>
+                    <h3 className="mt-3 sm:mt-4 font-serif text-xl sm:text-[22px] xl:text-[21px] 2xl:text-[24px] font-medium text-fg leading-tight min-h-0 sm:min-h-[56px] xl:min-h-[58px] flex items-center">
+                      Atal Innovation Multilateral Forum
+                    </h3>
+                    <p className="mt-3 sm:mt-4 text-[13px] sm:text-[14px] xl:text-[13px] 2xl:text-[13.5px] text-fg-2 leading-relaxed min-h-0 sm:min-h-[84px] xl:min-h-[108px]">
+                      Complimentary accreditation for artists, cultural ensembles, cinema studios, and creative economy leaders. Verified unique accreditation ID (<span className="font-mono text-gold-text">BMF.BC-AMF-00001</span> onwards) granting access to Grand Auditorium symphonies and plenaries.
+                    </p>
+                    <dl className="mt-5 sm:mt-6 grid grid-cols-3 gap-1.5 sm:gap-2 text-[11px] sm:text-xs xl:text-[11px] 2xl:text-[12.5px] border-t border-line/80 pt-4 sm:pt-5">
+                      <div><dt className="text-fg-3">Admission</dt><dd className="mt-1 text-gold-text font-medium">Complimentary</dd></div>
+                      <div><dt className="text-fg-3">Corridors</dt><dd className="mt-1 text-fg font-medium">23 Nations</dd></div>
+                      <div><dt className="text-fg-3">Reference</dt><dd className="mt-1 text-fg font-mono text-gold-text figure font-medium">BMF.BC-AMF</dd></div>
+                    </dl>
+                  </div>
+                  <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-line/60 flex flex-col gap-2.5">
+                    <button onClick={() => onNavigate('aimf')} className="btn-primary min-h-[44px] h-11 xl:h-12 px-4 sm:px-5 text-[14px] sm:text-[15px] flex items-center justify-center gap-2 w-full whitespace-nowrap cursor-pointer shadow-sm active:scale-[0.98]">
+                      Register for AIMF
+                      <ArrowRight {...ICON} />
+                    </button>
+                    <button
+                      onClick={() => onNavigate('aimf')}
+                      className="min-h-[44px] h-11 xl:h-12 px-3 sm:px-4 rounded-[10px] border border-gold-foil/70 text-gold-text text-xs sm:text-[13.5px] font-medium hover:bg-gold-foil/10 active:scale-[0.98] transition-all duration-150 cursor-pointer flex items-center justify-center whitespace-nowrap w-full"
+                    >
+                      AIMF Galas &amp; Framework
                     </button>
                   </div>
                 </div>

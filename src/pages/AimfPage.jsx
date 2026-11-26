@@ -20,7 +20,10 @@ import {
   Copy,
   FileText,
   Clock,
-  Printer
+  Printer,
+  Mail,
+  Phone,
+  Globe
 } from 'lucide-react';
 import { 
   ORGANISER, 
@@ -755,7 +758,7 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
               <Agree id="declData" label="Data and delegation communications" checked={v.declData} onChange={set('declData')} error={errors.declData}>
                 {DECLARATION_DATA}
               </Agree>
-              <Choice id="heardFrom" label="How did you hear about the Arab-India Multilateral Forum?" columns={3} options={HEARD_FROM}
+              <Choice id="heardFrom" label="How did you hear about the Atal Innovation Multilateral Forum?" columns={3} options={HEARD_FROM}
                 value={v.heardFrom} onChange={set('heardFrom')} />
             </div>
           </>
@@ -827,24 +830,24 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
   };
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-royal text-fg">
-      {/* Top Banner / Hero */}
-      <section className="relative overflow-hidden border-b border-line">
+    <div className="page-enter flex flex-col min-h-screen">
+      {/* Top Banner / Hero (Obsidian Royal ground) */}
+      <section className="pt-32 pb-12 sm:pt-40 bg-royal border-b border-line relative overflow-hidden text-fg">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gold-foil/15 via-coral/5 to-transparent pointer-events-none" />
         
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-14 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
           <div className="max-w-4xl">
             {/* Eyebrow */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-2 border border-gold-foil/30 shadow-sm mb-6">
               <span className="w-2 h-2 rotate-45 bg-gold-foil animate-pulse" />
               <span className="text-xs sm:text-[13px] font-mono uppercase tracking-[0.15em] text-gold-text">
-                Arab-India Multilateral Forum · Special Cultural Pavilion
+                Atal Innovation Multilateral Forum · Special Cultural Pavilion
               </span>
             </div>
 
             {/* Main Title */}
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium text-fg tracking-[-0.02em] leading-[1.1]">
-              AIMF — Arab-India Multilateral Forum
+              AIMF — Atal Innovation Multilateral Forum
             </h1>
 
             {/* Subtitle */}
@@ -895,181 +898,99 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
         </div>
       </section>
 
-      {/* Navigation Tabs */}
-      <div className="sticky top-20 z-30 bg-surface-1/90 backdrop-blur-md border-b border-line">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 sm:gap-6 overflow-x-auto scrollbar-none py-2.5">
-          <button
-            onClick={() => setActiveTab('portal')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'portal'
-                ? 'bg-surface-3 text-gold-text font-semibold shadow-sm'
-                : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-            }`}
-          >
-            AIMF Portal & Registration
-          </button>
-          <button
-            onClick={() => setActiveTab('pillars')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'pillars'
-                ? 'bg-surface-3 text-gold-text font-semibold shadow-sm'
-                : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-            }`}
-          >
-            Strategic Pillars
-          </button>
-          <button
-            onClick={() => setActiveTab('programme')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'programme'
-                ? 'bg-surface-3 text-gold-text font-semibold shadow-sm'
-                : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-            }`}
-          >
-            Programme & Galas
-          </button>
-          <button
-            onClick={() => setActiveTab('delegations')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'delegations'
-                ? 'bg-surface-3 text-gold-text font-semibold shadow-sm'
-                : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-            }`}
-          >
-            Participating Delegations
-          </button>
-          <button
-            onClick={() => setActiveTab('secretariat')}
-            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeTab === 'secretariat'
-                ? 'bg-surface-3 text-gold-text font-semibold shadow-sm'
-                : 'text-fg-3 hover:text-fg hover:bg-surface-2'
-            }`}
-          >
-            Protocol & Secretariat
-          </button>
-        </div>
-      </div>
-
-      {/* Main Container */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* TAB 1: AIMF PORTAL (User Request: "for AIMF PORTAL GIVE THE SAME FORM AS FOR START UP REGISTRATION [BUT FOR AIMF] AND REMOVE THE OPTION FOR PAYMENT") */}
-        {activeTab === 'portal' && (
-          <div className="space-y-8 animate-fade-in">
-            {/* Sign in gate protects the portal */}
-            <SignInGate
-              title="Sign in to apply for AIMF accreditation"
-              reason="AIMF registration needs an account (Google, Apple, or email), so your creative showcase, credentials, and unique Accreditation ID [BMF.BC-AMF-numbers] stay tied to you."
+      {/* Main Body Section in Ivory Theme (matching all Conclave pages) */}
+      <section className="theme-ivory flex-1 py-12 sm:py-16">
+        {/* Navigation Tabs */}
+        <div className="sticky top-[76px] sm:top-[88px] z-30 bg-surface-1/95 backdrop-blur-md border-b border-line shadow-sm -mt-12 sm:-mt-16 mb-10 sm:mb-12 py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center gap-2 sm:gap-4 overflow-x-auto scrollbar-none">
+            <button
+              onClick={() => setActiveTab('portal')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeTab === 'portal'
+                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
+                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
+              }`}
             >
-              <AimfHub
-                uid={user?.uid}
-                formOpen={formOpen}
-                onRegister={() => {
-                  setFormOpen(true);
-                  requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-                }}
-              />
+              AIMF Portal & Registration
+            </button>
+            <button
+              onClick={() => setActiveTab('pillars')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeTab === 'pillars'
+                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
+                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
+              }`}
+            >
+              Strategic Pillars
+            </button>
+            <button
+              onClick={() => setActiveTab('programme')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeTab === 'programme'
+                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
+                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
+              }`}
+            >
+              Programme & Galas
+            </button>
+            <button
+              onClick={() => setActiveTab('delegations')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeTab === 'delegations'
+                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
+                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
+              }`}
+            >
+              Participating Delegations
+            </button>
+            <button
+              onClick={() => setActiveTab('secretariat')}
+              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeTab === 'secretariat'
+                  ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/40 shadow-sm'
+                  : 'text-fg-3 hover:text-fg hover:bg-surface-2'
+              }`}
+            >
+              Protocol & Secretariat
+            </button>
+          </div>
+        </div>
 
-              <ApplicationGate type="aimf" onAnother={() => setFormOpen(true)}>
-                {formOpen && (
-                  <div ref={formRef} id="aimf-form" className="scroll-mt-28 surface-card rounded-3xl p-6 sm:p-10 border border-gold-foil/30 shadow-2xl">
-                    {status === 'sent' ? (
-                      /* Success Screen */
-                      <div className="max-w-2xl mx-auto py-8 text-center space-y-6">
-                        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
-                          <Check className="w-8 h-8" strokeWidth={2} />
-                        </div>
+        {/* Content Container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          {/* TAB 1: AIMF PORTAL */}
+          {activeTab === 'portal' && (
+            <div className="space-y-8 animate-fade-in">
+              {/* Sign in gate protects the portal */}
+              <SignInGate
+                title="Sign in to apply for AIMF accreditation"
+                reason="AIMF registration needs an account (Google, Apple, or email), so your creative showcase, credentials, and unique Accreditation ID [BMF.BC-AMF-numbers] stay tied to you."
+              >
+                <AimfHub
+                  uid={user?.uid}
+                  formOpen={formOpen}
+                  onRegister={() => {
+                    setFormOpen(true);
+                    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                  }}
+                />
 
-                        <div>
-                          <span className="text-xs font-mono uppercase tracking-wider text-emerald-400">Application Confirmed</span>
-                          <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-medium text-fg">
-                            AIMF Accreditation Submitted
-                          </h2>
-                          <p className="mt-3 text-sm sm:text-base text-fg-2 leading-relaxed">
-                            Your accreditation application for the Arab-India Multilateral Forum has been recorded by the Secretariat. Admission is complimentary. A copy has been dispatched to <strong className="text-fg">{values.commEmail || values.email}</strong>.
-                          </p>
-                        </div>
-
-                        <div className="p-5 rounded-2xl bg-surface-3 border border-gold-foil/30 inline-flex flex-col items-center gap-1.5 min-w-[280px]">
-                          <span className="text-xs font-mono uppercase tracking-wider text-fg-3">Your Accreditation ID</span>
-                          <span className="font-mono text-2xl font-bold text-gold-text">{assignedId}</span>
-                          <button
-                            type="button"
-                            onClick={() => copyId(assignedId)}
-                            className="btn-secondary !rounded-lg h-8 px-3 text-xs flex items-center gap-1 mt-2 cursor-pointer"
-                          >
-                            {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                            <span>{copiedId ? 'Copied ID' : 'Copy ID'}</span>
-                          </button>
-                        </div>
-
-                        <div className="pt-6 border-t border-line/60 flex flex-wrap items-center justify-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => window.print()}
-                            className="btn-secondary !rounded-xl h-11 px-5 text-sm flex items-center gap-2 cursor-pointer"
-                          >
-                            <Printer className="w-4 h-4" />
-                            <span>Print Confirmation</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setStatus('idle');
-                              setValues(EMPTY);
-                              setStep(0);
-                            }}
-                            className="btn-primary !rounded-xl h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer"
-                          >
-                            <span>Submit Another Application</span>
-                            <ArrowRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Multi-step Form */
-                      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
-                        {/* Sidebar Steps */}
-                        <aside className="lg:sticky lg:top-28 self-start">
-                          {/* Mobile progress indicator */}
-                          <div className="lg:hidden mb-4">
-                            <div className="flex items-center justify-between text-xs sm:text-sm text-fg-2 mb-2">
-                              <span>Step {step + 1} of {STEPS.length} · <strong className="text-fg">{STEPS[step].label}</strong></span>
-                              <span className="font-mono text-gold-text">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
-                            </div>
-                            <div className="h-1.5 rounded-full bg-surface-3 overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-gold-foil to-coral transition-all duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
-                            </div>
-
-                            <div className="flex items-center gap-1.5 overflow-x-auto py-2.5 mt-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
-                              {STEPS.map((s, i) => {
-                                const active = i === step;
-                                const done = i < reachable;
-                                const can = i <= reachable;
-                                return (
-                                  <button
-                                    key={s.id}
-                                    type="button"
-                                    disabled={!can}
-                                    onClick={() => goTo(i)}
-                                    className={`h-8 px-3 rounded-lg text-xs font-medium whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed ${
-                                      active ? 'bg-surface-3 text-gold-text border border-gold-foil/40' : done ? 'bg-surface-2 text-fg border border-line' : 'text-fg-3 opacity-60'
-                                    }`}
-                                  >
-                                    <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil" />
-                                    <span>{s.label}</span>
-                                  </button>
-                                );
-                              })}
-                            </div>
+                <ApplicationGate type="aimf" onAnother={() => setFormOpen(true)}>
+                  {formOpen && (
+                    <div ref={formRef} id="aimf-form" className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
+                      {/* Sidebar Steps */}
+                      <aside className="lg:sticky lg:top-28 self-start">
+                        {/* Mobile progress indicator */}
+                        <div className="lg:hidden mb-4">
+                          <div className="flex items-center justify-between text-xs sm:text-sm text-fg-2 mb-2">
+                            <span>Step {step + 1} of {STEPS.length} · <strong className="text-fg">{STEPS[step].label}</strong></span>
+                            <span className="font-mono text-gold-text">{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-surface-3 overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-gold-foil to-coral transition-all duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
                           </div>
 
-                          {/* Desktop Sidebar List */}
-                          <div className="hidden lg:flex flex-col gap-1.5">
-                            <div className="text-xs font-mono uppercase tracking-wider text-gold-text mb-2 px-3">
-                              AIMF Application Steps
-                            </div>
+                          <div className="flex items-center gap-1.5 overflow-x-auto py-2.5 mt-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
                             {STEPS.map((s, i) => {
                               const active = i === step;
                               const done = i < reachable;
@@ -1080,93 +1001,201 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
                                   type="button"
                                   disabled={!can}
                                   onClick={() => goTo(i)}
-                                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between cursor-pointer disabled:cursor-not-allowed ${
+                                  className={`shrink-0 min-h-[36px] px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none ${
                                     active
-                                      ? 'bg-surface-3 text-gold-text font-semibold border border-gold-foil/30 shadow-sm'
-                                      : can
-                                      ? 'text-fg-2 hover:bg-surface-2 hover:text-fg'
-                                      : 'text-fg-3 opacity-40'
+                                      ? 'bg-surface-3 text-gold-text border border-gold-foil shadow-sm'
+                                      : done
+                                      ? 'bg-surface-2 text-fg border border-line-strong hover:bg-surface-3'
+                                      : 'bg-surface-1 text-fg-3 border border-line/40 opacity-60 cursor-not-allowed'
                                   }`}
                                 >
-                                  <span className="flex items-center gap-2.5">
-                                    <span className="font-mono text-xs text-fg-3">{String(i + 1).padStart(2, '0')}</span>
-                                    <span>{s.label}</span>
+                                  <span className={`w-4 h-4 rounded-full flex items-center justify-center font-mono text-[10px] ${
+                                    done && !active ? 'bg-gold-foil/20 text-gold-text font-bold' : 'border border-current'
+                                  }`}>
+                                    {done && !active ? '✓' : i + 1}
                                   </span>
-                                  {done && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                                  <span>{s.label}</span>
                                 </button>
                               );
                             })}
                           </div>
-                        </aside>
+                        </div>
 
-                        {/* Main Step Body */}
-                        <div className="min-w-0">
-                          {renderStepBody()}
-
-                          {/* Navigation Buttons */}
-                          <div className="mt-12 pt-6 border-t border-line flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                              {step > 0 && (
+                        {/* Desktop Sidebar List */}
+                        <ol className="hidden lg:flex flex-col gap-1">
+                          {STEPS.map((s, i) => {
+                            const active = i === step && status !== 'sent';
+                            const done = i < reachable || status === 'sent';
+                            const can = i <= reachable && status !== 'sent';
+                            return (
+                              <li key={s.id}>
                                 <button
                                   type="button"
-                                  onClick={() => goTo(step - 1)}
-                                  className="btn-secondary !rounded-xl h-11 px-4 text-sm font-medium flex items-center gap-1.5 cursor-pointer"
+                                  disabled={!can}
+                                  onClick={() => goTo(i)}
+                                  aria-current={active ? 'step' : undefined}
+                                  className={`w-full h-9 px-3 rounded-lg flex items-center gap-3 text-sm text-left transition-colors ${
+                                    active
+                                      ? 'bg-surface-2 text-fg border border-line-strong font-medium shadow-sm'
+                                      : can
+                                      ? 'text-fg-2 hover:text-fg hover:bg-surface-2 cursor-pointer'
+                                      : 'text-fg-3 cursor-not-allowed opacity-60'
+                                  }`}
                                 >
-                                  <ArrowLeft className="w-4 h-4" />
-                                  <span>Previous</span>
+                                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono text-[11px] ${
+                                    done && !active ? 'bg-fg text-surface-1' : 'border border-line-strong'
+                                  }`}>
+                                    {done && !active ? <Check className="w-3 h-3" strokeWidth={2} /> : i + 1}
+                                  </span>
+                                  <span>{s.label}</span>
                                 </button>
-                              )}
+                              </li>
+                            );
+                          })}
+                        </ol>
 
-                              <button
-                                type="button"
-                                onClick={clearForm}
-                                className="text-xs text-fg-3 hover:text-coral transition-colors cursor-pointer py-2 px-1"
-                              >
-                                Clear form
-                              </button>
+                        {/* Questions / Assistance Box */}
+                        <div className="hidden lg:block mt-8 pt-6 border-t border-line text-sm text-fg-2 space-y-2">
+                          <p className="text-fg font-medium">Questions</p>
+                          <a href={`mailto:${ORGANISER.email}`} className="flex items-center gap-2 hover:text-fg transition-colors">
+                            <Mail className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+                            <span>{ORGANISER.email}</span>
+                          </a>
+                          <a href={ORGANISER.phoneHref} className="flex items-center gap-2 hover:text-fg font-mono transition-colors">
+                            <Phone className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+                            <span>{ORGANISER.phone}</span>
+                          </a>
+                          <a href={ORGANISER.websiteHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-fg transition-colors">
+                            <Globe className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+                            <span>{ORGANISER.website}</span>
+                          </a>
+                        </div>
+                      </aside>
+
+                      {/* Main Form Card or Success Screen */}
+                      <div className="surface-card rounded-2xl p-6 sm:p-10 border border-line shadow-sm min-w-0">
+                        {status === 'sent' ? (
+                          /* Success Screen */
+                          <div className="max-w-2xl mx-auto py-8 text-center space-y-6">
+                            <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
+                              <Check className="w-8 h-8" strokeWidth={2} />
                             </div>
 
                             <div>
-                              {step < STEPS.length - 1 ? (
-                                <button
-                                  type="button"
-                                  onClick={next}
-                                  className="btn-primary !rounded-xl h-11 px-6 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-                                >
-                                  <span>Continue</span>
-                                  <ArrowRight className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  disabled={status === 'sending'}
-                                  onClick={submit}
-                                  className="btn-primary !rounded-xl h-11 px-7 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 active:scale-[0.98]"
-                                >
-                                  {status === 'sending' ? (
-                                    <>
-                                      <Clock className="w-4 h-4 animate-spin" />
-                                      <span>Transmitting application…</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span>Submit AIMF Application</span>
-                                      <ArrowRight className="w-4 h-4" />
-                                    </>
-                                  )}
-                                </button>
-                              )}
+                              <span className="text-xs font-mono uppercase tracking-wider text-emerald-400">Application Confirmed</span>
+                              <h2 className="mt-2 font-serif text-3xl sm:text-4xl font-medium text-fg">
+                                AIMF Accreditation Submitted
+                              </h2>
+                              <p className="mt-3 text-sm sm:text-base text-fg-2 leading-relaxed">
+                                Your accreditation application for the Atal Innovation Multilateral Forum has been recorded by the Secretariat. Admission is complimentary. A copy has been dispatched to <strong className="text-fg">{values.commEmail || values.email}</strong>.
+                              </p>
+                            </div>
+
+                            <div className="p-5 rounded-2xl bg-surface-3 border border-gold-foil/30 inline-flex flex-col items-center gap-1.5 min-w-[280px]">
+                              <span className="text-xs font-mono uppercase tracking-wider text-fg-3">Your Accreditation ID</span>
+                              <span className="font-mono text-2xl font-bold text-gold-text">{assignedId}</span>
+                              <button
+                                type="button"
+                                onClick={() => copyId(assignedId)}
+                                className="btn-secondary !rounded-lg h-8 px-3 text-xs flex items-center gap-1 mt-2 cursor-pointer"
+                              >
+                                {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedId ? 'Copied ID' : 'Copy ID'}</span>
+                              </button>
+                            </div>
+
+                            <div className="pt-6 border-t border-line/60 flex flex-wrap items-center justify-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => window.print()}
+                                className="btn-secondary !rounded-xl h-11 px-5 text-sm flex items-center gap-2 cursor-pointer"
+                              >
+                                <Printer className="w-4 h-4" />
+                                <span>Print Confirmation</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setStatus('idle');
+                                  setValues(EMPTY);
+                                  setStep(0);
+                                }}
+                                className="btn-primary !rounded-xl h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer"
+                              >
+                                <span>Submit Another Application</span>
+                                <ArrowRight className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div>
+                            {renderStepBody()}
+
+                            {/* Navigation Buttons */}
+                            <div className="mt-12 pt-6 border-t border-line flex flex-wrap items-center justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                {step > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => goTo(step - 1)}
+                                    className="btn-secondary !rounded-xl h-11 px-4 text-sm font-medium flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <ArrowLeft className="w-4 h-4" />
+                                    <span>Previous</span>
+                                  </button>
+                                )}
+
+                                <button
+                                  type="button"
+                                  onClick={clearForm}
+                                  className="text-xs text-fg-3 hover:text-coral transition-colors cursor-pointer py-2 px-1"
+                                >
+                                  Clear form
+                                </button>
+                              </div>
+
+                              <div>
+                                {step < STEPS.length - 1 ? (
+                                  <button
+                                    type="button"
+                                    onClick={next}
+                                    className="btn-primary !rounded-xl h-11 px-6 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                                  >
+                                    <span>Continue</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={status === 'sending'}
+                                    onClick={submit}
+                                    className="btn-primary !rounded-xl h-11 px-7 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50 active:scale-[0.98]"
+                                  >
+                                    {status === 'sending' ? (
+                                      <>
+                                        <Clock className="w-4 h-4 animate-spin" />
+                                        <span>Transmitting application…</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span>Submit AIMF Application</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                      </>
+                                    )}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                )}
-              </ApplicationGate>
-            </SignInGate>
-          </div>
-        )}
+                    </div>
+                  )}
+                </ApplicationGate>
+              </SignInGate>
+            </div>
+          )}
 
         {/* TAB 2: Strategic Pillars */}
         {activeTab === 'pillars' && (
@@ -1174,7 +1203,7 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
             <div className="max-w-2xl">
               <span className="text-xs font-mono uppercase tracking-[0.14em] text-gold-text">Foundational Frameworks</span>
               <h2 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
-                Four Pillars of the Arab-India Multilateral Forum
+                Four Pillars of the Atal Innovation Multilateral Forum
               </h2>
               <p className="mt-2 text-sm sm:text-base text-fg-3">
                 Crafted to bridge ancient civilizational kinship with the modern multi-billion dollar creative economy.
@@ -1301,7 +1330,7 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
                 Accredited Cultural & Media Delegations
               </h2>
               <p className="mt-2 text-sm sm:text-base text-fg-3">
-                Official representations joining the Arab-India Multilateral Forum at Yashobhoomi.
+                Official representations joining the Atal Innovation Multilateral Forum at Yashobhoomi.
               </p>
             </div>
 
@@ -1371,7 +1400,8 @@ export default function AimfPage({ onNavigate, onOpenRegister }) {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
