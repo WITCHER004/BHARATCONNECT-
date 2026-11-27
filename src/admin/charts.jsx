@@ -36,7 +36,9 @@ export function lastNDays(n) {
 }
 
 export const sameDay = (iso, d) => {
+  if (!iso || !d) return false;
   const x = new Date(iso);
+  if (isNaN(x.getTime())) return false;
   return x.getFullYear() === d.getFullYear() && x.getMonth() === d.getMonth() && x.getDate() === d.getDate();
 };
 

@@ -430,16 +430,10 @@ button.ad-card:not(:disabled):hover {
 }
 
 .ad-donut-seg {
-  transition: stroke-width 0.2s var(--ease-out);
+  transition: stroke-width 0.2s ease-out;
   cursor: default;
-  animation: ad-sweep 0.9s var(--ease-out) both;
-  animation-delay: calc(0.25s + var(--i, 0) * 0.15s);
-}
-
-@keyframes ad-sweep {
-  from {
-    stroke-dasharray: 0 var(--c);
-  }
+  opacity: 1 !important;
+  animation: none !important;
 }
 
 .ad-donut-big {
@@ -450,19 +444,9 @@ button.ad-card:not(:disabled):hover {
 
 .ad-split,
 .ad-rank {
-  transform-origin: left;
-  animation: ad-grow-x 0.8s var(--ease-out) both;
-  animation-delay: calc(0.3s + var(--i, 0) * 80ms);
-}
-
-@keyframes ad-grow-x {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
+  transform: none !important;
+  opacity: 1 !important;
+  animation: none !important;
 }
 
 .ad-split {
@@ -470,7 +454,8 @@ button.ad-card:not(:disabled):hover {
 }
 
 .ad-spark {
-  animation: fade-in 0.8s var(--ease-out) 0.4s both;
+  opacity: 1 !important;
+  animation: none !important;
 }
 
 .ad-shake {

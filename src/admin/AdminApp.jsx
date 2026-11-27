@@ -615,7 +615,7 @@ function Card({ title, action, children, className = '' }) {
 
 /* ── Overview ─────────────────────────────────────────── */
 
-function Overview({ registrations = [], users = [], queries = [], consents = [], logins = [], onOpen, go }) {
+export function Overview({ registrations = [], users = [], queries = [], consents = [], logins = [], onOpen, go }) {
   const approvable = (registrations || []).filter((r) => r && TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r && r.status === 'pending').length;
   const approved = approvable.filter((r) => r && r.status === 'approved').length;
@@ -2422,7 +2422,7 @@ const FIELD_LABELS = {
 const fieldLabel = (k) => k.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase()).replace(/ ([A-Z])(?=[a-z])/g, (m, c) => ` ${c.toLowerCase()}`);
 const formatValue = (v) => (typeof v === 'boolean' ? (v ? 'Yes' : 'No') : Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v));
 
-function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
+export function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
@@ -2617,6 +2617,55 @@ function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
 
           {r.source === 'sample' && (
             <p className="mt-6 text-xs text-fg-3 leading-relaxed">This is a sample record for demonstration, not a real person.</p>
+          )}
+
+          {/* Quick Decision Desk at Bottom */}
+          {!isQuery && (
+            <div className="mt-6 pt-4 border-t border-line flex flex-col gap-2.5">
+              <span className="text-xs text-fg-3 font-medium flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-gold-text" /> Quick Status Decision
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'approved')}
+                  className={`ad-btn h-9 px-3.5 text-xs font-semibold cursor-pointer transition-all ${
+                    r.status === 'approved'
+                      ? 'bg-[#0CA30C] border-[#0CA30C] text-white shadow-md'
+                      : 'border-line hover:border-[#0CA30C] text-[#3FC23F] hover:bg-[#0CA30C]/15'
+                  }`}
+                  title={`Approve ${r.name || r.id}`}
+                >
+                  <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  {r.status === 'approved' ? 'Approved ✓' : 'Approve'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'declined')}
+                  className={`ad-btn h-9 px-3.5 text-xs font-semibold cursor-pointer transition-all ${
+                    r.status === 'declined'
+                      ? 'bg-[#D03B3B] border-[#D03B3B] text-white shadow-md'
+                      : 'border-line hover:border-[#D03B3B] text-[#E66767] hover:bg-[#D03B3B]/15'
+                  }`}
+                  title={`Decline ${r.name || r.id}`}
+                >
+                  <X className="w-3.5 h-3.5" strokeWidth={2} />
+                  {r.status === 'declined' ? 'Declined ✕' : 'Decline'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'pending')}
+                  className={`ad-btn h-9 px-3 text-xs font-medium cursor-pointer transition-all ${
+                    r.status === 'pending'
+                      ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                      : 'text-fg-3 hover:text-fg border-line hover:bg-surface-3'
+                  }`}
+                  title="Reset status back to pending"
+                >
+                  <Undo2 className="w-3.5 h-3.5" strokeWidth={1.5} /> Reset to Pending
+                </button>
+              </div>
+            </div>
           )}
 
           {r.source === 'live' && TYPES[r.type] && <DeleteRecord record={r} onDeleted={onClose} />}
