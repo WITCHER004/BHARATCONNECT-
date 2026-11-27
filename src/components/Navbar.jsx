@@ -88,7 +88,7 @@ function UserMenu() {
   );
 }
 
-function RegisterDropdown({ onNavigate, isStartupUser, isAimfUser }) {
+function RegisterDropdown({ onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -174,45 +174,39 @@ function RegisterDropdown({ onNavigate, isStartupUser, isAimfUser }) {
               </div>
             </button>
 
-            {/* If user is registered with AIMF, Startup Showcase is strictly hidden */}
-            {!isAimfUser && (
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  onNavigate('startup');
-                }}
-                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-              >
-                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-                <div>
-                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                    Startup Showcase
-                  </div>
-                  <div className="text-[11px] text-fg-3">Register your startup for exhibition & pitch</div>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('startup');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  Startup Showcase
                 </div>
-              </button>
-            )}
+                <div className="text-[11px] text-fg-3">Register your startup for exhibition &amp; pitch</div>
+              </div>
+            </button>
 
-            {/* If user is registered with Startup, AIMF Cultural Portal is strictly hidden */}
-            {!isStartupUser && (
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  onNavigate('aimf-register');
-                }}
-                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-              >
-                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-                <div>
-                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                    AIMF Cultural Portal
-                  </div>
-                  <div className="text-[11px] text-fg-3">Complimentary artist & cultural accreditation</div>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onNavigate('aimf-register');
+              }}
+              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+            >
+              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+              <div>
+                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                  AIMF Cultural Portal
                 </div>
-              </button>
-            )}
+                <div className="text-[11px] text-fg-3">Complimentary artist &amp; cultural accreditation</div>
+              </div>
+            </button>
 
             <button
               type="button"
@@ -344,13 +338,6 @@ export default function Navbar({ activePage, onNavigate }) {
   const isStartupUser = (myRegistrations || []).some((r) => r.type === 'startup');
   const isAimfUser = (myRegistrations || []).some((r) => r.type === 'aimf');
 
-  // Strict mutual exclusion: once registered with one, the other portal cannot be accessed or seen
-  const visibleNavItems = NAV_ITEMS.filter((item) => {
-    if (item.id === 'aimf' && isStartupUser) return false;
-    if (item.id === 'startups' && isAimfUser) return false;
-    return true;
-  });
-
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -423,7 +410,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
           {/* Desktop navigation */}
           <nav className="hidden xl:flex items-center" aria-label="Main">
-            {visibleNavItems.map((item) => {
+            {NAV_ITEMS.map((item) => {
               const isActive = activePage === item.id;
               return (
                 <button
@@ -465,12 +452,7 @@ export default function Navbar({ activePage, onNavigate }) {
               </button>
             )}
 
-            {/* Register Dropdown Button with mutual exclusion filtering */}
-            <RegisterDropdown
-              onNavigate={handleNavClick}
-              isStartupUser={isStartupUser}
-              isAimfUser={isAimfUser}
-            />
+            <RegisterDropdown onNavigate={handleNavClick} />
 
             {/* User Account Menu when authenticated */}
             {user && <UserMenu />}
@@ -495,7 +477,7 @@ export default function Navbar({ activePage, onNavigate }) {
         {mobileMenuOpen && (
           <div className="xl:hidden px-3 sm:px-4 pb-6 pt-3 border-t border-line animate-slide-up max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col gap-1">
-              {visibleNavItems.map((item) => {
+              {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;
                 return (
                   <button
