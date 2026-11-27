@@ -328,11 +328,12 @@ export function StatusSplit({ records = [] }) {
 
 /* ── Ranked bars (single series) ─────────────────────── */
 
-export function RankBars({ items, color = 'var(--color-gold-foil)' }) {
-  const max = Math.max(1, ...items.map((i) => i.n));
+export function RankBars({ items = [], color = 'var(--color-gold-foil)' }) {
+  const safeItems = Array.isArray(items) ? items : [];
+  const max = Math.max(1, ...safeItems.map((i) => i.n || 0));
   return (
     <ul className="flex flex-col gap-3">
-      {items.map((it, i) => (
+      {safeItems.map((it, i) => (
         <li key={it.label}>
           <div className="flex items-center justify-between text-sm">
             <span className="text-fg-2 truncate pr-3">{it.label}</span>

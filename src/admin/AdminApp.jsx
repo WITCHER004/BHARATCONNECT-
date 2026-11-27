@@ -348,16 +348,16 @@ function AdminAppInner() {
 
   if (!unlocked) return <Gate state={access.state} email={access.email} />;
 
-  const approvable = (registrations || []).filter((r) => TYPES[r.type]?.approvable);
-  const pending = approvable.filter((r) => r.status === 'pending');
-  const aimfList = (registrations || []).filter((r) => r.type === 'aimf');
-  const aimfPendingCount = aimfList.filter((r) => r.status === 'pending').length;
-  const flaggedUsersCount = (users || []).filter((u) => u.flagged).length;
-  const openQueriesCount = (queries || []).filter((q) => q.status === 'received' || q.status === 'in-progress').length;
-  const flaggedQueriesCount = (queries || []).filter((q) => q.flagged).length;
+  const approvable = (registrations || []).filter((r) => r && TYPES[r.type]?.approvable);
+  const pending = approvable.filter((r) => r && r.status === 'pending');
+  const aimfList = (registrations || []).filter((r) => r && r.type === 'aimf');
+  const aimfPendingCount = aimfList.filter((r) => r && r.status === 'pending').length;
+  const flaggedUsersCount = (users || []).filter((u) => u && u.flagged).length;
+  const openQueriesCount = (queries || []).filter((q) => q && (q.status === 'received' || q.status === 'in-progress')).length;
+  const flaggedQueriesCount = (queries || []).filter((q) => q && q.flagged).length;
   const totalFlaggedCount = flaggedUsersCount + flaggedQueriesCount;
 
-  const liveCount = (registrations || []).filter((r) => r.source === 'live').length + (logins || []).filter((l) => l.source === 'live').length;
+  const liveCount = (registrations || []).filter((r) => r && r.source === 'live').length + (logins || []).filter((l) => l && l.source === 'live').length;
   const current = VIEWS.find((v) => v.id === view) || VIEWS[0];
 
   const nav = (
@@ -616,38 +616,38 @@ function Card({ title, action, children, className = '', i = 0 }) {
 /* ── Overview ─────────────────────────────────────────── */
 
 function Overview({ registrations = [], users = [], queries = [], consents = [], logins = [], onOpen, go }) {
-  const approvable = (registrations || []).filter((r) => TYPES[r.type]?.approvable);
-  const pending = approvable.filter((r) => r.status === 'pending').length;
-  const approved = approvable.filter((r) => r.status === 'approved').length;
-  const declined = approvable.filter((r) => r.status === 'declined').length;
+  const approvable = (registrations || []).filter((r) => r && TYPES[r.type]?.approvable);
+  const pending = approvable.filter((r) => r && r.status === 'pending').length;
+  const approved = approvable.filter((r) => r && r.status === 'approved').length;
+  const declined = approvable.filter((r) => r && r.status === 'declined').length;
   const decided = approved + declined;
   const week = lastNDays(7);
-  const signIns7 = (logins || []).filter((l) => l.action !== 'sign-out' && new Date(l.at) >= week[0]).length;
+  const signIns7 = (logins || []).filter((l) => l && l.action !== 'sign-out' && l.at && new Date(l.at) >= week[0]).length;
   const days14 = lastNDays(14);
-  const regSpark = days14.map((d) => approvable.filter((r) => sameDay(r.submittedAt, d)).length);
-  const loginSpark = days14.map((d) => (logins || []).filter((l) => l.action !== 'sign-out' && sameDay(l.at, d)).length);
+  const regSpark = days14.map((d) => approvable.filter((r) => r && sameDay(r.submittedAt, d)).length);
+  const loginSpark = days14.map((d) => (logins || []).filter((l) => l && l.action !== 'sign-out' && sameDay(l.at, d)).length);
 
-  const flaggedCount = [...users, ...queries].filter((x) => x.flagged).length;
-  const openQueries = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
-  const agreedConsents = consents.filter((c) => c.decision === 'agreed').length;
-  const disagreedConsents = consents.filter((c) => c.decision === 'disagreed').length;
+  const flaggedCount = [...(users || []), ...(queries || [])].filter((x) => x && x.flagged).length;
+  const openQueries = (queries || []).filter((q) => q && (q.status === 'received' || q.status === 'in-progress')).length;
+  const agreedConsents = (consents || []).filter((c) => c && c.decision === 'agreed').length;
+  const disagreedConsents = (consents || []).filter((c) => c && c.decision === 'disagreed').length;
 
   const countries = Object.entries(
     approvable.reduce((acc, r) => {
-      if (r.country) acc[r.country] = (acc[r.country] || 0) + 1;
+      if (r && r.country) acc[r.country] = (acc[r.country] || 0) + 1;
       return acc;
     }, {}),
   ).map(([label, n]) => ({ label, n })).sort((a, b) => b.n - a.n).slice(0, 6);
 
   const feed = [
-    ...(registrations || []).slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
-    ...(queries || []).slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
-    ...(consents || []).slice(0, 8).map((c) => ({ kind: 'consent', at: c.timestamp, c })),
-    ...(logins || []).slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
-  ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 9);
+    ...(registrations || []).filter(Boolean).slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
+    ...(queries || []).filter(Boolean).slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
+    ...(consents || []).filter(Boolean).slice(0, 8).map((c) => ({ kind: 'consent', at: c.timestamp, c })),
+    ...(logins || []).filter(Boolean).slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
+  ].sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0)).slice(0, 9);
 
-  const aimfList = (registrations || []).filter((r) => r.type === 'aimf');
-  const aimfPending = aimfList.filter((r) => r.status === 'pending').length;
+  const aimfList = (registrations || []).filter((r) => r && r.type === 'aimf');
+  const aimfPending = aimfList.filter((r) => r && r.status === 'pending').length;
 
   const tiles = [
     { label: 'Registered Users', value: users.length, caption: `${approvable.length} conclave accreditations`, spark: regSpark, onClick: () => go('users') },
