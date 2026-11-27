@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Copy, ExternalLink, FileText, Mail, Phone, Globe, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Check, Copy, ExternalLink, FileText, Mail, Phone, Globe, ArrowLeft, ArrowRight, Printer, CheckCircle2 } from 'lucide-react';
 import {
   GOOGLE_FORM, TERMS_URL, ORGANISER, EVENT, DOCUMENTS, FEE,
   DESIGNATIONS, ENTITY_TYPES, SECTORS, STAGES, DPIIT_STATUS, PAYMENT_MODES, HEARD_FROM,
   TERMS_TEXT, DECLARATION_AUTHORITY, DECLARATION_DATA, ENTRY, VALIDATION,
 } from '../data/startupForm';
 import SignInGate from '../auth/SignInGate';
-import ApplicationGate from '../components/ApplicationGate';
 import { useAuth } from '../auth/AuthContext';
-import StartupHub from '../components/StartupHub';
-import { submitRegistration } from '../data/registry';
+import { submitRegistration, watchMyStartups } from '../data/registry';
+import StartupsPage from './StartupsPage';
 
 const DRAFT_KEY = 'bc-startup-draft';
 const ICON = { className: 'w-4 h-4', strokeWidth: 1.5 };
@@ -320,7 +319,8 @@ function OptionalImage({ src, alt, className, fallback = null }) {
 
 export default function StartupPage({ onNavigate }) {
   const { user } = useAuth();
-  // the form opens on request, or straight away if there is an unfinished draft
+  const [myStartups, setMyStartups] = useState([]);
+  // the form opens on request, or straight away if there is an unfinished draft or user hasn't registered yet
   const [formOpen, setFormOpen] = useState(() => !!loadDraft());
   const [values, setValues] = useState(() => loadDraft() ?? EMPTY);
   const [step, setStep] = useState(0);
@@ -337,6 +337,21 @@ export default function StartupPage({ onNavigate }) {
   const [copiedId, setCopiedId] = useState(false);
   const [hasDraft] = useState(() => { const d = loadDraft(); return !!(d && (d.email || d.fullName || d.entityName)); });
   const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!user) {
+      setMyStartups([]);
+      return undefined;
+    }
+    return watchMyStartups(user, (list) => {
+      setMyStartups(list);
+      if (list.length > 0 && !loadDraft()) {
+        setFormOpen(false);
+      } else if (list.length === 0) {
+        setFormOpen(true);
+      }
+    });
+  }, [user]);
 
   const copyId = async (idText) => {
     try {
@@ -419,9 +434,11 @@ export default function StartupPage({ onNavigate }) {
     // copy to the organiser's Google Form as before; the registration is already saved if this fails
     fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) }).catch(() => {});
     setAssignedId(uniqueId);
+    try { localStorage.setItem('bc-startup-last-id', uniqueId); } catch { /* storage unavailable */ }
     setStatus('sent');
+    setFormOpen(false);
     try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage unavailable */ }
-    requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   };
 
   const clearForm = () => {
@@ -886,17 +903,55 @@ export default function StartupPage({ onNavigate }) {
           portalType="startup"
           onNavigate={onNavigate}
         >
-        <StartupHub
-          uid={user?.uid}
-          formOpen={formOpen}
-          onRegister={() => {
-            setFormOpen(true);
-            requestAnimationFrame(() => document.getElementById('startup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-          }}
-        />
-        <ApplicationGate type="startup" onAnother={() => setFormOpen(true)}>
-        {formOpen && (
-        <div id="startup-form" className="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
+          {/* If already registered or just submitted, show Founder Dashboard */}
+          {!formOpen && (myStartups.length > 0 || status === 'sent') ? (
+            <div className="space-y-6">
+              {status === 'sent' && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                  <div className="surface-card rounded-2xl p-6 sm:p-8 border border-emerald-500/30 bg-emerald-500/[0.05] shadow-md animate-fade-in">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="font-serif text-2xl text-fg font-medium">Startup Registration Received!</h3>
+                          <p className="text-xs sm:text-sm text-fg-3 mt-0.5">
+                            Your official Registration ID is <span className="font-mono text-gold-text font-bold text-sm sm:text-base">{assignedId}</span>. Welcome to your Founder Portal &amp; Deal Room.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button type="button" onClick={() => window.print()} className="btn-secondary h-10 px-4 text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                          <Printer className="w-4 h-4" /> Print Confirmation
+                        </button>
+                        <button type="button" onClick={() => setFormOpen(true)} className="btn-secondary h-10 px-4 text-xs font-semibold cursor-pointer">
+                          Register Another Venture
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <StartupsPage onNavigate={onNavigate} />
+            </div>
+          ) : (
+            <div>
+              {myStartups.length > 0 && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-8 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setFormOpen(false)}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-gold-text hover:text-gold-foil transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Return to Founder Dashboard</span>
+                  </button>
+                </div>
+              )}
+
+              <div id="startup-form" className="scroll-mt-28 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
           {/* steps */}
           <aside className="lg:sticky lg:top-24 self-start">
             <div className="lg:hidden mb-4">
@@ -1131,8 +1186,8 @@ export default function StartupPage({ onNavigate }) {
             )}
           </div>
         </div>
+        </div>
         )}
-        </ApplicationGate>
         </SignInGate>
       </section>
     </div>

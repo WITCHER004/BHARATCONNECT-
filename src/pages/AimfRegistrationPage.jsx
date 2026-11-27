@@ -43,10 +43,9 @@ import {
   TERMS_URL 
 } from '../data/aimfForm';
 import SignInGate from '../auth/SignInGate';
-import ApplicationGate from '../components/ApplicationGate';
 import { useAuth } from '../auth/AuthContext';
-import AimfHub from '../components/AimfHub';
-import { submitRegistration } from '../data/registry';
+import { submitRegistration, watchMyAimfAccreditations } from '../data/registry';
+import AimfPage from './AimfPage';
 
 const DRAFT_KEY = 'bc-aimf-draft';
 const ICON = { className: 'w-4 h-4', strokeWidth: 1.5 };
@@ -265,9 +264,10 @@ function StepTitle({ title, intro }) {
 
 export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
   const { user } = useAuth();
+  const [myAccreditations, setMyAccreditations] = useState([]);
 
   // Form State
-  const [formOpen, setFormOpen] = useState(true);
+  const [formOpen, setFormOpen] = useState(() => !!loadDraft());
   const [values, setValues] = useState(() => loadDraft() ?? EMPTY);
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState({});
@@ -281,6 +281,21 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
   });
   const [copiedId, setCopiedId] = useState(false);
   const formRef = useRef(null);
+
+  useEffect(() => {
+    if (!user) {
+      setMyAccreditations([]);
+      return undefined;
+    }
+    return watchMyAimfAccreditations(user, (list) => {
+      setMyAccreditations(list);
+      if (list.length > 0 && !loadDraft()) {
+        setFormOpen(false);
+      } else if (list.length === 0) {
+        setFormOpen(true);
+      }
+    });
+  }, [user]);
 
   const copyId = async (idText) => {
     try {
@@ -370,8 +385,9 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
     setAssignedId(uniqueId);
     try { localStorage.setItem('bc-aimf-last-id', uniqueId); } catch { /* storage unavailable */ }
     setStatus('sent');
+    setFormOpen(false);
     try { localStorage.removeItem(DRAFT_KEY); } catch { /* storage unavailable */ }
-    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
   };
 
   const clearForm = () => {
@@ -763,17 +779,52 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
                 portalType="aimf"
                 onNavigate={onNavigate}
               >
-                <AimfHub
-                  uid={user?.uid}
-                  formOpen={formOpen}
-                  onRegister={() => {
-                    setFormOpen(true);
-                    requestAnimationFrame(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-                  }}
-                />
+                {/* If already accredited or just submitted, show AIMF Dashboard */}
+                {!formOpen && (myAccreditations.length > 0 || status === 'sent') ? (
+                  <div className="space-y-6">
+                    {status === 'sent' && (
+                      <div className="surface-card rounded-2xl p-6 sm:p-8 border border-emerald-500/30 bg-emerald-500/[0.05] shadow-md animate-fade-in">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                              <CheckCircle2 className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <h3 className="font-serif text-2xl text-fg font-medium">AIMF Accreditation Received!</h3>
+                              <p className="text-xs sm:text-sm text-fg-3 mt-0.5">
+                                Your official Accreditation Reference is <span className="font-mono text-gold-text font-bold text-sm sm:text-base">{assignedId}</span>. Welcome to your AIMF Cultural Portal.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button type="button" onClick={() => window.print()} className="btn-secondary h-10 px-4 text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
+                              <Printer className="w-4 h-4" /> Print Confirmation
+                            </button>
+                            <button type="button" onClick={() => setFormOpen(true)} className="btn-secondary h-10 px-4 text-xs font-semibold cursor-pointer">
+                              Submit Another Showcase
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                <ApplicationGate type="aimf" onAnother={() => setFormOpen(true)}>
-                  {formOpen && (
+                    <AimfPage onNavigate={onNavigate} />
+                  </div>
+                ) : (
+                  <div>
+                    {myAccreditations.length > 0 && (
+                      <div className="mb-6">
+                        <button
+                          type="button"
+                          onClick={() => setFormOpen(false)}
+                          className="inline-flex items-center gap-2 text-sm font-medium text-gold-text hover:text-gold-foil transition-colors cursor-pointer"
+                        >
+                          <ArrowLeft className="w-4 h-4" />
+                          <span>Return to AIMF Cultural Dashboard</span>
+                        </button>
+                      </div>
+                    )}
+
                     <div ref={formRef} id="aimf-form" className="scroll-mt-28 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
                       {/* Sidebar Steps */}
                       <aside className="lg:sticky lg:top-28 self-start">
@@ -988,8 +1039,8 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
                         )}
                       </div>
                     </div>
-                  )}
-                </ApplicationGate>
+                  </div>
+                )}
               </SignInGate>
             </div>
         </div>
