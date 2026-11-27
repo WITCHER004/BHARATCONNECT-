@@ -13,15 +13,26 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import AuthForm from '../auth/AuthForm';
-import { watchMyRegistrationsForUser } from '../data/registry';
+import { watchMyRegistrationsForUser, ADMIN_EMAILS, isAdminAccount } from '../data/registry';
 
 export default function LoginPage({ onNavigate }) {
   const { user, signOut } = useAuth();
   const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
   const [regs, setRegs] = useState([]);
+  const [isAdminUser, setIsAdminUser] = useState(false);
 
   useEffect(() => {
-    if (!user) { setRegs([]); return undefined; }
+    if (!user) { 
+      setRegs([]); 
+      setIsAdminUser(false);
+      return undefined; 
+    }
+    const cleanEmail = user.email?.trim().toLowerCase();
+    if (cleanEmail && ADMIN_EMAILS.includes(cleanEmail)) {
+      setIsAdminUser(true);
+    } else {
+      isAdminAccount(user).then(setIsAdminUser).catch(() => {});
+    }
     return watchMyRegistrationsForUser(user, setRegs);
   }, [user]);
 
@@ -155,6 +166,17 @@ export default function LoginPage({ onNavigate }) {
                     <p className="text-sm text-fg-2">You are signed in to your Bharat Connect account.</p>
 
                     <div className="grid grid-cols-1 gap-2.5">
+                      {isAdminUser && (
+                        <button
+                          onClick={() => onNavigate('admin')}
+                          className="btn-primary !bg-gold-foil/20 !text-gold-text !border-gold-foil/50 hover:!bg-gold-foil/30 !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        >
+                          <ShieldCheck className="w-4 h-4 text-gold-text" />
+                          <span>Secretariat Admin Portal</span>
+                          <ArrowRight className="w-4 h-4 ml-auto" />
+                        </button>
+                      )}
+
                       {aimfReg && (
                         <button
                           onClick={() => onNavigate('aimf')}

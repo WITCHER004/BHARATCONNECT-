@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
 import { PANELS, PANEL_IDS } from '../data/panels';
-import { watchMyRegistrationsForUser } from '../data/registry';
+import { watchMyRegistrationsForUser, ADMIN_EMAILS } from '../data/registry';
 
 export { BrandMark };
 
@@ -34,7 +34,7 @@ function Avatar({ user, size = 28 }) {
   );
 }
 
-function UserMenu() {
+function UserMenu({ onNavigate, isAdmin }) {
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -73,6 +73,22 @@ function UserMenu() {
               <p className="text-xs text-fg-3 truncate font-mono">{user.email}</p>
             </div>
           </div>
+          {isAdmin && (
+            <>
+              <div className="my-1.5 border-t border-line" />
+              <button
+                role="menuitem"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate('admin');
+                }}
+                className="w-full h-9 px-3 rounded-xl flex items-center gap-2 text-sm text-gold-text hover:bg-surface-3 transition-colors cursor-pointer font-medium"
+              >
+                <ShieldCheck className="w-4 h-4 text-gold-text" strokeWidth={1.75} />
+                <span>Admin Secretariat</span>
+              </button>
+            </>
+          )}
           <div className="my-1.5 border-t border-line" />
           <button
             role="menuitem"
@@ -337,6 +353,10 @@ export default function Navbar({ activePage, onNavigate }) {
 
   const isStartupUser = (myRegistrations || []).some((r) => r.type === 'startup');
   const isAimfUser = (myRegistrations || []).some((r) => r.type === 'aimf');
+  const isAdmin = !!user && (
+    ADMIN_EMAILS.includes(user.email?.trim().toLowerCase()) ||
+    (myRegistrations || []).some((r) => r.type === 'admin')
+  );
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
@@ -455,7 +475,7 @@ export default function Navbar({ activePage, onNavigate }) {
             <RegisterDropdown onNavigate={handleNavClick} />
 
             {/* User Account Menu when authenticated */}
-            {user && <UserMenu />}
+            {user && <UserMenu onNavigate={handleNavClick} isAdmin={isAdmin} />}
 
             {/* Mobile Hamburger Button */}
             <button
@@ -536,23 +556,35 @@ export default function Navbar({ activePage, onNavigate }) {
                   </button>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl bg-surface-2 border border-line flex items-center justify-between">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Avatar user={user} size={30} />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-fg truncate">{user.name}</p>
-                      <p className="text-xs text-fg-3 truncate font-mono">{user.email}</p>
+                <div className="space-y-2">
+                  <div className="p-3 rounded-xl bg-surface-2 border border-line flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Avatar user={user} size={30} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-fg truncate">{user.name}</p>
+                        <p className="text-xs text-fg-3 truncate font-mono">{user.email}</p>
+                      </div>
                     </div>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        signOut();
+                      }}
+                      className="h-8 px-2.5 rounded-lg text-xs font-medium text-coral hover:bg-surface-3 transition-colors cursor-pointer shrink-0"
+                    >
+                      Sign out
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      signOut();
-                    }}
-                    className="h-8 px-2.5 rounded-lg text-xs font-medium text-coral hover:bg-surface-3 transition-colors cursor-pointer shrink-0"
-                  >
-                    Sign out
-                  </button>
+
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleNavClick('admin')}
+                      className="w-full h-11 px-3.5 rounded-xl bg-surface-3 border border-gold-foil/40 text-gold-text text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                    >
+                      <ShieldCheck className="w-4 h-4" strokeWidth={1.75} />
+                      <span>Open Admin Secretariat Panel</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>

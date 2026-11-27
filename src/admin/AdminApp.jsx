@@ -8,6 +8,7 @@ import {
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+import AuthForm from '../auth/AuthForm';
 import {
   listRegistrations, listRegisteredUsers, listQueries, listTermsConsents, listLogins, decide, toggleFlag, updateQueryStatus, deleteRecord,
   subscribe, loadError, isAdminAccount, TYPES, TYPE_ORDER, STATUS,
@@ -89,23 +90,30 @@ function Gate({ state, email }) {
 
         {state === 'signed-out' && (
           <>
-            <p className="mt-7 text-sm text-fg-2 leading-relaxed">Sign in with the Google account the Secretariat registered as an admin.</p>
-            <button onClick={signIn} className="mt-5 btn-primary h-11 w-full text-sm">
+            <p className="mt-5 text-sm text-fg-2 leading-relaxed">Sign in with an authorized secretariat administrator account.</p>
+            <button onClick={signIn} className="mt-4 btn-primary h-11 w-full text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm">
               <Lock className="w-4 h-4" strokeWidth={1.5} /> Sign in with Google
             </button>
             <p className="mt-2 min-h-4 text-xs text-[#E66767]" role="alert">{error}</p>
+
+            <div className="mt-4 pt-4 border-t border-line/60">
+              <p className="text-xs text-fg-3 mb-2 text-center">Or sign in with email and password</p>
+              <AuthForm mode="signin" />
+            </div>
           </>
         )}
 
         {state === 'not-admin' && (
           <>
             <p className="mt-7 text-sm text-fg leading-relaxed">
-              <span className="font-mono text-xs break-all">{email}</span> is not an admin account.
+              <span className="font-mono text-xs break-all text-gold-text">{email}</span> is not registered on the admin list.
             </p>
             <p className="mt-2 text-xs text-fg-3 leading-relaxed">
-              Ask the site owner to add it in the Firebase console: Firestore, collection <span className="font-mono">admins</span>, a document named with this email.
+              Please verify that you are signed in with the correct email, or ensure <span className="font-mono text-fg">{email}</span> is in the <span className="font-mono text-gold-text">admins</span> collection in Firestore.
             </p>
-            <button onClick={() => signOut(auth)} className="mt-5 btn-secondary h-10 w-full text-sm">Use a different account</button>
+            <button onClick={() => signOut(auth)} className="mt-5 btn-secondary h-10 w-full text-sm cursor-pointer">
+              Sign out &amp; switch account
+            </button>
           </>
         )}
       </div>

@@ -15,9 +15,10 @@ import StartupsPage from './pages/StartupsPage';
 import AimfPage from './pages/AimfPage';
 import AimfRegistrationPage from './pages/AimfRegistrationPage';
 import LoginPage from './pages/LoginPage';
+import AdminApp from './admin/AdminApp';
 import { PANEL_IDS } from './data/panels';
 
-const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'aimf-register', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', ...PANEL_IDS];
+const VALID_PAGES = ['home', 'schedule', 'exhibition', 'experience', 'aimf', 'aimf-register', 'register', 'startup', 'startups', 'collaborate', 'query', 'login', 'admin', ...PANEL_IDS];
 const TERMS_PORTAL_PAGES = ['register', 'startup', 'aimf', 'aimf-register', 'collaborate', 'exhibition', 'query'];
 import QueryConciergeModal from './components/QueryConciergeModal';
 import InstagramPopup from './components/InstagramPopup';
@@ -186,13 +187,21 @@ export default function App() {
             onOpenRegister={handleOpenRegister}
           />
         )}
+
+        {activePage === 'admin' && (
+          <div className="pt-20">
+            <AdminApp />
+          </div>
+        )}
       </main>
 
       {/* Footer */}
-      <Footer
-        onNavigate={navigate}
-        onOpenRegister={handleOpenRegister}
-      />
+      {activePage !== 'admin' && (
+        <Footer
+          onNavigate={navigate}
+          onOpenRegister={handleOpenRegister}
+        />
+      )}
 
       {/* Page-Specific Terms and Conditions Consent Modal */}
       <TermsConsentModal

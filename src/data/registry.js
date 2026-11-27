@@ -767,17 +767,51 @@ export async function deleteRecord(id) {
 }
 
 // keep in step with the list in isAdmin() in firestore.rules, which is what actually grants access
-const ADMIN_EMAILS = ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra6111@gmail.com'];
+export const ADMIN_EMAILS = [
+  'aryamansaxena04@gmail.com',
+  'surishri03@gmail.com',
+  'intouch.vijay@gmail.com',
+  'amitabh2227@gmail.com',
+  'ayushra611@gmail.com',
+  'ayushra6111@gmail.com'
+];
 
 /* Is this signed-in account an admin? (listed above, or an admins/{email} document added in the Firebase console) */
 export async function isAdminAccount(user) {
   if (!user?.email) return false;
-  if (ADMIN_EMAILS.includes(user.email.toLowerCase())) return true;
+  const email = user.email.trim().toLowerCase();
+  if (ADMIN_EMAILS.includes(email)) return true;
+
+  // 1. Direct document lookup by lowercased email ID (e.g. admins/ayushra6111@gmail.com)
   try {
-    return (await getDoc(doc(db, 'admins', user.email.toLowerCase()))).exists();
-  } catch {
-    return false;
+    const snap = await getDoc(doc(db, 'admins', email));
+    if (snap.exists()) return true;
+  } catch (err) {
+    // continue
   }
+
+  // 2. Direct document lookup with exact email ID if different from lowercase
+  if (user.email.trim() !== email) {
+    try {
+      const snap = await getDoc(doc(db, 'admins', user.email.trim()));
+      if (snap.exists()) return true;
+    } catch (err) {}
+  }
+
+  // 3. Query collection where field `email` or `adminEmail` matches (in case document was created with an Auto-ID)
+  try {
+    const q1 = query(collection(db, 'admins'), where('email', '==', email));
+    const snap1 = await getDocs(q1);
+    if (!snap1.empty) return true;
+  } catch (err) {}
+
+  try {
+    const q2 = query(collection(db, 'admins'), where('email', '==', user.email.trim()));
+    const snap2 = await getDocs(q2);
+    if (!snap2.empty) return true;
+  } catch (err) {}
+
+  return false;
 }
 
 /* ── Sample data (clearly marked, for demonstrating the panel) ─ */

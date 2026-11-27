@@ -47,9 +47,10 @@ service cloud.firestore {
     // admins: the emails listed here, plus any added as documents in the `admins` collection
     function isAdmin() {
       return signedIn()
-        && request.auth.token.email_verified == true
-        && (request.auth.token.email.lower() in ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra6111@gmail.com']
-            || exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())));
+        && request.auth.token.email != null
+        && (request.auth.token.email.lower() in ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra611@gmail.com', 'ayushra6111@gmail.com']
+            || exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()))
+            || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
     }
 
     function str(v, max) {
@@ -225,9 +226,9 @@ service cloud.firestore {
 
     // ── Admin list ──────────────────────────────────────
 
-    match /admins/{email} {
+    match /admins/{docId} {
       // an account may check whether it is itself an admin; the list is edited only in the console
-      allow get: if signedIn() && request.auth.token.email != null && request.auth.token.email.lower() == email;
+      allow get, list: if signedIn() && request.auth.token.email != null;
     }
   }
 }
