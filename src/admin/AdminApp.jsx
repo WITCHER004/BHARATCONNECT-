@@ -203,14 +203,14 @@ export default function AdminApp() {
                 {pending.length}
               </span>
             )}
-            {v.id === 'aimf' && aimfPendingCount > 0 && (
-              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-[#FAB219]/15 text-[#FAB219] text-xs font-semibold flex items-center justify-center tabular-nums" title={`${aimfPendingCount} pending review`}>
-                {aimfPendingCount}
-              </span>
-            )}
-            {v.id === 'aimf' && aimfPendingCount === 0 && aimfList.length > 0 && (
-              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-surface-3 border border-line text-gold-text text-xs font-semibold flex items-center justify-center tabular-nums">
-                {aimfList.length}
+            {v.id === 'aimf' && (
+              <span
+                className={`ml-auto min-w-6 h-6 px-1.5 rounded-full text-xs font-semibold flex items-center justify-center tabular-nums ${
+                  aimfPendingCount > 0 ? 'bg-[#FAB219]/15 text-[#FAB219]' : 'bg-surface-3 border border-line text-gold-text'
+                }`}
+                title={aimfPendingCount > 0 ? `${aimfPendingCount} pending review` : `${aimfList.length} AIMF accreditations`}
+              >
+                {aimfPendingCount > 0 ? aimfPendingCount : aimfList.length}
               </span>
             )}
             {v.id === 'users' && flaggedUsersCount > 0 && (
@@ -460,9 +460,13 @@ function Overview({ registrations, users = [], queries = [], consents = [], logi
     ...logins.slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
   ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 9);
 
+  const aimfList = registrations.filter((r) => r.type === 'aimf');
+  const aimfPending = aimfList.filter((r) => r.status === 'pending').length;
+
   const tiles = [
     { label: 'Registered Users', value: users.length, caption: `${approvable.length} conclave accreditations`, spark: regSpark, onClick: () => go('users') },
     { label: 'Awaiting review', value: pending, caption: pending ? 'need a decision' : 'queue is clear', accent: '#FAB219', onClick: () => go('approvals') },
+    { label: 'AIMF Cultural Desk', value: aimfList.length, caption: aimfPending ? `${aimfPending} pending review` : 'cultural showcases', accent: aimfPending ? '#FAB219' : undefined, onClick: () => go('aimf') },
     { label: 'Query Desk', value: openQueries, suffix: ` / ${queries.length}`, caption: `${openQueries} inquiries pending response`, onClick: () => go('queries'), accent: openQueries ? '#FAB219' : undefined },
     { label: 'Terms & Conditions', value: `${agreedConsents}/${consents.length}`, caption: `${disagreedConsents} disagreements logged`, onClick: () => go('terms'), accent: disagreedConsents ? '#D03B3B' : '#0CA30C' },
     { label: 'Flagged for review', value: flaggedCount, caption: flaggedCount ? 'requires administrative attention' : 'no flagged items', accent: flaggedCount ? '#FAB219' : undefined, onClick: () => go('users') },

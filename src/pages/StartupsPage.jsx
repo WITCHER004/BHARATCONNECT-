@@ -29,9 +29,10 @@ import {
   FileText,
   Briefcase,
   ShieldCheck,
+  ShieldAlert,
   Tag
 } from 'lucide-react';
-import { watchMyStartups, watchMyEventApplications, submitEventApplication } from '../data/registry';
+import { watchMyStartups, watchMyAimfAccreditations, watchMyEventApplications, submitEventApplication, isAdminAccount } from '../data/registry';
 import { useAuth } from '../auth/AuthContext';
 import SignInGate from '../auth/SignInGate';
 import { EVENTS, eventStatus, calendarFile, googleCalendarUrl } from '../data/events';
@@ -284,6 +285,8 @@ function openGoogleCal(e) {
 export default function StartupsPage({ onNavigate }) {
   const { user, openAuth } = useAuth();
   const [startups, setStartups] = useState([]);
+  const [aimfAccreditations, setAimfAccreditations] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [query, setQuery] = useState('');
   const [sector, setSector] = useState('All');
   const [copiedId, setCopiedId] = useState('');
@@ -321,8 +324,12 @@ export default function StartupsPage({ onNavigate }) {
   useEffect(() => {
     if (!user) {
       setStartups([]);
+      setAimfAccreditations([]);
+      setIsAdmin(false);
       return;
     }
+
+    isAdminAccount(user).then((admin) => setIsAdmin(admin));
 
     const unsubStartups = watchMyStartups(user, (rawList) => {
       const formatted = rawList.map((r) => {
@@ -349,6 +356,10 @@ export default function StartupsPage({ onNavigate }) {
       setStartups(formatted);
     });
 
+    const unsubAimf = watchMyAimfAccreditations(user, (rawList) => {
+      setAimfAccreditations(rawList);
+    });
+
     const unsubApps = watchMyEventApplications(user, (list) => {
       const map = { ...appliedEvents };
       list.forEach((app) => {
@@ -359,9 +370,12 @@ export default function StartupsPage({ onNavigate }) {
 
     return () => {
       unsubStartups();
+      unsubAimf();
       unsubApps();
     };
   }, [user]);
+
+  const isAimfUser = aimfAccreditations.length > 0;
 
   const sectors = useMemo(
     () => ['All', ...new Set(startups.flatMap((s) => s.sectors || []))],
@@ -490,22 +504,65 @@ export default function StartupsPage({ onNavigate }) {
                     <span className="block font-serif text-2xl text-gold-text tabular-nums">{startups.length}</span>
                     <span className="text-xs text-fg-3">Registered {startups.length === 1 ? 'Startup' : 'Startups'}</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate('startup')}
-                    className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-                  >
-                    <Plus className="w-4 h-4" strokeWidth={2} />
-                    <span>Register Startup</span>
-                  </button>
+                  {!isAimfUser && (
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('startup')}
+                      className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                    >
+                      <Plus className="w-4 h-4" strokeWidth={2} />
+                      <span>Register Startup</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
           </div>
         </section>
 
-        {/* If signed in but has no registered startups, display registration gate */}
-        {startups.length === 0 ? (
+        {/* If signed in as an AIMF registered user, block access per mutual exclusion rules */}
+        {user && isAimfUser && !isAdmin ? (
+          <section className="theme-cream py-16 sm:py-24 bg-surface-0 flex-1 flex items-center justify-center">
+            <div className="max-w-xl mx-auto px-4 sm:px-6 w-full text-center animate-fade-in">
+              <div className="surface-card rounded-3xl p-8 sm:p-12 border border-line-strong shadow-xl">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-[#D03B3B]/10 border border-[#D03B3B]/30 flex items-center justify-center text-[#D03B3B] mb-6">
+                  <ShieldAlert className="w-8 h-8" strokeWidth={1.75} />
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-[#FAB219]/15 text-[#FAB219] border border-[#FAB219]/30 mb-4">
+                  Portal Access Restricted
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-fg">
+                  AIMF Account Cannot Access Startups
+                </h2>
+                <p className="mt-3 text-sm sm:text-[15px] text-fg-2 leading-relaxed">
+                  Your account (<span className="font-mono text-xs text-fg">{user.email}</span>) is registered under the <strong className="text-fg">AIMF Cultural &amp; Creative Portal</strong>.
+                </p>
+                <div className="mt-5 p-4 rounded-xl bg-surface-3 border border-line inline-block text-left w-full max-w-sm">
+                  <div className="text-xs text-fg-3">Your AIMF Accreditation Reference</div>
+                  <div className="font-mono text-base font-semibold text-gold-text mt-0.5">
+                    {aimfAccreditations[0]?.id || aimfAccreditations[0]?.ref || 'BC.AIMF-Registered'}
+                  </div>
+                  {aimfAccreditations[0]?.name && (
+                    <div className="text-xs text-fg-2 mt-1 truncate">{aimfAccreditations[0].name}</div>
+                  )}
+                </div>
+                <p className="mt-4 text-xs text-fg-3 leading-relaxed">
+                  Per Bharat Connect guidelines, a person registered with the AIMF portal cannot access or register in the Startups portal.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('aimf')}
+                    className="btn-primary h-12 px-7 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98] mx-auto"
+                  >
+                    <span>Go to AIMF Cultural Portal</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : startups.length === 0 ? (
           <section className="theme-cream py-16 sm:py-24 bg-surface-0 flex-1 flex items-center justify-center">
             <div className="max-w-xl mx-auto px-4 sm:px-6 w-full text-center animate-fade-in">
               <div className="surface-card rounded-3xl p-8 sm:p-12 border border-line shadow-xl">

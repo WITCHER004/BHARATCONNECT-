@@ -48,7 +48,7 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn()
         && request.auth.token.email != null
-        && (request.auth.token.email.lower() in ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra611@gmail.com', 'ayushra6111@gmail.com']
+        && (request.auth.token.email.lower() in ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra6111@gmail.com']
             || exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower()))
             || exists(/databases/$(database)/documents/admins/$(request.auth.token.email)));
     }

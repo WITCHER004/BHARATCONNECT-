@@ -772,7 +772,6 @@ export const ADMIN_EMAILS = [
   'surishri03@gmail.com',
   'intouch.vijay@gmail.com',
   'amitabh2227@gmail.com',
-  'ayushra611@gmail.com',
   'ayushra6111@gmail.com'
 ];
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight, ShieldCheck, Lock } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
 import { PANELS, PANEL_IDS } from '../data/panels';
@@ -104,7 +104,7 @@ function UserMenu({ onNavigate, isAdmin }) {
   );
 }
 
-function RegisterDropdown({ onNavigate }) {
+function RegisterDropdown({ onNavigate, isStartupUser, isAimfUser, isAdmin }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -190,39 +190,43 @@ function RegisterDropdown({ onNavigate }) {
               </div>
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onNavigate('startup');
-              }}
-              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-            >
-              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-              <div>
-                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                  Startup Showcase
+            {(!isAimfUser || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate('startup');
+                }}
+                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+              >
+                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                    Startup Showcase
+                  </div>
+                  <div className="text-[11px] text-fg-3">Register your startup for exhibition &amp; pitch</div>
                 </div>
-                <div className="text-[11px] text-fg-3">Register your startup for exhibition &amp; pitch</div>
-              </div>
-            </button>
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onNavigate('aimf-register');
-              }}
-              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-            >
-              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-              <div>
-                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                  AIMF Cultural Portal
+            {(!isStartupUser || isAdmin) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate('aimf-register');
+                }}
+                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+              >
+                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                    AIMF Cultural Portal
+                  </div>
+                  <div className="text-[11px] text-fg-3">Complimentary artist &amp; cultural accreditation</div>
                 </div>
-                <div className="text-[11px] text-fg-3">Complimentary artist &amp; cultural accreditation</div>
-              </div>
-            </button>
+              </button>
+            )}
 
             <button
               type="button"
@@ -374,11 +378,16 @@ export default function Navbar({ activePage, onNavigate }) {
 
   const handleNavClick = (pageId) => {
     let target = pageId;
-    // For unregistered users, clicking Startups or AIMF directs them to register first
-    if (pageId === 'startups' && !isStartupUser) {
-      target = 'startup';
-    } else if (pageId === 'aimf' && !isAimfUser) {
-      target = 'aimf-register';
+    if (!isAdmin) {
+      if (isStartupUser && (pageId === 'aimf' || pageId === 'aimf-register')) {
+        target = 'startups';
+      } else if (isAimfUser && (pageId === 'startups' || pageId === 'startup')) {
+        target = 'aimf';
+      } else if (pageId === 'startups' && !isStartupUser) {
+        target = 'startup';
+      } else if (pageId === 'aimf' && !isAimfUser) {
+        target = 'aimf-register';
+      }
     }
     onNavigate(target);
     setMobileMenuOpen(false);
@@ -432,16 +441,22 @@ export default function Navbar({ activePage, onNavigate }) {
           <nav className="hidden xl:flex items-center" aria-label="Main">
             {NAV_ITEMS.map((item) => {
               const isActive = activePage === item.id;
+              const isLocked = !isAdmin && (
+                (item.id === 'aimf' && isStartupUser) ||
+                (item.id === 'startups' && isAimfUser)
+              );
               return (
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`group relative h-11 px-2.5 text-[15px] font-medium tracking-[0.01em] transition-colors duration-200 cursor-pointer ${
-                    isActive ? 'text-gold-text' : 'text-fg-2 hover:text-fg'
+                  title={isLocked ? `${item.label} (Restricted to registered ${item.id === 'aimf' ? 'AIMF' : 'Startup'} accounts)` : undefined}
+                  className={`group relative h-11 px-2.5 text-[15px] font-medium tracking-[0.01em] transition-colors duration-200 cursor-pointer flex items-center gap-1.5 ${
+                    isActive ? 'text-gold-text' : isLocked ? 'text-fg-3/60 hover:text-fg-3' : 'text-fg-2 hover:text-fg'
                   }`}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
+                  {isLocked && <Lock className="w-3 h-3 text-fg-3/70" strokeWidth={2} />}
                   {/* hover underline */}
                   <span
                     className={`absolute left-2.5 right-2.5 bottom-1.5 h-px bg-gradient-to-r from-transparent via-gold-foil to-transparent origin-center transition-transform duration-300 ${
@@ -472,7 +487,12 @@ export default function Navbar({ activePage, onNavigate }) {
               </button>
             )}
 
-            <RegisterDropdown onNavigate={handleNavClick} />
+            <RegisterDropdown
+              onNavigate={handleNavClick}
+              isStartupUser={isStartupUser}
+              isAimfUser={isAimfUser}
+              isAdmin={isAdmin}
+            />
 
             {/* User Account Menu when authenticated */}
             {user && <UserMenu onNavigate={handleNavClick} isAdmin={isAdmin} />}
@@ -499,15 +519,24 @@ export default function Navbar({ activePage, onNavigate }) {
             <div className="flex flex-col gap-1">
               {NAV_ITEMS.map((item) => {
                 const isActive = activePage === item.id;
+                const isLocked = !isAdmin && (
+                  (item.id === 'aimf' && isStartupUser) ||
+                  (item.id === 'startups' && isAimfUser)
+                );
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    className={`min-h-[44px] px-3.5 rounded-xl text-[15px] text-left font-medium transition-colors cursor-pointer flex items-center ${
-                      isActive ? 'bg-surface-3 text-gold-text font-semibold' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
+                    className={`min-h-[44px] px-3.5 rounded-xl text-[15px] text-left font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                      isActive ? 'bg-surface-3 text-gold-text font-semibold' : isLocked ? 'text-fg-3/60' : 'text-fg-2 hover:bg-surface-2 hover:text-fg'
                     }`}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {isLocked && (
+                      <span className="flex items-center gap-1 text-[11px] font-mono text-fg-3 bg-surface-2 px-2 py-0.5 rounded-md border border-line">
+                        <Lock className="w-3 h-3" strokeWidth={1.5} /> Restricted
+                      </span>
+                    )}
                   </button>
                 );
               })}
