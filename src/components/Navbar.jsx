@@ -357,10 +357,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
   const isStartupUser = (myRegistrations || []).some((r) => r.type === 'startup');
   const isAimfUser = (myRegistrations || []).some((r) => r.type === 'aimf');
-  const isAdmin = !!user && (
-    ADMIN_EMAILS.includes(user.email?.trim().toLowerCase()) ||
-    (myRegistrations || []).some((r) => r.type === 'admin')
-  );
+  const isAdmin = !!user && ADMIN_EMAILS.includes(user.email?.trim().toLowerCase());
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
