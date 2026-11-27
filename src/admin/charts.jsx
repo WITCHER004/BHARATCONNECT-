@@ -177,7 +177,7 @@ export function DailyBars({ records, days = 14 }) {
                     width={barW}
                     height={Math.max(0, h - (top ? 0 : 2))}
                     rx={top ? 4 : 1}
-                    fill={TYPES[t].color}
+                    fill={TYPES[t]?.color || '#FAB219'}
                     className="ad-bar"
                   />
                 );
@@ -202,8 +202,8 @@ export function DailyBars({ records, days = 14 }) {
             {TYPE_ORDER.map((t) => (
               <li key={t} className="flex items-center justify-between gap-4 text-xs text-fg-2">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ background: TYPES[t].color }} />
-                  {TYPES[t].short}
+                  <span className="w-2 h-2 rounded-full" style={{ background: TYPES[t]?.color || '#FAB219' }} />
+                  {TYPES[t]?.short || t}
                 </span>
                 <span className="tabular-nums text-fg">{data[hover].byType[t]}</span>
               </li>
@@ -240,7 +240,7 @@ export function Donut({ records }) {
               cy="90"
               r={R}
               fill="none"
-              stroke={TYPES[c.t].color}
+              stroke={TYPES[c.t]?.color || '#FAB219'}
               strokeWidth={hover === i ? 22 : 18}
               strokeDasharray={`${Math.max(0, len - gap)} ${C}`}
               strokeDashoffset={-offset}
@@ -255,7 +255,7 @@ export function Donut({ records }) {
           return c.n ? seg : null;
         })}
         <text x="90" y="86" textAnchor="middle" className="ad-donut-big">{focus ? focus.n : total}</text>
-        <text x="90" y="104" textAnchor="middle" className="ad-axis">{focus ? TYPES[focus.t].short : 'total'}</text>
+        <text x="90" y="104" textAnchor="middle" className="ad-axis">{focus ? (TYPES[focus.t]?.short || focus.t) : 'total'}</text>
       </svg>
       <ul className="grid grid-cols-2 gap-x-5 gap-y-1.5 w-full">
         {counts.map((c, i) => (
@@ -266,8 +266,8 @@ export function Donut({ records }) {
             onMouseLeave={() => setHover(null)}
           >
             <span className="inline-flex items-center gap-2 text-fg-2">
-              <span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: TYPES[c.t].color }} />
-              {TYPES[c.t].short}
+              <span className="w-2.5 h-2.5 rounded-[3px]" style={{ background: TYPES[c.t]?.color || '#FAB219' }} />
+              {TYPES[c.t]?.short || c.t}
             </span>
             <span className="tabular-nums text-fg">
               {c.n}
@@ -294,7 +294,7 @@ export function StatusSplit({ records }) {
       {rows.map((row, ri) => (
         <div key={row.t}>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-fg-2">{TYPES[row.t].short}</span>
+            <span className="text-fg-2">{TYPES[row.t]?.short || row.t}</span>
             <span className="text-xs text-fg-3 tabular-nums">{row.n} total</span>
           </div>
           <div className="mt-1.5 h-2.5 rounded-full bg-surface-3 overflow-hidden flex gap-[2px]">

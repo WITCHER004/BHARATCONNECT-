@@ -640,7 +640,7 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6">
         <Card
           title="Registrations, last 14 days"
-          action={<Legend items={TYPE_ORDER.map((t) => ({ label: TYPES[t].short, color: TYPES[t].color }))} />}
+          action={<Legend items={TYPE_ORDER.map((t) => ({ label: TYPES[t]?.short || t, color: TYPES[t]?.color || '#FAB219' }))} />}
           className="xl:col-span-2"
           i={4}
         >
@@ -728,7 +728,7 @@ function Empty({ text }) {
 /* ── Approvals ────────────────────────────────────────── */
 
 function TypeFilter({ value, onChange, records }) {
-  const opts = [{ id: 'all', label: 'All' }, ...TYPE_ORDER.map((t) => ({ id: t, label: TYPES[t].short }))];
+  const opts = [{ id: 'all', label: 'All' }, ...TYPE_ORDER.map((t) => ({ id: t, label: TYPES[t]?.short || t }))];
   return (
     <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by type">
       {opts.map((o) => {
@@ -741,7 +741,7 @@ function TypeFilter({ value, onChange, records }) {
             aria-pressed={on}
             className={`h-9 px-3.5 rounded-full text-sm flex items-center gap-2 border transition-colors cursor-pointer ${on ? 'bg-surface-3 border-gold-foil/50 text-fg' : 'border-line text-fg-2 hover:text-fg hover:bg-surface-2'}`}
           >
-            {o.id !== 'all' && <span className="w-2 h-2 rounded-full" style={{ background: TYPES[o.id].color }} />}
+            {o.id !== 'all' && <span className="w-2 h-2 rounded-full" style={{ background: TYPES[o.id]?.color || '#FAB219' }} />}
             {o.label}
             <span className="text-xs text-fg-3 tabular-nums">{n}</span>
           </button>

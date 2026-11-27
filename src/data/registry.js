@@ -27,6 +27,7 @@ export const TYPES = {
   aimf: { label: 'AIMF accreditation', short: 'AIMF', color: '#B98A3A', approvable: true },
   collaboration: { label: 'Collaboration', short: 'Collaborations', color: '#2FA58C', approvable: true },
   panel: { label: 'Panel application', short: 'Panels', color: '#B98A3A', approvable: true },
+  event_app: { label: 'Event application', short: 'Event Apps', color: '#9D6DE3', approvable: true },
   query: { label: 'Inquiry', short: 'Inquiries', color: '#8A9E97', approvable: false },
 };
 
