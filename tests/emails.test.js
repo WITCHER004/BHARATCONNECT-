@@ -1,7 +1,9 @@
 // node --test tests/emails.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import emailjs from '@emailjs/browser';
 import { welcomeEmail, receivedEmail, adminAlertEmail, decisionEmail, esc } from '../src/data/emails.js';
+import { sendWelcomeEmail } from '../src/data/mailer.js';
 
 const app = { ref: 'BMF.BC-SEO-00007', type: 'startup', name: 'Asha <script>', email: 'a@example.com', organisation: 'Asha & Co', status: 'pending' };
 
@@ -33,4 +35,44 @@ test('admin alert links to the approvals view', () => {
 test('decision email differs for approved and declined', () => {
   assert.match(decisionEmail({ ...app, status: 'approved' }).subject, /^Approved/);
   assert.match(decisionEmail({ ...app, status: 'declined', note: 'Incomplete documents' }).text, /Reason: Incomplete documents/);
+});
+
+test('sendWelcomeEmail passes expected credentials, variables, and falls back gracefully', async (t) => {
+  const sendMock = t.mock.method(emailjs, 'send', async () => ({ status: 200, text: 'OK' }));
+
+  await sendWelcomeEmail('Asha Sharma', 'asha@example.com');
+  assert.equal(sendMock.mock.callCount(), 1);
+  assert.deepEqual(sendMock.mock.calls[0].arguments, [
+    'service_nc4451t',
+    'template_6ot9999',
+    {
+      to_name: 'Asha Sharma',
+      name: 'Asha Sharma',
+      to_email: 'asha@example.com',
+      email: 'asha@example.com',
+    },
+    'z_0w3S5cSA7W4kWvq',
+  ]);
+
+  await sendWelcomeEmail('', 'delegate@bharat.in');
+  assert.deepEqual(sendMock.mock.calls[1].arguments[2], {
+    to_name: 'delegate',
+    name: 'delegate',
+    to_email: 'delegate@bharat.in',
+    email: 'delegate@bharat.in',
+  });
+
+  await sendWelcomeEmail(null, '@invalid');
+  assert.deepEqual(sendMock.mock.calls[2].arguments[2], {
+    to_name: 'Member',
+    name: 'Member',
+    to_email: '@invalid',
+    email: '@invalid',
+  });
+
+  // Should not throw if EmailJS fails
+  t.mock.method(console, 'error', () => {});
+  const failMock = t.mock.method(emailjs, 'send', async () => { throw new Error('network down'); });
+  await assert.doesNotReject(() => sendWelcomeEmail('Test', 'test@example.com'));
+  assert.equal(failMock.mock.callCount(), 1);
 });

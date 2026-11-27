@@ -20,10 +20,39 @@ import emailjs from '@emailjs/browser';
 const EMAILJS = {
   serviceId: 'service_nc4451t',
   templateId: '',
-  publicKey: '',
+  publicKey: 'z_0w3S5cSA7W4kWvq',
+  welcomeTemplateId: 'template_6ot9999',
 };
 
 export const emailReady = () => Boolean(EMAILJS.serviceId && EMAILJS.templateId && EMAILJS.publicKey);
+
+/**
+ * Send a welcome email on sign-in using EmailJS without blocking auth flow.
+ */
+export async function sendWelcomeEmail(userName, userEmail) {
+  const to_email = typeof userEmail === 'string' ? userEmail.trim() : '';
+  if (!to_email) return;
+
+  const trimmedName = typeof userName === 'string' ? userName.trim() : '';
+  const emailPrefix = to_email.includes('@') ? to_email.split('@')[0].trim() : '';
+  const to_name = trimmedName || emailPrefix || 'Member';
+
+  try {
+    await emailjs.send(
+      EMAILJS.serviceId,
+      EMAILJS.welcomeTemplateId,
+      {
+        to_name,
+        name: to_name,
+        to_email,
+        email: to_email,
+      },
+      EMAILJS.publicKey,
+    );
+  } catch (err) {
+    console.error('Welcome email not sent:', err?.text || err);
+  }
+}
 
 /* Best effort: a failed email is logged and never blocks a sign-up, registration or decision. */
 export async function sendEmail(to, { subject, html }) {
