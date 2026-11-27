@@ -6,46 +6,28 @@
     var(--color-surface-1);
 }
 
-/* entrance: cards rise in one after another */
+/* entrance: cards and views are always immediately visible */
 .ad-rise {
-  opacity: 1;
-  animation: ad-rise 0.5s var(--ease-out, ease-out) both;
-  animation-delay: calc(var(--i, 0) * 40ms);
-}
-
-@keyframes ad-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
 }
 
 .ad-view {
-  opacity: 1;
-  animation: fade-in 0.25s var(--ease-out, ease-out);
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  opacity: 1 !important;
+  animation: none !important;
 }
 
 .ad-card {
-  transition: border-color 0.2s, transform 0.25s var(--ease-out);
+  background-color: var(--color-surface-2, #121514);
+  border: 1px solid var(--color-line-strong, rgb(217 179 106 / 0.25));
+  opacity: 1 !important;
+  transition: border-color 0.2s, transform 0.25s ease-out;
 }
 
 button.ad-card:not(:disabled):hover {
   transform: translateY(-2px);
+  border-color: var(--color-gold-foil, #D9B36A);
 }
 
 /* sidebar: gold marker slides beside the current view */
@@ -379,26 +361,16 @@ button.ad-card:not(:disabled):hover {
 }
 
 .ad-row {
-  animation: ad-row 0.4s var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 25ms);
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
   transition: background 0.15s;
 }
 
-@keyframes ad-row {
-  from {
-    opacity: 0;
-    transform: translateX(-6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 .ad-feed-item {
-  animation: ad-row 0.45s var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 50ms);
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
 }
 
 /* ── charts ── */
@@ -421,26 +393,11 @@ button.ad-card:not(:disabled):hover {
   cursor: default;
 }
 
-/* bars grow up from the baseline */
+/* bars */
 .ad-bar {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: ad-grow 0.7s var(--ease-out) both;
-  animation-delay: calc(0.2s + var(--i, 0) * 35ms);
-}
-
-.ad-bar-group .ad-bar {
-  animation-delay: calc(0.2s + var(--i, 0) * 35ms);
-}
-
-@keyframes ad-grow {
-  from {
-    transform: scaleY(0);
-  }
-
-  to {
-    transform: scaleY(1);
-  }
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
 }
 
 .ad-col {

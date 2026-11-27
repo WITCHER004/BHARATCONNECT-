@@ -48,26 +48,12 @@ export function Counter({ value, suffix = '' }) {
   if (typeof value !== 'number' || isNaN(value)) {
     return <span className="tabular-nums">{value ?? 0}{suffix}</span>;
   }
-  const [shown, setShown] = useState(reduced() ? value : 0);
-  const from = useRef(reduced() ? value : 0);
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
 
   useEffect(() => {
-    if (reduced()) {
-      setShown(value);
-      return undefined;
-    }
-    const start = performance.now();
-    const a = typeof from.current === 'number' && !isNaN(from.current) ? from.current : 0;
-    let raf;
-    const tick = (now) => {
-      const p = Math.min((now - start) / 900, 1);
-      const v = Math.round(a + (value - a) * (1 - Math.pow(1 - p, 3)));
-      setShown(v);
-      if (p < 1) raf = requestAnimationFrame(tick);
-      else from.current = value;
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    setShown(value);
+    from.current = value;
   }, [value]);
 
   return <span className="tabular-nums">{typeof shown === 'number' && !isNaN(shown) ? shown.toLocaleString('en-IN') : (shown ?? 0)}{suffix}</span>;

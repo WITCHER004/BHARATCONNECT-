@@ -104,7 +104,7 @@ function Gate({ state, email }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 ad-gate-bg">
-      <div className="ad-rise w-full max-w-sm surface-card rounded-2xl p-7 border border-line shadow-2xl">
+      <div className="w-full max-w-sm surface-card rounded-2xl p-7 border border-line shadow-2xl">
         <div className="flex items-center gap-3">
           <span className="h-10 px-2 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 flex items-center">
             <img src={`${import.meta.env.BASE_URL}brand/logo.png`} alt="Bharat Connect" className="h-7 w-auto" />
@@ -599,9 +599,9 @@ function SampleTag() {
   return <span className="inline-block align-middle text-[10px] font-mono tracking-wider text-[#FAB219] border border-[#FAB219]/40 rounded px-1 py-px">SAMPLE</span>;
 }
 
-function Card({ title, action, children, className = '', i = 0 }) {
+function Card({ title, action, children, className = '' }) {
   return (
-    <section className={`ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-5 sm:p-6 ${className}`} style={{ '--i': i }}>
+    <section className={`ad-card rounded-2xl border border-line bg-surface-2 p-5 sm:p-6 shadow-sm ${className}`}>
       {(title || action) && (
         <div className="flex items-center justify-between gap-3 mb-5">
           <h2 className="text-sm font-medium text-fg">{title}</h2>
@@ -668,20 +668,21 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
-        {tiles.map((t, i) => (
+        {tiles.map((t) => (
           <button
             key={t.label}
             type="button"
             onClick={t.onClick}
             disabled={!t.onClick}
-            className={`ad-card ad-rise text-left rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5 ${t.onClick ? 'cursor-pointer hover:border-gold-foil/50' : 'cursor-default'}`}
-            style={{ '--i': i }}
+            className={`ad-card text-left rounded-2xl border border-line bg-surface-2 p-4 sm:p-5 shadow-sm transition-all ${t.onClick ? 'cursor-pointer hover:border-gold-foil/50 hover:bg-surface-3' : 'cursor-default'}`}
           >
-            <p className="text-xs text-fg-3 flex items-center gap-1.5">
+            <p className="text-xs text-fg-3 flex items-center gap-1.5 font-medium">
               {t.accent && <span className="w-1.5 h-1.5 rounded-full ad-blink" style={{ background: t.accent }} />}
               {t.label}
             </p>
-            <p className="mt-3 font-serif text-3xl sm:text-[40px] leading-none text-fg">{t.value === null ? '—' : <Counter value={t.value} suffix={t.suffix} />}</p>
+            <p className="mt-3 font-serif text-3xl sm:text-[40px] leading-none text-fg font-medium">
+              {t.value === null ? '—' : <Counter value={t.value} suffix={t.suffix} />}
+            </p>
             <div className="mt-3 flex items-end justify-between gap-2">
               <p className="text-xs text-fg-3">{t.caption}</p>
               {t.spark && <Sparkline values={t.spark} />}
@@ -931,7 +932,7 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
           {shown.map((r, i) => (
             <li
               key={r.id}
-              className={`ad-queue ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden ${leaving[r.id] ? `is-leaving is-${leaving[r.id]}` : ''}`}
+              className={`ad-queue rounded-2xl border border-line bg-surface-2 overflow-hidden ${leaving[r.id] ? `is-leaving is-${leaving[r.id]}` : ''}`}
               style={{ '--i': Math.min(i, 8), '--type': TYPES[r.type]?.color || '#FAB219' }}
             >
               <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -1145,7 +1146,7 @@ function RegisteredUsers({ users, onOpen, onToggleFlag }) {
       </div>
 
       {/* Users Table */}
-      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+      <div className="rounded-2xl border border-line bg-surface-2 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[840px]">
             <thead>
@@ -1426,7 +1427,7 @@ function QueryDesk({ queries, onOpen, onToggleFlag, onUpdateStatus }) {
       </div>
 
       {/* Query Desk Table */}
-      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+      <div className="rounded-2xl border border-line bg-surface-2 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[880px]">
             <thead>
@@ -1613,34 +1614,34 @@ function TermsConsentDesk({ consents = [], onOpen }) {
     <div className="flex flex-col gap-5 sm:gap-6">
       {/* Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+        <div className="ad-card rounded-2xl border border-line bg-surface-2 p-4 sm:p-5 shadow-sm">
           <p className="text-xs text-fg-3 flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-gold-text" />
             Total Consents Logged
           </p>
-          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-fg">
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-fg font-medium">
             <Counter value={consents.length} />
           </p>
           <p className="mt-2 text-xs text-fg-3">Tracked legal acknowledgements</p>
         </div>
 
-        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+        <div className="ad-card rounded-2xl border border-line bg-surface-2 p-4 sm:p-5 shadow-sm">
           <p className="text-xs text-fg-3 flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4 text-[#0CA30C]" />
             Agreed Users
           </p>
-          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-[#0CA30C]">
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-[#0CA30C] font-medium">
             <Counter value={agreedCount} />
           </p>
           <p className="mt-2 text-xs text-fg-3">{agreementRate}% compliance rate</p>
         </div>
 
-        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+        <div className="ad-card rounded-2xl border border-line bg-surface-2 p-4 sm:p-5 shadow-sm">
           <p className="text-xs text-fg-3 flex items-center gap-1.5">
             <AlertCircle className="w-4 h-4 text-coral" />
             Disagreed Users
           </p>
-          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-coral">
+          <p className="mt-3 font-serif text-3xl sm:text-[38px] leading-none text-coral font-medium">
             <Counter value={disagreedCount} />
           </p>
           <p className="mt-2 text-xs text-fg-3">
@@ -1648,7 +1649,7 @@ function TermsConsentDesk({ consents = [], onOpen }) {
           </p>
         </div>
 
-        <div className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-4 sm:p-5">
+        <div className="ad-card rounded-2xl border border-line bg-surface-2 p-4 sm:p-5 shadow-sm">
           <p className="text-xs text-fg-3 flex items-center gap-1.5">
             <FileText className="w-4 h-4 text-gold-text" />
             Master Terms Protocol
@@ -2045,7 +2046,7 @@ function AimfRegistrations({ registrations, onOpen, onToggleFlag }) {
       </div>
 
       {/* AIMF Table */}
-      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+      <div className="rounded-2xl border border-line bg-surface-2 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[800px]">
             <thead>
@@ -2222,7 +2223,7 @@ function Registrations({ registrations, onOpen, onToggleFlag }) {
         </div>
       </div>
 
-      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+      <div className="rounded-2xl border border-line bg-surface-2 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[800px]">
             <thead>
@@ -2344,10 +2345,10 @@ function SignIns({ logins, registrations }) {
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
-        {tiles.map((t, i) => (
-          <div key={t.label} className="ad-card ad-rise rounded-2xl border border-line bg-surface-0/70 p-5" style={{ '--i': i }}>
+        {tiles.map((t) => (
+          <div key={t.label} className="ad-card rounded-2xl border border-line bg-surface-2 p-5 shadow-sm">
             <p className="text-xs text-fg-3">{t.label}</p>
-            <p className="mt-3 font-serif text-[40px] leading-none text-fg"><Counter value={t.value} /></p>
+            <p className="mt-3 font-serif text-[40px] leading-none text-fg font-medium"><Counter value={t.value} /></p>
           </div>
         ))}
       </div>
@@ -2373,7 +2374,7 @@ function SignIns({ logins, registrations }) {
 
       <div className="flex justify-end"><SearchBox value={q} onChange={setQ} placeholder="Search name or email…" /></div>
 
-      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 4 }}>
+      <div className="rounded-2xl border border-line bg-surface-2 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[620px]">
             <thead>
