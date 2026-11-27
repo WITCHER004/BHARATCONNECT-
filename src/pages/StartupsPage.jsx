@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { 
   ArrowUpRight, 
+  ArrowRight,
   Rocket, 
   Search, 
   Lock, 
@@ -32,6 +33,7 @@ import {
 } from 'lucide-react';
 import { watchMyStartups, watchMyEventApplications, submitEventApplication } from '../data/registry';
 import { useAuth } from '../auth/AuthContext';
+import SignInGate from '../auth/SignInGate';
 import { EVENTS, eventStatus, calendarFile, googleCalendarUrl } from '../data/events';
 
 /*
@@ -455,48 +457,86 @@ export default function StartupsPage({ onNavigate }) {
   const primaryStartup = startups[0] || null;
 
   return (
-    <div className="page-enter flex flex-col min-h-screen">
-      {/* ── Top Header Banner (Obsidian Royal) ──────────── */}
-      <section className="pt-32 pb-10 bg-royal border-b border-line text-fg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line mb-3 text-gold-text">Bharat Connect 2026 · Founder Portal</p>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em]">
-                Founder Hub &amp; Directory
-              </h1>
-              <p className="mt-2 text-sm sm:text-base text-fg-2 max-w-xl leading-relaxed">
-                {user ? (
-                  <>
-                    Active founder dashboard for <strong className="text-fg">{user.email}</strong>.
-                  </>
-                ) : (
-                  'Private showcase, official announcements & event accreditation for Bharat Connect 2026.'
-                )}
-              </p>
-            </div>
-
-            {user && (
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="px-4 py-2 rounded-xl bg-surface-2 border border-line">
-                  <span className="block font-serif text-2xl text-gold-text tabular-nums">{startups.length}</span>
-                  <span className="text-xs text-fg-3">Registered {startups.length === 1 ? 'Startup' : 'Startups'}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('startup')}
-                  className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-                >
-                  <Plus className="w-4 h-4" strokeWidth={2} />
-                  <span>Register Startup</span>
-                </button>
+    <SignInGate
+      title="Sign in to access Founder Portal"
+      reason="The Founder Hub & Deal Room is reserved for registered startups. Sign in with your registered account to manage your venture, summit events, and passes."
+      portalType="startup"
+      onNavigate={onNavigate}
+    >
+      <div className="page-enter flex flex-col min-h-screen">
+        {/* ── Top Header Banner (Obsidian Royal) ──────────── */}
+        <section className="pt-32 pb-10 bg-royal border-b border-line text-fg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
+            <p className="ref-line mb-3 text-gold-text">Bharat Connect 2026 · Founder Portal</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em]">
+                  Founder Hub &amp; Directory
+                </h1>
+                <p className="mt-2 text-sm sm:text-base text-fg-2 max-w-xl leading-relaxed">
+                  {user ? (
+                    <>
+                      Active founder dashboard for <strong className="text-fg">{user.email}</strong>.
+                    </>
+                  ) : (
+                    'Private showcase, official announcements & event accreditation for Bharat Connect 2026.'
+                  )}
+                </p>
               </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* ── HORIZONTAL NAVIGATION BAR (Sticky Tabs) ─────── */}
+              {user && (
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="px-4 py-2 rounded-xl bg-surface-2 border border-line">
+                    <span className="block font-serif text-2xl text-gold-text tabular-nums">{startups.length}</span>
+                    <span className="text-xs text-fg-3">Registered {startups.length === 1 ? 'Startup' : 'Startups'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('startup')}
+                    className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                  >
+                    <Plus className="w-4 h-4" strokeWidth={2} />
+                    <span>Register Startup</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* If signed in but has no registered startups, display registration gate */}
+        {startups.length === 0 ? (
+          <section className="theme-cream py-16 sm:py-24 bg-surface-0 flex-1 flex items-center justify-center">
+            <div className="max-w-xl mx-auto px-4 sm:px-6 w-full text-center animate-fade-in">
+              <div className="surface-card rounded-3xl p-8 sm:p-12 border border-line shadow-xl">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-surface-3 border border-gold-foil/40 flex items-center justify-center text-gold-text mb-6">
+                  <Rocket className="w-8 h-8" strokeWidth={1.75} />
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-gold-foil/15 text-gold-text border border-gold-foil/30 mb-4">
+                  Registration Required
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-fg">
+                  Startup Registration Required
+                </h2>
+                <p className="mt-3 text-sm text-fg-2 leading-relaxed">
+                  The Founder Hub, Deal Room &amp; Summit Passes are strictly reserved for registered ventures. No startup registration was found under <strong className="text-fg">{user?.email}</strong>.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('startup')}
+                    className="btn-primary h-12 px-7 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98] mx-auto"
+                  >
+                    <span>Register Your Startup Now</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            {/* ── HORIZONTAL NAVIGATION BAR (Sticky Tabs) ─────── */}
       <div className="sticky top-[76px] sm:top-[88px] z-20 bg-surface-1/95 backdrop-blur-md border-b border-line shadow-sm py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-4 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -1339,6 +1379,10 @@ export default function StartupsPage({ onNavigate }) {
         </div>
       )}
 
-    </div>
+            </div>
+          </>
+        )}
+      </div>
+    </SignInGate>
   );
 }

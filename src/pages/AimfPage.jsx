@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { 
   ArrowUpRight, 
+  ArrowRight,
   Music, 
   Search, 
   Lock, 
@@ -33,6 +34,7 @@ import {
 } from 'lucide-react';
 import { watchMyAimfAccreditations, watchMyEventApplications, submitEventApplication } from '../data/registry';
 import { useAuth } from '../auth/AuthContext';
+import SignInGate from '../auth/SignInGate';
 import { calendarFile, googleCalendarUrl } from '../data/events';
 
 /*
@@ -440,48 +442,86 @@ export default function AimfPage({ onNavigate }) {
   };
 
   return (
-    <div className="page-enter flex flex-col min-h-screen">
-      {/* ── HEADER BANNER ─────────────────────────────────── */}
-      <section className="pt-32 pb-12 bg-royal border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8">
-          <p className="ref-line mb-4">Bharat Connect 2026 · Atal Innovation Multilateral Forum</p>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em]">
-                AIMF Cultural &amp; Creative Portal
-              </h1>
-              <p className="mt-2 text-sm sm:text-base text-fg-2 max-w-2xl leading-relaxed">
-                {user ? (
-                  <>
-                    Accreditation hub, pavilion staging, and bilateral cultural showcases registered under <strong className="text-fg">{user.email}</strong>.
-                  </>
-                ) : (
-                  'Private cultural & creative accreditation hub for Atal Innovation Multilateral Forum 2026.'
-                )}
-              </p>
-            </div>
-
-            {user && (
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="px-4 py-2 rounded-xl bg-surface-2 border border-line">
-                  <span className="block font-serif text-2xl text-gold-text tabular-nums">{accreditations.length}</span>
-                  <span className="text-xs text-fg-3">Registered {accreditations.length === 1 ? 'Accreditation' : 'Accreditations'}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('aimf-register')}
-                  className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
-                >
-                  <Plus className="w-4 h-4" strokeWidth={2} />
-                  <span>Register for AIMF</span>
-                </button>
+    <SignInGate
+      title="Sign in to access AIMF Cultural Portal"
+      reason="The AIMF Cultural & Creative Portal is reserved for accredited delegates. Sign in with your registered account to manage your showcase, pavilion staging, and performance applications."
+      portalType="aimf"
+      onNavigate={onNavigate}
+    >
+      <div className="page-enter flex flex-col min-h-screen">
+        {/* ── HEADER BANNER ─────────────────────────────────── */}
+        <section className="pt-32 pb-12 bg-royal border-b border-line">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
+            <p className="ref-line mb-4">Bharat Connect 2026 · Atal Innovation Multilateral Forum</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h1 className="font-serif font-medium text-4xl sm:text-5xl text-fg tracking-[-0.02em]">
+                  AIMF Cultural &amp; Creative Portal
+                </h1>
+                <p className="mt-2 text-sm sm:text-base text-fg-2 max-w-2xl leading-relaxed">
+                  {user ? (
+                    <>
+                      Accreditation hub, pavilion staging, and bilateral cultural showcases registered under <strong className="text-fg">{user.email}</strong>.
+                    </>
+                  ) : (
+                    'Private cultural & creative accreditation hub for Atal Innovation Multilateral Forum 2026.'
+                  )}
+                </p>
               </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* ── STICKY HORIZONTAL TAB NAVIGATION BAR ──────────── */}
+              {user && (
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="px-4 py-2 rounded-xl bg-surface-2 border border-line">
+                    <span className="block font-serif text-2xl text-gold-text tabular-nums">{accreditations.length}</span>
+                    <span className="text-xs text-fg-3">Registered {accreditations.length === 1 ? 'Accreditation' : 'Accreditations'}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('aimf-register')}
+                    className="btn-primary h-11 px-5 text-sm font-semibold flex items-center gap-2 cursor-pointer shadow-sm active:scale-[0.98]"
+                  >
+                    <Plus className="w-4 h-4" strokeWidth={2} />
+                    <span>Register for AIMF</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* If signed in but has no registered AIMF accreditations, display accreditation gate */}
+        {accreditations.length === 0 ? (
+          <section className="theme-cream py-16 sm:py-24 bg-surface-0 flex-1 flex items-center justify-center">
+            <div className="max-w-xl mx-auto px-4 sm:px-6 w-full text-center animate-fade-in">
+              <div className="surface-card rounded-3xl p-8 sm:p-12 border border-line shadow-xl">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-surface-3 border border-gold-foil/40 flex items-center justify-center text-gold-text mb-6">
+                  <Palette className="w-8 h-8" strokeWidth={1.75} />
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-gold-foil/15 text-gold-text border border-gold-foil/30 mb-4">
+                  Accreditation Required
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-medium text-fg">
+                  AIMF Accreditation Required
+                </h2>
+                <p className="mt-3 text-sm text-fg-2 leading-relaxed">
+                  The AIMF Cultural &amp; Creative Portal, Pavilion Staging &amp; Bilateral Media Deals are strictly reserved for accredited delegates. No AIMF accreditation was found under <strong className="text-fg">{user?.email}</strong>.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('aimf-register')}
+                    className="btn-primary h-12 px-7 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98] mx-auto"
+                  >
+                    <span>Apply for AIMF Accreditation Now</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <>
+            {/* ── STICKY HORIZONTAL TAB NAVIGATION BAR ──────────── */}
       <div className="sticky top-[76px] sm:top-[88px] z-20 bg-surface-1/95 backdrop-blur-md border-b border-line shadow-sm py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between gap-4 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -1284,6 +1324,10 @@ export default function AimfPage({ onNavigate }) {
           </div>
         </div>
       )}
-    </div>
+            </div>
+          </>
+        )}
+      </div>
+    </SignInGate>
   );
 }

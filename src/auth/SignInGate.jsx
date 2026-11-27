@@ -141,8 +141,8 @@ export default function SignInGate({ title, reason, portalType, onNavigate, chil
               <button
                 type="button"
                 onClick={() => {
-                  if (onNavigate) onNavigate('startup');
-                  else window.location.hash = 'startup';
+                  if (onNavigate) onNavigate('startups');
+                  else window.location.hash = 'startups';
                 }}
                 className="btn-primary h-11 px-6 text-sm w-full sm:w-auto flex items-center justify-center gap-2 cursor-pointer"
               >

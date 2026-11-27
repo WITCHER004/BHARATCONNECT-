@@ -168,7 +168,7 @@ export default function LoginPage({ onNavigate }) {
 
                       {startupReg && (
                         <button
-                          onClick={() => onNavigate('startup')}
+                          onClick={() => onNavigate('startups')}
                           className="btn-primary !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md"
                         >
                           <Building2 className="w-4 h-4 text-gold-text" />
@@ -185,22 +185,22 @@ export default function LoginPage({ onNavigate }) {
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
-                      {!aimfReg && (
-                        <button
-                          onClick={() => onNavigate('startups')}
-                          className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                          <span>View Registered Startups</span>
-                        </button>
-                      )}
-
-                      {!startupReg && (
-                        <button
-                          onClick={() => onNavigate('aimf')}
-                          className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                          <span>Explore AIMF Pavilion</span>
-                        </button>
+                      {/* For users with no registration yet, show options to register either */}
+                      {!aimfReg && !startupReg && (
+                        <>
+                          <button
+                            onClick={() => onNavigate('startup')}
+                            className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <span>Register Startup Showcase</span>
+                          </button>
+                          <button
+                            onClick={() => onNavigate('aimf-register')}
+                            className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <span>Apply for AIMF Cultural Accreditation</span>
+                          </button>
+                        </>
                       )}
 
                       <button

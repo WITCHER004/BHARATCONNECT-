@@ -3,6 +3,7 @@ import { Menu, X, LogOut, ChevronDown, LogIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandLogo, BrandMark } from './BrandLogo';
 import { PANELS, PANEL_IDS } from '../data/panels';
+import { watchMyRegistrationsForUser } from '../data/registry';
 
 export { BrandMark };
 
@@ -87,7 +88,7 @@ function UserMenu() {
   );
 }
 
-function RegisterDropdown({ onNavigate }) {
+function RegisterDropdown({ onNavigate, isStartupUser, isAimfUser }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -173,39 +174,45 @@ function RegisterDropdown({ onNavigate }) {
               </div>
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onNavigate('startup');
-              }}
-              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-            >
-              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-              <div>
-                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                  Startup Showcase
+            {/* If user is registered with AIMF, Startup Showcase is strictly hidden */}
+            {!isAimfUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate('startup');
+                }}
+                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+              >
+                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                    Startup Showcase
+                  </div>
+                  <div className="text-[11px] text-fg-3">Register your startup for exhibition & pitch</div>
                 </div>
-                <div className="text-[11px] text-fg-3">Register your startup for exhibition & pitch</div>
-              </div>
-            </button>
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                onNavigate('aimf-register');
-              }}
-              className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
-            >
-              <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
-              <div>
-                <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
-                  AIMF Cultural Portal
+            {/* If user is registered with Startup, AIMF Cultural Portal is strictly hidden */}
+            {!isStartupUser && (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate('aimf-register');
+                }}
+                className="w-full text-left p-2.5 rounded-xl hover:bg-surface-3 transition-colors cursor-pointer group flex items-start gap-2.5"
+              >
+                <span className="w-1.5 h-1.5 rotate-45 bg-gold-foil mt-1.5 shrink-0" />
+                <div>
+                  <div className="text-sm font-medium text-fg group-hover:text-gold-text transition-colors">
+                    AIMF Cultural Portal
+                  </div>
+                  <div className="text-[11px] text-fg-3">Complimentary artist & cultural accreditation</div>
                 </div>
-                <div className="text-[11px] text-fg-3">Complimentary artist & cultural accreditation</div>
-              </div>
-            </button>
+              </button>
+            )}
 
             <button
               type="button"
@@ -324,6 +331,25 @@ export default function Navbar({ activePage, onNavigate }) {
   const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [myRegistrations, setMyRegistrations] = useState([]);
+
+  useEffect(() => {
+    if (!user) {
+      setMyRegistrations([]);
+      return undefined;
+    }
+    return watchMyRegistrationsForUser(user, setMyRegistrations);
+  }, [user]);
+
+  const isStartupUser = (myRegistrations || []).some((r) => r.type === 'startup');
+  const isAimfUser = (myRegistrations || []).some((r) => r.type === 'aimf');
+
+  // Strict mutual exclusion: once registered with one, the other portal cannot be accessed or seen
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (item.id === 'aimf' && isStartupUser) return false;
+    if (item.id === 'startups' && isAimfUser) return false;
+    return true;
+  });
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 8);
@@ -340,7 +366,14 @@ export default function Navbar({ activePage, onNavigate }) {
   }, [mobileMenuOpen]);
 
   const handleNavClick = (pageId) => {
-    onNavigate(pageId);
+    let target = pageId;
+    // For unregistered users, clicking Startups or AIMF directs them to register first
+    if (pageId === 'startups' && !isStartupUser) {
+      target = 'startup';
+    } else if (pageId === 'aimf' && !isAimfUser) {
+      target = 'aimf-register';
+    }
+    onNavigate(target);
     setMobileMenuOpen(false);
   };
 
@@ -390,7 +423,7 @@ export default function Navbar({ activePage, onNavigate }) {
 
           {/* Desktop navigation */}
           <nav className="hidden xl:flex items-center" aria-label="Main">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = activePage === item.id;
               return (
                 <button
@@ -432,8 +465,12 @@ export default function Navbar({ activePage, onNavigate }) {
               </button>
             )}
 
-            {/* Register Dropdown Button (User Request: clicking Register shows the Login option which redirects to another page) */}
-            <RegisterDropdown onNavigate={handleNavClick} />
+            {/* Register Dropdown Button with mutual exclusion filtering */}
+            <RegisterDropdown
+              onNavigate={handleNavClick}
+              isStartupUser={isStartupUser}
+              isAimfUser={isAimfUser}
+            />
 
             {/* User Account Menu when authenticated */}
             {user && <UserMenu />}
@@ -458,7 +495,7 @@ export default function Navbar({ activePage, onNavigate }) {
         {mobileMenuOpen && (
           <div className="xl:hidden px-3 sm:px-4 pb-6 pt-3 border-t border-line animate-slide-up max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain">
             <div className="flex flex-col gap-1">
-              {NAV_ITEMS.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive = activePage === item.id;
                 return (
                   <button
