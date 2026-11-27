@@ -45,6 +45,9 @@ const reduced = () => typeof window !== 'undefined' && window.matchMedia('(prefe
 /* ── Counter: tweens from the last value to the new one ─ */
 
 export function Counter({ value, suffix = '' }) {
+  if (typeof value !== 'number' || isNaN(value)) {
+    return <span className="tabular-nums">{value ?? 0}{suffix}</span>;
+  }
   const [shown, setShown] = useState(reduced() ? value : 0);
   const from = useRef(reduced() ? value : 0);
 
@@ -54,7 +57,7 @@ export function Counter({ value, suffix = '' }) {
       return undefined;
     }
     const start = performance.now();
-    const a = from.current;
+    const a = typeof from.current === 'number' && !isNaN(from.current) ? from.current : 0;
     let raf;
     const tick = (now) => {
       const p = Math.min((now - start) / 900, 1);
@@ -67,7 +70,7 @@ export function Counter({ value, suffix = '' }) {
     return () => cancelAnimationFrame(raf);
   }, [value]);
 
-  return <span className="tabular-nums">{shown.toLocaleString('en-IN')}{suffix}</span>;
+  return <span className="tabular-nums">{typeof shown === 'number' && !isNaN(shown) ? shown.toLocaleString('en-IN') : (shown ?? 0)}{suffix}</span>;
 }
 
 /* ── Status badge: colour + icon + label, never colour alone ─ */
@@ -116,13 +119,14 @@ export function Legend({ items }) {
 
 /* ── Stacked bars: registrations per day, by type ───── */
 
-export function DailyBars({ records, days = 14 }) {
+export function DailyBars({ records = [], days = 14 }) {
   const [hover, setHover] = useState(null);
   const dayList = lastNDays(days);
+  const safeRecords = Array.isArray(records) ? records : [];
   const data = dayList.map((d) => {
     const byType = Object.fromEntries(TYPE_ORDER.map((t) => [t, 0]));
-    records.forEach((r) => {
-      if (byType[r.type] !== undefined && sameDay(r.submittedAt, d)) byType[r.type] += 1;
+    safeRecords.forEach((r) => {
+      if (r && byType[r.type] !== undefined && sameDay(r.submittedAt, d)) byType[r.type] += 1;
     });
     return { d, byType, total: Object.values(byType).reduce((a, b) => a + b, 0) };
   });
@@ -217,9 +221,10 @@ export function DailyBars({ records, days = 14 }) {
 
 /* ── Donut: share of registrations by type ───────────── */
 
-export function Donut({ records }) {
+export function Donut({ records = [] }) {
   const [hover, setHover] = useState(null);
-  const counts = TYPE_ORDER.map((t) => ({ t, n: records.filter((r) => r.type === t).length }));
+  const safeRecords = Array.isArray(records) ? records : [];
+  const counts = TYPE_ORDER.map((t) => ({ t, n: safeRecords.filter((r) => r && r.type === t).length }));
   const total = counts.reduce((a, b) => a + b.n, 0);
   const R = 70;
   const C = 2 * Math.PI * R;
@@ -282,9 +287,10 @@ export function Donut({ records }) {
 
 /* ── Status split per type: pending / approved / declined ─ */
 
-export function StatusSplit({ records }) {
+export function StatusSplit({ records = [] }) {
+  const safeRecords = Array.isArray(records) ? records : [];
   const rows = TYPE_ORDER.map((t) => {
-    const list = records.filter((r) => r.type === t);
+    const list = safeRecords.filter((r) => r && r.type === t);
     const n = list.length;
     const by = Object.fromEntries(Object.keys(STATUS).map((s) => [s, list.filter((r) => r.status === s).length]));
     return { t, n, by };
@@ -343,11 +349,13 @@ export function RankBars({ items, color = 'var(--color-gold-foil)' }) {
 
 /* ── Sparkline for stat tiles ────────────────────────── */
 
-export function Sparkline({ values, color = 'var(--color-gold-foil)' }) {
+export function Sparkline({ values = [], color = 'var(--color-gold-foil)' }) {
+  if (!Array.isArray(values) || !values.length) return null;
   const W = 100;
   const H = 28;
-  const max = Math.max(1, ...values);
-  const pts = values.map((v, i) => `${(i / Math.max(1, values.length - 1)) * W},${H - 2 - (v / max) * (H - 4)}`).join(' ');
+  const safeValues = values.map((v) => (typeof v === 'number' && !isNaN(v) ? v : 0));
+  const max = Math.max(1, ...safeValues);
+  const pts = safeValues.map((v, i) => `${(i / Math.max(1, safeValues.length - 1)) * W},${H - 2 - (v / max) * (H - 4)}`).join(' ');
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-24 h-7" preserveAspectRatio="none" aria-hidden="true">
       <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" className="ad-spark" />

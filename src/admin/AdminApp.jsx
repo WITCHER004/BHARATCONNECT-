@@ -253,6 +253,50 @@ class ErrorBoundary extends Component {
   }
 }
 
+class ViewErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('View render error in', this.props.view, error, errorInfo);
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.view !== this.props.view && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="surface-card rounded-2xl p-6 sm:p-8 border border-line text-center max-w-lg mx-auto my-6">
+          <div className="w-10 h-10 rounded-xl bg-[#D03B3B]/15 border border-[#D03B3B]/30 flex items-center justify-center mx-auto text-[#D03B3B]">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <h3 className="mt-3 font-serif text-lg text-fg">Notice: {this.props.view}</h3>
+          <p className="mt-1.5 text-xs text-fg-3 leading-relaxed">
+            A display issue occurred while rendering this section.
+          </p>
+          <pre className="mt-3 p-3 rounded-lg bg-surface-2 text-left font-mono text-[11px] text-[#FAB219] overflow-x-auto whitespace-pre-wrap">
+            {this.state.error?.message || String(this.state.error)}
+          </pre>
+          <button
+            type="button"
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="mt-4 btn-primary h-9 px-4 text-xs font-semibold cursor-pointer"
+          >
+            Retry Section
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 /* ── Shell ────────────────────────────────────────────── */
 
 function AdminAppInner() {
@@ -453,65 +497,67 @@ function AdminAppInner() {
         )}
 
         <main key={view} className="ad-view p-4 sm:p-8">
-          {view === 'overview' && (
-            <Overview
-              registrations={registrations}
-              users={users}
-              queries={queries}
-              consents={consents}
-              logins={logins}
-              onOpen={setSelected}
-              go={go}
-            />
-          )}
-          {view === 'approvals' && (
-            <Approvals
-              registrations={approvable}
-              onOpen={setSelected}
-              onToggleFlag={handleToggleFlag}
-            />
-          )}
-          {view === 'aimf' && (
-            <AimfRegistrations
-              registrations={aimfList}
-              onOpen={setSelected}
-              onToggleFlag={handleToggleFlag}
-            />
-          )}
-          {view === 'users' && (
-            <RegisteredUsers
-              users={users}
-              onOpen={setSelected}
-              onToggleFlag={handleToggleFlag}
-            />
-          )}
-          {view === 'queries' && (
-            <QueryDesk
-              queries={queries}
-              onOpen={setSelected}
-              onToggleFlag={handleToggleFlag}
-              onUpdateStatus={handleUpdateQueryStatus}
-            />
-          )}
-          {view === 'terms' && (
-            <TermsConsentDesk
-              consents={consents}
-              onOpen={setSelected}
-            />
-          )}
-          {view === 'registrations' && (
-            <Registrations
-              registrations={registrations}
-              onOpen={setSelected}
-              onToggleFlag={handleToggleFlag}
-            />
-          )}
-          {view === 'signins' && (
-            <SignIns
-              logins={logins}
-              registrations={registrations}
-            />
-          )}
+          <ViewErrorBoundary view={view}>
+            {view === 'overview' && (
+              <Overview
+                registrations={registrations}
+                users={users}
+                queries={queries}
+                consents={consents}
+                logins={logins}
+                onOpen={setSelected}
+                go={go}
+              />
+            )}
+            {view === 'approvals' && (
+              <Approvals
+                registrations={approvable}
+                onOpen={setSelected}
+                onToggleFlag={handleToggleFlag}
+              />
+            )}
+            {view === 'aimf' && (
+              <AimfRegistrations
+                registrations={aimfList}
+                onOpen={setSelected}
+                onToggleFlag={handleToggleFlag}
+              />
+            )}
+            {view === 'users' && (
+              <RegisteredUsers
+                users={users}
+                onOpen={setSelected}
+                onToggleFlag={handleToggleFlag}
+              />
+            )}
+            {view === 'queries' && (
+              <QueryDesk
+                queries={queries}
+                onOpen={setSelected}
+                onToggleFlag={handleToggleFlag}
+                onUpdateStatus={handleUpdateQueryStatus}
+              />
+            )}
+            {view === 'terms' && (
+              <TermsConsentDesk
+                consents={consents}
+                onOpen={setSelected}
+              />
+            )}
+            {view === 'registrations' && (
+              <Registrations
+                registrations={registrations}
+                onOpen={setSelected}
+                onToggleFlag={handleToggleFlag}
+              />
+            )}
+            {view === 'signins' && (
+              <SignIns
+                logins={logins}
+                registrations={registrations}
+              />
+            )}
+          </ViewErrorBoundary>
         </main>
       </div>
 
@@ -608,7 +654,7 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
     { label: 'Awaiting review', value: pending, caption: pending ? 'need a decision' : 'queue is clear', accent: '#FAB219', onClick: () => go('approvals') },
     { label: 'AIMF Cultural Desk', value: aimfList.length, caption: aimfPending ? `${aimfPending} pending review` : 'cultural showcases', accent: aimfPending ? '#FAB219' : undefined, onClick: () => go('aimf') },
     { label: 'Query Desk', value: openQueries, suffix: ` / ${queries.length}`, caption: `${openQueries} inquiries pending response`, onClick: () => go('queries'), accent: openQueries ? '#FAB219' : undefined },
-    { label: 'Terms & Conditions', value: `${agreedConsents}/${consents.length}`, caption: `${disagreedConsents} disagreements logged`, onClick: () => go('terms'), accent: disagreedConsents ? '#D03B3B' : '#0CA30C' },
+    { label: 'Terms & Conditions', value: agreedConsents, suffix: ` / ${consents.length}`, caption: `${disagreedConsents} disagreements logged`, onClick: () => go('terms'), accent: disagreedConsents ? '#D03B3B' : '#0CA30C' },
     { label: 'Flagged for review', value: flaggedCount, caption: flaggedCount ? 'requires administrative attention' : 'no flagged items', accent: flaggedCount ? '#FAB219' : undefined, onClick: () => go('users') },
   ];
 
@@ -666,39 +712,39 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
           <ul className="flex flex-col">
             {feed.length === 0 && <Empty text="Nothing yet. Activity on the site appears here." />}
             {feed.map((f, i) => (
-              <li key={(f.r?.id || f.q?.id || f.l?.email) + f.at} className="ad-feed-item py-2.5 border-b border-line last:border-0" style={{ '--i': i }}>
+              <li key={(f.r?.id || f.q?.id || f.c?.id || f.l?.id || f.l?.email || '') + (f.at || '') + i} className="ad-feed-item py-2.5 border-b border-line last:border-0" style={{ '--i': i }}>
                 {f.kind === 'reg' ? (
-                  <button onClick={() => onOpen(f.r.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
-                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: TYPES[f.r.type]?.color }} />
+                  <button onClick={() => f.r?.id && onOpen(f.r.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
+                    <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: TYPES[f.r?.type]?.color || '#FAB219' }} />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-fg truncate group-hover:text-gold-text transition-colors">
-                        {f.r.name || 'Someone'} <span className="text-fg-3">registered · {TYPES[f.r.type]?.short}</span>
+                        {f.r?.name || 'Someone'} <span className="text-fg-3">registered · {TYPES[f.r?.type]?.short || f.r?.type || 'User'}</span>
                       </span>
-                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.r.source === 'sample' && <SampleTag />} {f.r.flagged && <span className="text-[#FAB219] font-mono ml-1">· Flagged</span>}</span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.r?.source === 'sample' && <SampleTag />} {f.r?.flagged && <span className="text-[#FAB219] font-mono ml-1">· Flagged</span>}</span>
                     </span>
                   </button>
                 ) : f.kind === 'query' ? (
-                  <button onClick={() => onOpen(f.q.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
+                  <button onClick={() => f.q?.id && onOpen(f.q.id)} className="w-full text-left flex items-start gap-3 cursor-pointer group">
                     <span className="mt-1.5 w-2 h-2 rounded-full shrink-0 bg-[#8A9E97]" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-fg truncate group-hover:text-gold-text transition-colors">
-                        {f.q.name} <span className="text-fg-3">inquired · {f.q.category}</span>
+                        {f.q?.name || 'Someone'} <span className="text-fg-3">inquired · {f.q?.category || 'General'}</span>
                       </span>
-                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} · <span className="font-mono text-gold-text">{f.q.id}</span></span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} · <span className="font-mono text-gold-text">{f.q?.id || ''}</span></span>
                     </span>
                   </button>
                 ) : f.kind === 'consent' ? (
                   <div className="flex items-start gap-3">
-                    <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${f.c.decision === 'agreed' ? 'bg-[#0CA30C]' : 'bg-coral'}`} />
+                    <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${f.c?.decision === 'agreed' ? 'bg-[#0CA30C]' : 'bg-coral'}`} />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-fg truncate">
-                        {f.c.userName || f.c.userEmail}{' '}
-                        <span className={f.c.decision === 'agreed' ? 'text-[#0CA30C]' : 'text-coral'}>
-                          {f.c.decision === 'agreed' ? 'agreed to terms' : 'disagreed with terms'}
+                        {f.c?.userName || f.c?.userEmail || 'User'}{' '}
+                        <span className={f.c?.decision === 'agreed' ? 'text-[#0CA30C]' : 'text-coral'}>
+                          {f.c?.decision === 'agreed' ? 'agreed to terms' : 'disagreed with terms'}
                         </span>
-                        <span className="text-fg-3"> · {f.c.portalTitle || f.c.portal}</span>
+                        <span className="text-fg-3"> · {f.c?.portalTitle || f.c?.portal || 'Terms'}</span>
                       </span>
-                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.c.source === 'sample' && <SampleTag />}</span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.c?.source === 'sample' && <SampleTag />}</span>
                     </span>
                   </div>
                 ) : (
@@ -706,9 +752,9 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
                     <Activity className="mt-0.5 w-3.5 h-3.5 text-fg-3 shrink-0" strokeWidth={1.5} />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-fg truncate">
-                        {f.l.name || f.l.email} <span className="text-fg-3">{f.l.action.replace('-', ' ')} · {f.l.method}</span>
+                        {f.l?.name || f.l?.email || 'User'} <span className="text-fg-3">{(f.l?.action || 'session').replace('-', ' ')} · {f.l?.method || 'auth'}</span>
                       </span>
-                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.l.source === 'sample' && <SampleTag />}</span>
+                      <span className="block text-xs text-fg-3">{timeAgo(f.at)} {f.l?.source === 'sample' && <SampleTag />}</span>
                     </span>
                   </div>
                 )}
