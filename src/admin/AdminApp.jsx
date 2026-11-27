@@ -3,7 +3,7 @@ import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
   HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2,
-  ShieldCheck, FileText, Trash2, Sparkles,
+  ShieldCheck, FileText, Trash2, Sparkles, Clock,
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
@@ -333,7 +333,7 @@ export default function AdminApp() {
           )}
           {view === 'aimf' && (
             <AimfRegistrations
-              registrations={registrations}
+              registrations={aimfList}
               onOpen={setSelected}
               onToggleFlag={handleToggleFlag}
             />
