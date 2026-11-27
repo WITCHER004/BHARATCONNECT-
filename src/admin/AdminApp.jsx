@@ -498,7 +498,7 @@ function AdminAppInner() {
 
         <main key={view} className="ad-view p-4 sm:p-8">
           <ViewErrorBoundary view={view}>
-            {view === 'overview' && (
+            {(view === 'overview' || !VIEWS.some((v) => v.id === view)) && (
               <Overview
                 registrations={registrations}
                 users={users}
@@ -660,6 +660,13 @@ function Overview({ registrations = [], users = [], queries = [], consents = [],
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6">
+      <div className="flex items-center justify-between text-xs text-fg-3 border-b border-line/40 pb-2">
+        <span className="font-medium text-fg">Secretariat Operations Dashboard</span>
+        <span className="font-mono text-[11px] text-gold-text">
+          {approvable.length} conclave accreditations · {users.length} users · {queries.length} queries
+        </span>
+      </div>
+
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-5">
         {tiles.map((t, i) => (
           <button
