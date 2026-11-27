@@ -8,6 +8,7 @@ import {
 import SignInGate from '../auth/SignInGate';
 import { useAuth } from '../auth/AuthContext';
 import { submitRegistration, watchMyStartups } from '../data/registry';
+import { sendFormSubmissionEmail } from '../data/mailer';
 import StartupsPage from './StartupsPage';
 
 const DRAFT_KEY = 'bc-startup-draft';
@@ -433,6 +434,10 @@ export default function StartupPage({ onNavigate }) {
     }
     // copy to the organiser's Google Form as before; the registration is already saved if this fails
     fetch(GOOGLE_FORM.responseUrl, { method: 'POST', mode: 'no-cors', body: buildPayload(values) }).catch(() => {});
+    sendFormSubmissionEmail(
+      values.fullName || user?.name,
+      values.commEmail || values.email || user?.email,
+    );
     setAssignedId(uniqueId);
     try { localStorage.setItem('bc-startup-last-id', uniqueId); } catch { /* storage unavailable */ }
     setStatus('sent');

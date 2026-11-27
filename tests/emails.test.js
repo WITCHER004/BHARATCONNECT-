@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import emailjs from '@emailjs/browser';
 import { welcomeEmail, receivedEmail, adminAlertEmail, decisionEmail, esc } from '../src/data/emails.js';
-import { sendWelcomeEmail } from '../src/data/mailer.js';
+import { sendWelcomeEmail, sendFormSubmissionEmail } from '../src/data/mailer.js';
 
 const app = { ref: 'BMF.BC-SEO-00007', type: 'startup', name: 'Asha <script>', email: 'a@example.com', organisation: 'Asha & Co', status: 'pending' };
 
@@ -74,5 +74,44 @@ test('sendWelcomeEmail passes expected credentials, variables, and falls back gr
   t.mock.method(console, 'error', () => {});
   const failMock = t.mock.method(emailjs, 'send', async () => { throw new Error('network down'); });
   await assert.doesNotReject(() => sendWelcomeEmail('Test', 'test@example.com'));
+  assert.equal(failMock.mock.callCount(), 1);
+});
+
+test('sendFormSubmissionEmail uses template_7t66wzf, Applicant fallback, and handles errors safely', async (t) => {
+  const sendMock = t.mock.method(emailjs, 'send', async () => ({ status: 200, text: 'OK' }));
+
+  await sendFormSubmissionEmail('Priya Nair', 'priya@startup.in');
+  assert.equal(sendMock.mock.callCount(), 1);
+  assert.deepEqual(sendMock.mock.calls[0].arguments, [
+    'service_nc4451t',
+    'template_7t66wzf',
+    {
+      to_name: 'Priya Nair',
+      name: 'Priya Nair',
+      to_email: 'priya@startup.in',
+      email: 'priya@startup.in',
+    },
+    'z_0w3S5cSA7W4kWvq',
+  ]);
+
+  await sendFormSubmissionEmail('', 'founder@example.com');
+  assert.deepEqual(sendMock.mock.calls[1].arguments[2], {
+    to_name: 'founder',
+    name: 'founder',
+    to_email: 'founder@example.com',
+    email: 'founder@example.com',
+  });
+
+  await sendFormSubmissionEmail(null, '@invalid');
+  assert.deepEqual(sendMock.mock.calls[2].arguments[2], {
+    to_name: 'Applicant',
+    name: 'Applicant',
+    to_email: '@invalid',
+    email: '@invalid',
+  });
+
+  t.mock.method(console, 'error', () => {});
+  const failMock = t.mock.method(emailjs, 'send', async () => { throw new Error('timeout'); });
+  await assert.doesNotReject(() => sendFormSubmissionEmail('Test', 'test@example.com'));
   assert.equal(failMock.mock.callCount(), 1);
 });

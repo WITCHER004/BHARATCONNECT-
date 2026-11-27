@@ -45,6 +45,7 @@ import {
 import SignInGate from '../auth/SignInGate';
 import { useAuth } from '../auth/AuthContext';
 import { submitRegistration, watchMyAimfAccreditations } from '../data/registry';
+import { sendFormSubmissionEmail } from '../data/mailer';
 import AimfPage from './AimfPage';
 
 const DRAFT_KEY = 'bc-aimf-draft';
@@ -382,6 +383,10 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
       return;
     }
 
+    sendFormSubmissionEmail(
+      values.fullName || user?.name,
+      values.commEmail || values.email || user?.email,
+    );
     setAssignedId(uniqueId);
     try { localStorage.setItem('bc-aimf-last-id', uniqueId); } catch { /* storage unavailable */ }
     setStatus('sent');
