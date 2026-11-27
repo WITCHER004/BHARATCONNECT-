@@ -1,7 +1,11 @@
-import { Phone, MapPin, Download, ArrowUp } from 'lucide-react';
+import { Phone, MapPin, Download, ArrowUp, ExternalLink } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 
 const icon = 'w-4 h-4 text-fg-3 shrink-0';
+const OFFICE_MAP_URL =
+  'https://www.google.com/maps/dir//Bharat+Mahotsav+Festivals+LLP,+Ground+Floor,+250,+Kailash+Hills,+East+of+Kailash,+New+Delhi,+Delhi+110065/@23.0785024,76.8475136,7349m/data=!3m2!1e3!4b1!4m8!4m7!1m0!1m5!1m1!1s0x390ce3a5d2dd8fcf:0x5dea26df6b4735f7!2m2!1d77.2584755!2d28.5577284?entry=ttu&g_ep=EgoyMDI2MTEyMy4wIKXMDSoASAFQAw%3D%3D';
+const OFFICE_MAP_EMBED_URL =
+  'https://maps.google.com/maps?q=28.5577284,77.2584755+(Bharat%20Mahotsav%20Festivals%20LLP)&z=17&output=embed';
 
 
 export default function Footer({ onNavigate, onOpenRegister }) {
@@ -77,17 +81,24 @@ SECRETARIAT & ACCREDITATION:
             <p className="mt-6 ref-line">18–19 Dec 2026 · Palash Hall, 6F · Yashobhoomi</p>
           </div>
 
-          {/* Secretariat */}
+          {/* Official Office Address */}
           <div className="lg:col-span-5">
-            <h4 className="text-sm font-medium text-fg">Secretariat</h4>
+            <h4 className="text-sm font-medium text-fg">Official Office Address</h4>
             <ul className="mt-4 flex flex-col gap-3 text-sm text-fg-2">
-              <li className="flex items-start gap-3">
-                <MapPin className={`${icon} mt-0.5`} strokeWidth={1.5} />
-                <span>
-                  250, Ground Floor, Kailash Hills<br />
-                  East of Kailash, New Delhi<br />
-                  Delhi 110065
-                </span>
+              <li>
+                <a
+                  href={OFFICE_MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-start gap-3 hover:text-fg transition-colors duration-150"
+                >
+                  <MapPin className={`${icon} mt-0.5 group-hover:text-gold-text transition-colors duration-150`} strokeWidth={1.5} />
+                  <span>
+                    Bharat Mahotsav Festivals LLP<br />
+                    250, Ground Floor, Kailash Hills<br />
+                    East of Kailash, New Delhi, Delhi 110065
+                  </span>
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className={icon} strokeWidth={1.5} />
@@ -96,9 +107,29 @@ SECRETARIAT & ACCREDITATION:
                 </a>
               </li>
             </ul>
+
+            <div className="mt-4 rounded-xl overflow-hidden border border-line bg-surface-2 max-w-sm">
+              <iframe
+                src={OFFICE_MAP_EMBED_URL}
+                title="Bharat Mahotsav Festivals LLP — Official Office Address Map"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-36 border-0 block"
+              />
+              <a
+                href={OFFICE_MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gold-text hover:text-fg hover:bg-surface-3 border-t border-line transition-colors duration-150"
+              >
+                <span className="truncate">Open directions in Google Maps</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+              </a>
+            </div>
+
             <button
               onClick={handleDownloadMediaKit}
-              className="mt-6 btn-secondary h-9 px-3 text-sm"
+              className="mt-5 btn-secondary h-9 px-3 text-sm"
             >
               <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
               Media kit and factsheet
