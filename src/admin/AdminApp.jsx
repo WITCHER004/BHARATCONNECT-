@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, Component } from 'react';
 import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
   HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2,
-  ShieldCheck, FileText, Trash2, Sparkles, Clock,
+  ShieldCheck, FileText, Trash2, Sparkles, Clock, Eye, EyeOff
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import AuthForm from '../auth/AuthForm';
 import {
@@ -63,6 +63,11 @@ function useRegistry(includeSamples, enabled) {
 
 function Gate({ state, email }) {
   const [error, setError] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+
   const signIn = async () => {
     setError('');
     try {
@@ -73,9 +78,33 @@ function Gate({ state, email }) {
       }
     }
   };
+
+  const signInEmail = async (e) => {
+    e.preventDefault();
+    if (!emailInput.trim() || !passwordInput) {
+      setError('Please enter both email and password.');
+      return;
+    }
+    setError('');
+    setBusy(true);
+    try {
+      await signInWithEmailAndPassword(auth, emailInput.trim(), passwordInput);
+    } catch (e) {
+      if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(e.code)) {
+        setError('Incorrect email or password.');
+      } else if (e.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please wait a minute and try again.');
+      } else {
+        setError(e.message || 'Sign-in failed. Please try again.');
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 ad-gate-bg">
-      <div className="ad-rise w-full max-w-sm surface-card rounded-2xl p-7 border border-line">
+      <div className="ad-rise w-full max-w-sm surface-card rounded-2xl p-7 border border-line shadow-2xl">
         <div className="flex items-center gap-3">
           <span className="h-10 px-2 rounded-xl bg-[#FCFBF9] ring-1 ring-gold-foil/40 flex items-center">
             <img src={`${import.meta.env.BASE_URL}brand/logo.png`} alt="Bharat Connect" className="h-7 w-auto" />
@@ -86,20 +115,65 @@ function Gate({ state, email }) {
           </span>
         </div>
 
-        {state === 'checking' && <p className="mt-7 text-sm text-fg-3" aria-busy="true">Checking your account…</p>}
+        {state === 'checking' && (
+          <div className="mt-7 flex items-center gap-3 text-sm text-fg-3" aria-busy="true">
+            <span className="w-4 h-4 rounded-full border-2 border-gold-foil border-t-transparent animate-spin" />
+            <span>Verifying administrative access…</span>
+          </div>
+        )}
 
         {state === 'signed-out' && (
           <>
             <p className="mt-5 text-sm text-fg-2 leading-relaxed">Sign in with an authorized secretariat administrator account.</p>
-            <button onClick={signIn} className="mt-4 btn-primary h-11 w-full text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+            <button
+              type="button"
+              onClick={signIn}
+              className="mt-4 btn-primary h-11 w-full text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            >
               <Lock className="w-4 h-4" strokeWidth={1.5} /> Sign in with Google
             </button>
-            <p className="mt-2 min-h-4 text-xs text-[#E66767]" role="alert">{error}</p>
 
-            <div className="mt-4 pt-4 border-t border-line/60">
-              <p className="text-xs text-fg-3 mb-2 text-center">Or sign in with email and password</p>
-              <AuthForm mode="signin" />
+            <div className="mt-5 pt-4 border-t border-line/60">
+              <p className="text-xs text-fg-3 mb-3 text-center">Or sign in with email and password</p>
+              <form onSubmit={signInEmail} className="space-y-3">
+                <input
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="admin@example.com"
+                  autoComplete="email"
+                  required
+                  className="w-full h-10 px-3 rounded-xl bg-surface-2 border border-line text-xs text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil/60"
+                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    placeholder="Password"
+                    autoComplete="current-password"
+                    required
+                    className="w-full h-10 pl-3 pr-9 rounded-xl bg-surface-2 border border-line text-xs text-fg placeholder:text-fg-3 focus:outline-none focus:border-gold-foil/60"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-2.5 top-2.5 text-fg-3 hover:text-fg cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full h-10 rounded-xl bg-surface-3 hover:bg-surface-3/80 border border-line text-xs font-semibold text-fg flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-60"
+                >
+                  {busy ? 'Authenticating…' : 'Sign in with Password'}
+                </button>
+              </form>
             </div>
+            {error && <p className="mt-3 text-xs text-[#E66767]" role="alert">{error}</p>}
           </>
         )}
 
@@ -121,9 +195,67 @@ function Gate({ state, email }) {
   );
 }
 
+/* ── Error Boundary ───────────────────────────────────── */
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('Admin portal uncaught error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-surface-1 text-fg">
+          <div className="w-full max-w-md surface-card rounded-2xl p-7 border border-[#D03B3B]/40 text-center shadow-2xl">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-[#D03B3B]/15 text-[#D03B3B] flex items-center justify-center mb-4">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <h2 className="font-serif text-xl text-fg font-medium">Admin Portal Notice</h2>
+            <p className="mt-2 text-xs text-fg-3 leading-relaxed">
+              An unexpected render issue occurred in the Secretariat portal.
+            </p>
+            {this.state.error?.message && (
+              <p className="mt-3 p-2.5 rounded-lg bg-surface-2 border border-line text-xs font-mono text-[#FAB219] text-left break-all">
+                {this.state.error.message}
+              </p>
+            )}
+            <div className="mt-5 flex gap-3 justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.hash = 'overview';
+                  window.location.reload();
+                }}
+                className="btn-primary h-10 px-5 text-xs font-semibold cursor-pointer"
+              >
+                Reload Portal
+              </button>
+              <button
+                type="button"
+                onClick={() => signOut(auth).then(() => window.location.reload())}
+                className="btn-secondary h-10 px-4 text-xs font-semibold cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 /* ── Shell ────────────────────────────────────────────── */
 
-export default function AdminApp() {
+function AdminAppInner() {
   const [access, setAccess] = useState({ state: 'checking', email: '' });
   useEffect(() => onAuthStateChanged(auth, async (u) => {
     if (!u || u.isAnonymous) { setAccess({ state: 'signed-out', email: '' }); return; }
@@ -172,16 +304,16 @@ export default function AdminApp() {
 
   if (!unlocked) return <Gate state={access.state} email={access.email} />;
 
-  const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
+  const approvable = (registrations || []).filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending');
-  const aimfList = registrations.filter((r) => r.type === 'aimf');
+  const aimfList = (registrations || []).filter((r) => r.type === 'aimf');
   const aimfPendingCount = aimfList.filter((r) => r.status === 'pending').length;
-  const flaggedUsersCount = users.filter((u) => u.flagged).length;
-  const openQueriesCount = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
-  const flaggedQueriesCount = queries.filter((q) => q.flagged).length;
+  const flaggedUsersCount = (users || []).filter((u) => u.flagged).length;
+  const openQueriesCount = (queries || []).filter((q) => q.status === 'received' || q.status === 'in-progress').length;
+  const flaggedQueriesCount = (queries || []).filter((q) => q.flagged).length;
   const totalFlaggedCount = flaggedUsersCount + flaggedQueriesCount;
 
-  const liveCount = registrations.filter((r) => r.source === 'live').length + logins.filter((l) => l.source === 'live').length;
+  const liveCount = (registrations || []).filter((r) => r.source === 'live').length + (logins || []).filter((l) => l.source === 'live').length;
   const current = VIEWS.find((v) => v.id === view) || VIEWS[0];
 
   const nav = (
@@ -395,6 +527,14 @@ export default function AdminApp() {
   );
 }
 
+export default function AdminApp(props) {
+  return (
+    <ErrorBoundary>
+      <AdminAppInner {...props} />
+    </ErrorBoundary>
+  );
+}
+
 function Brand() {
   return (
     <a href="#overview" className="flex items-center gap-3">
@@ -429,17 +569,17 @@ function Card({ title, action, children, className = '', i = 0 }) {
 
 /* ── Overview ─────────────────────────────────────────── */
 
-function Overview({ registrations, users = [], queries = [], consents = [], logins, onOpen, go }) {
-  const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
+function Overview({ registrations = [], users = [], queries = [], consents = [], logins = [], onOpen, go }) {
+  const approvable = (registrations || []).filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending').length;
   const approved = approvable.filter((r) => r.status === 'approved').length;
   const declined = approvable.filter((r) => r.status === 'declined').length;
   const decided = approved + declined;
   const week = lastNDays(7);
-  const signIns7 = logins.filter((l) => l.action !== 'sign-out' && new Date(l.at) >= week[0]).length;
+  const signIns7 = (logins || []).filter((l) => l.action !== 'sign-out' && new Date(l.at) >= week[0]).length;
   const days14 = lastNDays(14);
   const regSpark = days14.map((d) => approvable.filter((r) => sameDay(r.submittedAt, d)).length);
-  const loginSpark = days14.map((d) => logins.filter((l) => l.action !== 'sign-out' && sameDay(l.at, d)).length);
+  const loginSpark = days14.map((d) => (logins || []).filter((l) => l.action !== 'sign-out' && sameDay(l.at, d)).length);
 
   const flaggedCount = [...users, ...queries].filter((x) => x.flagged).length;
   const openQueries = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
@@ -454,13 +594,13 @@ function Overview({ registrations, users = [], queries = [], consents = [], logi
   ).map(([label, n]) => ({ label, n })).sort((a, b) => b.n - a.n).slice(0, 6);
 
   const feed = [
-    ...registrations.slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
-    ...queries.slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
-    ...consents.slice(0, 8).map((c) => ({ kind: 'consent', at: c.timestamp, c })),
-    ...logins.slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
+    ...(registrations || []).slice(0, 8).map((r) => ({ kind: 'reg', at: r.submittedAt, r })),
+    ...(queries || []).slice(0, 8).map((q) => ({ kind: 'query', at: q.submittedAt, q })),
+    ...(consents || []).slice(0, 8).map((c) => ({ kind: 'consent', at: c.timestamp, c })),
+    ...(logins || []).slice(0, 8).map((l) => ({ kind: 'login', at: l.at, l })),
   ].sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 9);
 
-  const aimfList = registrations.filter((r) => r.type === 'aimf');
+  const aimfList = (registrations || []).filter((r) => r.type === 'aimf');
   const aimfPending = aimfList.filter((r) => r.status === 'pending').length;
 
   const tiles = [
