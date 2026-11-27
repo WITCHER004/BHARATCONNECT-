@@ -64,10 +64,10 @@ SECRETARIAT & ACCREDITATION:
   return (
     <footer className="bg-surface-0 border-t border-line text-fg">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 sm:pt-20 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12 border-b border-line">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-12 border-b border-line">
 
           {/* Brand */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-5">
             <div className="flex items-center gap-3">
               <BrandLogo variant="badge" className="py-1 px-3" />
               <span className="flex flex-col">
@@ -82,58 +82,62 @@ SECRETARIAT & ACCREDITATION:
           </div>
 
           {/* Official Office Address */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-7">
             <h4 className="text-sm font-medium text-fg">Official Office Address</h4>
-            <ul className="mt-4 flex flex-col gap-3 text-sm text-fg-2">
-              <li>
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+              <div className="flex-1 min-w-0">
+                <ul className="flex flex-col gap-3 text-sm text-fg-2">
+                  <li>
+                    <a
+                      href={OFFICE_MAP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-start gap-3 hover:text-fg transition-colors duration-150"
+                    >
+                      <MapPin className={`${icon} mt-0.5 group-hover:text-gold-text transition-colors duration-150`} strokeWidth={1.5} />
+                      <span>
+                        Bharat Mahotsav Festivals LLP<br />
+                        250, Ground Floor, Kailash Hills<br />
+                        East of Kailash, New Delhi, Delhi 110065
+                      </span>
+                    </a>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Phone className={icon} strokeWidth={1.5} />
+                    <a href="tel:+919217400624" className="font-mono text-[13px] tabular-nums hover:text-fg transition-colors duration-150">
+                      +91 92174 00624
+                    </a>
+                  </li>
+                </ul>
+
+                <button
+                  onClick={handleDownloadMediaKit}
+                  className="mt-6 btn-secondary h-9 px-3 text-sm"
+                >
+                  <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
+                  Media kit and factsheet
+                </button>
+              </div>
+
+              <div className="w-full sm:w-64 md:w-72 shrink-0 rounded-xl overflow-hidden border border-line bg-surface-2">
+                <iframe
+                  src={OFFICE_MAP_EMBED_URL}
+                  title="Bharat Mahotsav Festivals LLP — Official Office Address Map"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-36 border-0 block"
+                />
                 <a
                   href={OFFICE_MAP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-3 hover:text-fg transition-colors duration-150"
+                  className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gold-text hover:text-fg hover:bg-surface-3 border-t border-line transition-colors duration-150"
                 >
-                  <MapPin className={`${icon} mt-0.5 group-hover:text-gold-text transition-colors duration-150`} strokeWidth={1.5} />
-                  <span>
-                    Bharat Mahotsav Festivals LLP<br />
-                    250, Ground Floor, Kailash Hills<br />
-                    East of Kailash, New Delhi, Delhi 110065
-                  </span>
+                  <span className="truncate">Open directions in Google Maps</span>
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
                 </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className={icon} strokeWidth={1.5} />
-                <a href="tel:+919217400624" className="font-mono text-[13px] tabular-nums hover:text-fg transition-colors duration-150">
-                  +91 92174 00624
-                </a>
-              </li>
-            </ul>
-
-            <div className="mt-4 rounded-xl overflow-hidden border border-line bg-surface-2 max-w-sm">
-              <iframe
-                src={OFFICE_MAP_EMBED_URL}
-                title="Bharat Mahotsav Festivals LLP — Official Office Address Map"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-36 border-0 block"
-              />
-              <a
-                href={OFFICE_MAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-gold-text hover:text-fg hover:bg-surface-3 border-t border-line transition-colors duration-150"
-              >
-                <span className="truncate">Open directions in Google Maps</span>
-                <ExternalLink className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
-              </a>
+              </div>
             </div>
-
-            <button
-              onClick={handleDownloadMediaKit}
-              className="mt-5 btn-secondary h-9 px-3 text-sm"
-            >
-              <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} />
-              Media kit and factsheet
-            </button>
           </div>
 
         </div>
