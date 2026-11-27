@@ -760,6 +760,8 @@ export default function AimfRegistrationPage({ onNavigate, onOpenRegister }) {
               <SignInGate
                 title="Sign in to apply for AIMF accreditation"
                 reason="AIMF registration needs an account (Google, Apple, or email), so your creative showcase, credentials, and unique Accreditation ID [BC.AIMF-numbers] stay tied to you."
+                portalType="aimf"
+                onNavigate={onNavigate}
               >
                 <AimfHub
                   uid={user?.uid}

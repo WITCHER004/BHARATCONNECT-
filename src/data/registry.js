@@ -13,7 +13,7 @@
 */
 import {
   collection, doc, onSnapshot, query, where, runTransaction, serverTimestamp, updateDoc, setDoc, deleteDoc, addDoc,
-  getDoc,
+  getDoc, getDocs,
 } from 'firebase/firestore';
 import { db, auth, ensureSignedIn } from '../firebase';
 import { sendEmail } from './mailer';
@@ -69,12 +69,35 @@ async function saveWithRef(kind, record) {
 
 /*
   Save a registration and return its reference (BMF.BC-DGO-00001 …).
-  `type` is delegate | startup | collaboration. Summary fields are flat and short:
+  `type` is delegate | startup | collaboration | aimf. Summary fields are flat and short:
   { name, email, organisation, country, detail, sector, phone, payment, profile }
   and `details` holds the complete form, shown in full in the admin panel.
 */
 export async function submitRegistration(type, record) {
-  const ref = await saveWithRef(type, { ...record, accountEmail: auth.currentUser?.email || '' });
+  const currentUid = auth.currentUser?.uid;
+  const currentEmail = auth.currentUser?.email || '';
+
+  // Enforce mutual exclusion: AIMF vs Startup portals
+  if (type === 'startup' || type === 'aimf') {
+    const conflictType = type === 'startup' ? 'aimf' : 'startup';
+    if (currentUid) {
+      try {
+        const snap = await getDocs(query(collection(db, 'registrations'), where('uid', '==', currentUid)));
+        const conflicting = snap.docs.find((d) => d.data().type === conflictType);
+        if (conflicting) {
+          throw new Error(
+            type === 'startup'
+              ? 'An account registered with the AIMF portal cannot register as a startup.'
+              : 'An account registered with the Startups portal cannot register for AIMF accreditation.'
+          );
+        }
+      } catch (err) {
+        if (err.message?.includes('cannot register')) throw err;
+      }
+    }
+  }
+
+  const ref = await saveWithRef(type, { ...record, accountEmail: currentEmail });
   // confirmation to the applicant and an alert to the admins; neither blocks the confirmation screen
   const r = { ...record, type, ref };
   sendEmail(record.email, receivedEmail(r));
@@ -187,6 +210,45 @@ export function watchMyRegistrations(uid, cb) {
     (s) => cb(s.docs.map((d) => toRecord(d, 'registrations'))),
     () => cb([]),
   );
+}
+
+/* All registrations belonging to the signed-in user (filtered by UID and linked account email) */
+export function watchMyRegistrationsForUser(user, cb) {
+  if (!user || (!user.uid && !user.email)) {
+    cb([]);
+    return () => {};
+  }
+  const unsubs = [];
+  const map = new Map();
+  const emit = () => cb(Array.from(map.values()));
+
+  if (user.uid) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('uid', '==', user.uid)),
+        (snap) => {
+          snap.docs.forEach((d) => map.set(d.id, toRecord(d, 'registrations')));
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  if (user.email) {
+    unsubs.push(
+      onSnapshot(
+        query(collection(db, 'registrations'), where('accountEmail', '==', user.email)),
+        (snap) => {
+          snap.docs.forEach((d) => map.set(d.id, toRecord(d, 'registrations')));
+          emit();
+        },
+        () => emit()
+      )
+    );
+  }
+
+  return () => unsubs.forEach((u) => u());
 }
 
 /* Approved startups for the public directory, live. */
@@ -705,7 +767,7 @@ export async function deleteRecord(id) {
 }
 
 // keep in step with the list in isAdmin() in firestore.rules, which is what actually grants access
-const ADMIN_EMAILS = ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com'];
+const ADMIN_EMAILS = ['aryamansaxena04@gmail.com', 'surishri03@gmail.com', 'intouch.vijay@gmail.com', 'amitabh2227@gmail.com', 'ayushra611@gmail.com'];
 
 /* Is this signed-in account an admin? (listed above, or an admins/{email} document added in the Firebase console) */
 export async function isAdminAccount(user) {

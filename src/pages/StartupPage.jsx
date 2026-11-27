@@ -883,6 +883,8 @@ export default function StartupPage({ onNavigate }) {
         <SignInGate
           title="Sign in to register your startup"
           reason="Startup registration needs an account (Google or email), so your application, payment details and unique Registration ID [BMF.BC-SEO-numbers] stay tied to you."
+          portalType="startup"
+          onNavigate={onNavigate}
         >
         <StartupHub
           uid={user?.uid}

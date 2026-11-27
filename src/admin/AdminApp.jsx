@@ -3,7 +3,7 @@ import {
   LayoutDashboard, ClipboardCheck, Users, LogIn, Search, ExternalLink, Lock, Check, X,
   Download, ArrowUpRight, Undo2, Database, LogOut, Activity, Menu, BellRing,
   HelpCircle, MessageSquare, Flag, Copy, AlertCircle, Mail, Phone, Building2, UserCheck, CheckCircle2,
-  ShieldCheck, FileText, Trash2
+  ShieldCheck, FileText, Trash2, Sparkles,
 } from 'lucide-react';
 import { currentEvent } from '../data/events';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
@@ -27,6 +27,7 @@ const SITE_URL = `${import.meta.env.BASE_URL}`;
 const VIEWS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'approvals', label: 'Approvals', icon: ClipboardCheck },
+  { id: 'aimf', label: 'AIMF Registrations', icon: Sparkles },
   { id: 'users', label: 'Registered Users', icon: Users },
   { id: 'queries', label: 'Query Desk', icon: HelpCircle },
   { id: 'terms', label: 'Terms & Conditions', icon: ShieldCheck },
@@ -165,6 +166,8 @@ export default function AdminApp() {
 
   const approvable = registrations.filter((r) => TYPES[r.type]?.approvable);
   const pending = approvable.filter((r) => r.status === 'pending');
+  const aimfList = registrations.filter((r) => r.type === 'aimf');
+  const aimfPendingCount = aimfList.filter((r) => r.status === 'pending').length;
   const flaggedUsersCount = users.filter((u) => u.flagged).length;
   const openQueriesCount = queries.filter((q) => q.status === 'received' || q.status === 'in-progress').length;
   const flaggedQueriesCount = queries.filter((q) => q.flagged).length;
@@ -190,6 +193,16 @@ export default function AdminApp() {
             {v.id === 'approvals' && pending.length > 0 && (
               <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-[#FAB219]/15 text-[#FAB219] text-xs font-semibold flex items-center justify-center tabular-nums">
                 {pending.length}
+              </span>
+            )}
+            {v.id === 'aimf' && aimfPendingCount > 0 && (
+              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-[#FAB219]/15 text-[#FAB219] text-xs font-semibold flex items-center justify-center tabular-nums" title={`${aimfPendingCount} pending review`}>
+                {aimfPendingCount}
+              </span>
+            )}
+            {v.id === 'aimf' && aimfPendingCount === 0 && aimfList.length > 0 && (
+              <span className="ml-auto min-w-6 h-6 px-1.5 rounded-full bg-surface-3 border border-line text-gold-text text-xs font-semibold flex items-center justify-center tabular-nums">
+                {aimfList.length}
               </span>
             )}
             {v.id === 'users' && flaggedUsersCount > 0 && (
@@ -314,6 +327,13 @@ export default function AdminApp() {
           {view === 'approvals' && (
             <Approvals
               registrations={approvable}
+              onOpen={setSelected}
+              onToggleFlag={handleToggleFlag}
+            />
+          )}
+          {view === 'aimf' && (
+            <AimfRegistrations
+              registrations={registrations}
               onOpen={setSelected}
               onToggleFlag={handleToggleFlag}
             />
@@ -834,6 +854,12 @@ function RegisteredUsers({ users, onOpen, onToggleFlag }) {
               className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'startup' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
             >
               Startups
+            </button>
+            <button
+              onClick={() => setTab('aimf')}
+              className={`h-8 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors ${tab === 'aimf' ? 'bg-surface-3 text-fg' : 'text-fg-3 hover:text-fg'}`}
+            >
+              AIMF
             </button>
             <button
               onClick={() => setTab('collaboration')}
@@ -1605,6 +1631,204 @@ function TermsConsentDesk({ consents = [], onOpen }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ── AIMF Registrations Desk ──────────────────────────── */
+
+function toAimfCsv(rows) {
+  const cols = ['id', 'status', 'name', 'email', 'organisation', 'country', 'detail', 'sector', 'submittedAt', 'decidedAt', 'flagged', 'source'];
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  return [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
+}
+
+function AimfRegistrations({ registrations, onOpen, onToggleFlag }) {
+  const [status, setStatus] = useState('all');
+  const [q, setQ] = useState('');
+  const [flagOnly, setFlagOnly] = useState(false);
+
+  // Exclusively filter for AIMF registrations
+  const aimfRecords = registrations.filter((r) => r.type === 'aimf');
+
+  const pendingCount = aimfRecords.filter((r) => r.status === 'pending').length;
+  const approvedCount = aimfRecords.filter((r) => r.status === 'approved').length;
+  const declinedCount = aimfRecords.filter((r) => r.status === 'declined').length;
+  const flaggedCount = aimfRecords.filter((r) => r.flagged).length;
+
+  const rows = aimfRecords
+    .filter((r) => (status === 'all' || r.status === status))
+    .filter((r) => (!flagOnly || r.flagged))
+    .filter((r) => matches(r, q));
+
+  const downloadCsv = () => {
+    const blob = new Blob([toAimfCsv(rows)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `bharat-connect-aimf-registrations-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const aimfEmails = [...new Set(aimfRecords
+    .filter((r) => r.source !== 'sample' && r.status !== 'declined' && r.email)
+    .map((r) => r.email.toLowerCase()))];
+
+  const emailApplicants = () => {
+    const subject = 'Update from Atal Innovation Multilateral Forum (AIMF) Secretariat';
+    const body = `Dear AIMF Delegate,\n\nThis is an official communication regarding your AIMF cultural & creative accreditation for Bharat Connect 2026.\n\nPlease check your registration details in the portal or reply to this email if you have any questions.\n\nWarm regards,\nAIMF Secretariat · Bharat Connect 2026`;
+    window.location.href = `mailto:?bcc=${encodeURIComponent(aimfEmails.join(','))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-gold-foil animate-pulse" />
+            <span className="text-xs font-mono uppercase tracking-widest text-gold-text">Dedicated Desk</span>
+          </div>
+          <h1 className="mt-1 font-serif text-2xl sm:text-3xl font-medium text-fg">
+            AIMF Registrations & Accreditations
+          </h1>
+          <p className="mt-1 text-sm text-fg-3">
+            Atal Innovation Multilateral Forum creative enterprises, cultural troupes, and media accreditations.
+          </p>
+        </div>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="surface-card rounded-2xl p-4 sm:p-5 border border-line">
+          <span className="text-xs text-fg-3 font-medium">Total AIMF Applications</span>
+          <p className="mt-2 font-serif text-2xl sm:text-3xl text-fg font-medium tabular-nums">{aimfRecords.length}</p>
+        </div>
+        <div className="surface-card rounded-2xl p-4 sm:p-5 border border-line">
+          <span className="text-xs text-[#FAB219] font-medium flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" /> Pending Review
+          </span>
+          <p className="mt-2 font-serif text-2xl sm:text-3xl text-[#FAB219] font-medium tabular-nums">{pendingCount}</p>
+        </div>
+        <div className="surface-card rounded-2xl p-4 sm:p-5 border border-line">
+          <span className="text-xs text-[#0CA30C] font-medium flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Approved Accreditations
+          </span>
+          <p className="mt-2 font-serif text-2xl sm:text-3xl text-[#0CA30C] font-medium tabular-nums">{approvedCount}</p>
+        </div>
+        <div className="surface-card rounded-2xl p-4 sm:p-5 border border-line">
+          <span className="text-xs text-[#E66767] font-medium flex items-center gap-1.5">
+            <Flag className="w-3.5 h-3.5" /> Flagged for Review
+          </span>
+          <p className="mt-2 font-serif text-2xl sm:text-3xl text-[#E66767] font-medium tabular-nums">{flaggedCount}</p>
+        </div>
+      </div>
+
+      {/* Controls: Filters, Search, and Exports */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="ad-select text-xs h-10"
+            aria-label="Filter by approval status"
+          >
+            <option value="all">All Statuses ({aimfRecords.length})</option>
+            <option value="pending">Pending ({pendingCount})</option>
+            <option value="approved">Approved ({approvedCount})</option>
+            <option value="declined">Declined ({declinedCount})</option>
+          </select>
+
+          <button
+            onClick={() => setFlagOnly(!flagOnly)}
+            className={`h-10 px-3 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer ${
+              flagOnly ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+            }`}
+          >
+            <Flag className={`w-3.5 h-3.5 ${flagOnly ? 'fill-[#FAB219]' : ''}`} />
+            Flagged ({flaggedCount})
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2 items-center">
+          <SearchBox value={q} onChange={setQ} />
+          <button
+            onClick={emailApplicants}
+            disabled={!aimfEmails.length}
+            title={aimfEmails.length ? `Email announcement to ${aimfEmails.length} active AIMF applicant${aimfEmails.length === 1 ? '' : 's'}` : 'No active AIMF applicants'}
+            className="btn-secondary h-10 px-3.5 text-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Mail className="w-4 h-4 text-fg-3" strokeWidth={1.5} /> Email Applicants ({aimfEmails.length})
+          </button>
+          <button onClick={downloadCsv} className="btn-secondary h-10 px-3.5 text-sm shrink-0">
+            <Download className="w-4 h-4 text-fg-3" strokeWidth={1.5} /> Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* AIMF Table */}
+      <div className="ad-rise rounded-2xl border border-line bg-surface-0/70 overflow-hidden" style={{ '--i': 1 }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[800px]">
+            <thead>
+              <tr className="text-left text-xs text-fg-3 border-b border-line bg-surface-1/40">
+                <th className="font-medium px-4 py-3">Accreditation ID</th>
+                <th className="font-medium px-4 py-3">Applicant / Delegate</th>
+                <th className="font-medium px-3 py-3">Creative Enterprise / Troupe</th>
+                <th className="font-medium px-3 py-3">Category / Showcase</th>
+                <th className="font-medium px-3 py-3">Country</th>
+                <th className="font-medium px-3 py-3">Submitted</th>
+                <th className="font-medium px-3 py-3">Status</th>
+                <th className="font-medium px-4 py-3 text-right">Flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.slice(0, 200).map((r, i) => (
+                <tr
+                  key={r.id}
+                  onClick={() => onOpen(r.id)}
+                  className={`ad-row border-b border-line last:border-0 hover:bg-surface-2/70 cursor-pointer ${
+                    r.flagged ? 'bg-[#FAB219]/[0.03]' : ''
+                  }`}
+                  style={{ '--i': Math.min(i, 14) }}
+                >
+                  <td className="px-4 py-3">
+                    <span className="font-mono text-xs text-gold-text font-semibold">{r.id}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="block text-fg font-medium">{r.name || '—'} {r.source === 'sample' && <SampleTag />}</span>
+                    <span className="block text-xs text-fg-3">{r.email}</span>
+                  </td>
+                  <td className="px-3 py-3 text-fg-2 font-medium">{r.organisation || '—'}</td>
+                  <td className="px-3 py-3 text-xs text-fg-3">{r.detail || r.sector || 'AIMF Accreditation'}</td>
+                  <td className="px-3 py-3 text-fg-2">{r.country || '—'}</td>
+                  <td className="px-3 py-3 text-fg-3 whitespace-nowrap">{timeAgo(r.submittedAt)}</td>
+                  <td className="px-3 py-3"><StatusBadge status={r.status} /></td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFlag(r.id, 'registrations');
+                      }}
+                      className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
+                        r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+                      }`}
+                      title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
+                    >
+                      <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {rows.length === 0 && <Empty text="No AIMF registrations match these filters." />}
+        <p className="px-5 py-3 border-t border-line text-xs text-fg-3">
+          {rows.length} of {aimfRecords.length} AIMF records{rows.length > 200 ? ' · showing the latest 200' : ''}
+        </p>
+      </div>
     </div>
   );
 }

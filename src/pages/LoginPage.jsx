@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
   ShieldCheck, 
@@ -13,10 +13,20 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import AuthForm from '../auth/AuthForm';
+import { watchMyRegistrationsForUser } from '../data/registry';
 
 export default function LoginPage({ onNavigate }) {
   const { user, signOut } = useAuth();
   const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
+  const [regs, setRegs] = useState([]);
+
+  useEffect(() => {
+    if (!user) { setRegs([]); return undefined; }
+    return watchMyRegistrationsForUser(user, setRegs);
+  }, [user]);
+
+  const aimfReg = regs.find((r) => r.type === 'aimf');
+  const startupReg = regs.find((r) => r.type === 'startup');
 
   return (
     <div className="pt-24 pb-20 min-h-screen bg-royal text-fg flex flex-col justify-center">
@@ -135,7 +145,9 @@ export default function LoginPage({ onNavigate }) {
                     <div className="min-w-0 flex-1">
                       <h3 className="text-base font-semibold text-fg truncate">{user.name || 'Delegate User'}</h3>
                       <p className="text-xs text-fg-3 truncate">{user.email}</p>
-                      <p className="text-[11px] font-mono text-gold-text mt-0.5">Accredited Delegate</p>
+                      <p className="text-[11px] font-mono text-gold-text mt-0.5">
+                        {aimfReg ? `AIMF Accredited · ${aimfReg.id}` : startupReg ? `Startup Founder · ${startupReg.id}` : 'Accredited Delegate'}
+                      </p>
                     </div>
                   </div>
 
@@ -143,27 +155,53 @@ export default function LoginPage({ onNavigate }) {
                     <p className="text-sm text-fg-2">You are signed in to your Bharat Connect account.</p>
 
                     <div className="grid grid-cols-1 gap-2.5">
+                      {aimfReg && (
+                        <button
+                          onClick={() => onNavigate('aimf')}
+                          className="btn-primary !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        >
+                          <Sparkles className="w-4 h-4 text-gold-text" />
+                          <span>My AIMF Accreditations ({aimfReg.id})</span>
+                          <ArrowRight className="w-4 h-4 ml-auto" />
+                        </button>
+                      )}
+
+                      {startupReg && (
+                        <button
+                          onClick={() => onNavigate('startup')}
+                          className="btn-primary !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        >
+                          <Building2 className="w-4 h-4 text-gold-text" />
+                          <span>My Startup Showcase & Deal Room ({startupReg.id})</span>
+                          <ArrowRight className="w-4 h-4 ml-auto" />
+                        </button>
+                      )}
+
                       <button
                         onClick={() => onNavigate('register')}
-                        className="btn-primary !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer"
+                        className={`${!aimfReg && !startupReg ? 'btn-primary' : 'btn-secondary'} !rounded-xl h-11 text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer`}
                       >
                         <span>Access Delegate Pass Registration</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
-                      <button
-                        onClick={() => onNavigate('startups')}
-                        className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <span>View Registered Startups</span>
-                      </button>
+                      {!aimfReg && (
+                        <button
+                          onClick={() => onNavigate('startups')}
+                          className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <span>View Registered Startups</span>
+                        </button>
+                      )}
 
-                      <button
-                        onClick={() => onNavigate('aimf')}
-                        className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <span>Explore AIMF Pavilion</span>
-                      </button>
+                      {!startupReg && (
+                        <button
+                          onClick={() => onNavigate('aimf')}
+                          className="btn-secondary !rounded-xl h-11 text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <span>Explore AIMF Pavilion</span>
+                        </button>
+                      )}
 
                       <button
                         onClick={() => onNavigate('home')}
