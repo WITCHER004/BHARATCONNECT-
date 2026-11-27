@@ -827,6 +827,7 @@ const matches = (r, q) => {
 };
 
 function Approvals({ registrations, onOpen, onToggleFlag }) {
+  const [scope, setScope] = useState('pending'); // 'pending' | 'all'
   const [type, setType] = useState('all');
   const [q, setQ] = useState('');
   const [flagFilter, setFlagFilter] = useState(false);
@@ -834,7 +835,8 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
   const [toast, setToast] = useState(null);
 
   const pending = registrations.filter((r) => r.status === 'pending');
-  const shown = pending
+  const targetList = scope === 'pending' ? pending : registrations;
+  const shown = targetList
     .filter((r) => (type === 'all' || r.type === type))
     .filter((r) => (!flagFilter || r.flagged))
     .filter((r) => matches(r, q));
@@ -864,9 +866,36 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6 items-start">
       <div className="xl:col-span-2 flex flex-col gap-4">
+        {/* Scope selector: Pending vs All */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-1 rounded-2xl bg-surface-2 border border-line">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setScope('pending')}
+              className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
+                scope === 'pending' ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-3 hover:text-fg'
+              }`}
+            >
+              Awaiting Review ({pending.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setScope('all')}
+              className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
+                scope === 'all' ? 'bg-surface-3 text-fg shadow-sm' : 'text-fg-3 hover:text-fg'
+              }`}
+            >
+              All Applications ({registrations.length})
+            </button>
+          </div>
+          <span className="text-xs text-fg-3 pr-3 hidden sm:inline">
+            Direct Secretariat Accreditation Actions
+          </span>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <TypeFilter value={type} onChange={setType} records={pending} />
+            <TypeFilter value={type} onChange={setType} records={targetList} />
             <button
               onClick={() => setFlagFilter(!flagFilter)}
               className={`h-9 px-3 rounded-full text-xs font-mono flex items-center gap-1.5 border transition-colors cursor-pointer ${
@@ -886,8 +915,14 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
               <span className="ad-clear w-14 h-14 rounded-full border border-[#0CA30C]/50 flex items-center justify-center">
                 <Check className="w-6 h-6 text-[#0CA30C]" strokeWidth={2} />
               </span>
-              <p className="mt-4 font-serif text-xl text-fg">All caught up</p>
-              <p className="mt-1 text-sm text-fg-3">No registrations are waiting for review{type !== 'all' ? ' in this category' : ''}.</p>
+              <p className="mt-4 font-serif text-xl text-fg">
+                {scope === 'pending' ? 'All caught up' : 'No applications found'}
+              </p>
+              <p className="mt-1 text-sm text-fg-3">
+                {scope === 'pending'
+                  ? 'No registrations are currently waiting for review.'
+                  : 'No applications match your filter settings.'}
+              </p>
             </div>
           </Card>
         )}
@@ -903,11 +938,12 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
                 <button onClick={() => onOpen(r.id)} className="flex-1 min-w-0 text-left cursor-pointer group">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <TypeTag type={r.type} />
+                    <StatusBadge status={r.status} />
                     <span className="text-xs text-fg-3">{timeAgo(r.submittedAt)}</span>
                     {r.source === 'sample' && <SampleTag />}
                     {r.flagged && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#FAB219] bg-[#FAB219]/15 border border-[#FAB219]/30 rounded px-1.5 py-0.5">
-                        <Flag className="w-3 h-3 fill-[#FAB219]" /> Flagged for review
+                        <Flag className="w-3 h-3 fill-[#FAB219]" /> Flagged
                       </span>
                     )}
                   </div>
@@ -929,12 +965,21 @@ function Approvals({ registrations, onOpen, onToggleFlag }) {
                     <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
                     <span className="hidden sm:inline">{r.flagged ? 'Flagged' : 'Flag'}</span>
                   </button>
-                  <button onClick={() => act(r, 'declined')} className="ad-btn ad-btn-decline" aria-label={`Decline ${r.name}`}>
-                    <X className="w-4 h-4" strokeWidth={2} /> Decline
-                  </button>
-                  <button onClick={() => act(r, 'approved')} className="ad-btn ad-btn-approve" aria-label={`Approve ${r.name}`}>
-                    <Check className="w-4 h-4" strokeWidth={2} /> Approve
-                  </button>
+                  {r.status !== 'declined' && (
+                    <button onClick={() => act(r, 'declined')} className="ad-btn ad-btn-decline" aria-label={`Decline ${r.name}`}>
+                      <X className="w-4 h-4" strokeWidth={2} /> Decline
+                    </button>
+                  )}
+                  {r.status !== 'approved' && (
+                    <button onClick={() => act(r, 'approved')} className="ad-btn ad-btn-approve" aria-label={`Approve ${r.name}`}>
+                      <Check className="w-4 h-4" strokeWidth={2} /> Approve
+                    </button>
+                  )}
+                  {r.status !== 'pending' && (
+                    <button onClick={() => act(r, 'pending')} className="ad-btn text-xs" title="Reset back to pending">
+                      <Undo2 className="w-3.5 h-3.5" /> Reset
+                    </button>
+                  )}
                 </div>
               </div>
             </li>
@@ -1112,7 +1157,7 @@ function RegisteredUsers({ users, onOpen, onToggleFlag }) {
                 <th className="font-medium px-3 py-3">Country</th>
                 <th className="font-medium px-3 py-3">Registered</th>
                 <th className="font-medium px-3 py-3">Status</th>
-                <th className="font-medium px-4 py-3 text-right">Review Flag</th>
+                <th className="font-medium px-4 py-3 text-right">Approval Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1179,24 +1224,52 @@ function RegisteredUsers({ users, onOpen, onToggleFlag }) {
                     <StatusBadge status={u.status} />
                   </td>
 
-                  {/* Flag Toggle Button */}
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFlag(u.id, 'registrations');
-                      }}
-                      className={`h-8 px-2.5 rounded-lg border flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors ml-auto ${
-                        u.flagged
-                          ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
-                          : 'border-line text-fg-3 hover:text-fg hover:bg-surface-3'
-                      }`}
-                      title={u.flagged ? 'Flagged for review (click to unflag)' : 'Flag for review'}
-                    >
-                      <Flag className={`w-3.5 h-3.5 ${u.flagged ? 'fill-[#FAB219]' : ''}`} />
-                      <span>{u.flagged ? 'Flagged' : 'Flag'}</span>
-                    </button>
+                  {/* Inline Approval & Flag Actions */}
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      {u.status !== 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(u.id, 'approved')}
+                          className="h-8 px-2.5 rounded-lg bg-[#0CA30C]/15 border border-[#0CA30C]/40 text-[#3FC23F] hover:bg-[#0CA30C] hover:text-white text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Approve ${u.name || u.id}`}
+                        >
+                          <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Approve
+                        </button>
+                      )}
+                      {u.status !== 'declined' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(u.id, 'declined')}
+                          className="h-8 px-2.5 rounded-lg border border-line text-fg-3 hover:border-[#D03B3B] hover:text-[#E66767] hover:bg-[#D03B3B]/10 text-xs font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Decline ${u.name || u.id}`}
+                        >
+                          <X className="w-3.5 h-3.5" strokeWidth={2} /> Decline
+                        </button>
+                      )}
+                      {u.status === 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(u.id, 'pending')}
+                          className="h-8 px-2 rounded-lg border border-line text-fg-3 hover:text-fg text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Reset status back to pending"
+                        >
+                          <Undo2 className="w-3 h-3" /> Reset
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onToggleFlag(u.id, 'registrations')}
+                        className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
+                          u.flagged
+                            ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                            : 'border-line text-fg-3 hover:text-fg'
+                        }`}
+                        title={u.flagged ? 'Flagged for review (click to unflag)' : 'Flag for review'}
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${u.flagged ? 'fill-[#FAB219]' : ''}`} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -1984,7 +2057,7 @@ function AimfRegistrations({ registrations, onOpen, onToggleFlag }) {
                 <th className="font-medium px-3 py-3">Country</th>
                 <th className="font-medium px-3 py-3">Submitted</th>
                 <th className="font-medium px-3 py-3">Status</th>
-                <th className="font-medium px-4 py-3 text-right">Flag</th>
+                <th className="font-medium px-4 py-3 text-right">Approval Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -2009,20 +2082,49 @@ function AimfRegistrations({ registrations, onOpen, onToggleFlag }) {
                   <td className="px-3 py-3 text-fg-2">{r.country || '—'}</td>
                   <td className="px-3 py-3 text-fg-3 whitespace-nowrap">{timeAgo(r.submittedAt)}</td>
                   <td className="px-3 py-3"><StatusBadge status={r.status} /></td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFlag(r.id, 'registrations');
-                      }}
-                      className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
-                        r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
-                      }`}
-                      title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
-                    >
-                      <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
-                    </button>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      {r.status !== 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'approved')}
+                          className="h-8 px-2.5 rounded-lg bg-[#0CA30C]/15 border border-[#0CA30C]/40 text-[#3FC23F] hover:bg-[#0CA30C] hover:text-white text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Approve AIMF accreditation for ${r.name}`}
+                        >
+                          <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Approve
+                        </button>
+                      )}
+                      {r.status !== 'declined' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'declined')}
+                          className="h-8 px-2.5 rounded-lg border border-line text-fg-3 hover:border-[#D03B3B] hover:text-[#E66767] hover:bg-[#D03B3B]/10 text-xs font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Decline AIMF accreditation for ${r.name}`}
+                        >
+                          <X className="w-3.5 h-3.5" strokeWidth={2} /> Decline
+                        </button>
+                      )}
+                      {r.status === 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'pending')}
+                          className="h-8 px-2 rounded-lg border border-line text-fg-3 hover:text-fg text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Reset status back to pending"
+                        >
+                          <Undo2 className="w-3 h-3" /> Reset
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onToggleFlag(r.id, 'registrations')}
+                        className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
+                          r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+                        }`}
+                        title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -2132,7 +2234,7 @@ function Registrations({ registrations, onOpen, onToggleFlag }) {
                 <th className="font-medium px-3 py-3">Country</th>
                 <th className="font-medium px-3 py-3">Submitted</th>
                 <th className="font-medium px-3 py-3">Status</th>
-                <th className="font-medium px-4 py-3 text-right">Flag</th>
+                <th className="font-medium px-4 py-3 text-right">Approval Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -2157,20 +2259,49 @@ function Registrations({ registrations, onOpen, onToggleFlag }) {
                   <td className="px-3 py-3 text-fg-2">{r.country || '—'}</td>
                   <td className="px-3 py-3 text-fg-3 whitespace-nowrap">{timeAgo(r.submittedAt)}</td>
                   <td className="px-3 py-3"><StatusBadge status={r.status} /></td>
-                  <td className="px-4 py-3 text-right">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFlag(r.id, r.type === 'query' ? 'queries' : 'registrations');
-                      }}
-                      className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
-                        r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
-                      }`}
-                      title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
-                    >
-                      <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
-                    </button>
+                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      {r.type !== 'query' && r.status !== 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'approved')}
+                          className="h-8 px-2.5 rounded-lg bg-[#0CA30C]/15 border border-[#0CA30C]/40 text-[#3FC23F] hover:bg-[#0CA30C] hover:text-white text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Approve ${r.name || r.id}`}
+                        >
+                          <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> Approve
+                        </button>
+                      )}
+                      {r.type !== 'query' && r.status !== 'declined' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'declined')}
+                          className="h-8 px-2.5 rounded-lg border border-line text-fg-3 hover:border-[#D03B3B] hover:text-[#E66767] hover:bg-[#D03B3B]/10 text-xs font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title={`Decline ${r.name || r.id}`}
+                        >
+                          <X className="w-3.5 h-3.5" strokeWidth={2} /> Decline
+                        </button>
+                      )}
+                      {r.type !== 'query' && r.status === 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => decide(r.id, 'pending')}
+                          className="h-8 px-2 rounded-lg border border-line text-fg-3 hover:text-fg text-xs inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Reset status back to pending"
+                        >
+                          <Undo2 className="w-3 h-3" /> Reset
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onToggleFlag(r.id, r.type === 'query' ? 'queries' : 'registrations')}
+                        className={`h-8 w-8 rounded-lg border inline-flex items-center justify-center transition-colors cursor-pointer ${
+                          r.flagged ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]' : 'border-line text-fg-3 hover:text-fg'
+                        }`}
+                        title={r.flagged ? 'Flagged for review (click to remove)' : 'Flag for review'}
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${r.flagged ? 'fill-[#FAB219]' : ''}`} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -2350,6 +2481,60 @@ function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
             </button>
           </div>
 
+          {/* Review Approval Controls - Prominent at the top */}
+          {!isQuery && (
+            <div className="mt-4 p-4 rounded-xl border border-line bg-surface-1 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-fg flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-gold-text" /> Accreditation Decision Desk
+                </span>
+                <span className="text-xs text-fg-3 font-mono">
+                  Current: <strong className="text-gold-text capitalize">{r.status || 'pending'}</strong>
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'approved')}
+                  className={`ad-btn h-9 px-3.5 text-xs font-semibold transition-all ${
+                    r.status === 'approved'
+                      ? 'bg-[#0CA30C] border-[#0CA30C] text-white shadow-md'
+                      : 'border-line hover:border-[#0CA30C] text-[#3FC23F] hover:bg-[#0CA30C]/15'
+                  }`}
+                  title={`Approve accreditation for ${r.name || r.id}`}
+                >
+                  <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  {r.status === 'approved' ? 'Approved ✓' : 'Approve'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'declined')}
+                  className={`ad-btn h-9 px-3.5 text-xs font-semibold transition-all ${
+                    r.status === 'declined'
+                      ? 'bg-[#D03B3B] border-[#D03B3B] text-white shadow-md'
+                      : 'border-line hover:border-[#D03B3B] text-[#E66767] hover:bg-[#D03B3B]/15'
+                  }`}
+                  title={`Decline accreditation for ${r.name || r.id}`}
+                >
+                  <X className="w-3.5 h-3.5" strokeWidth={2} />
+                  {r.status === 'declined' ? 'Declined ✕' : 'Decline'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => decide(r.id, 'pending')}
+                  className={`ad-btn h-9 px-3 text-xs font-medium transition-all ${
+                    r.status === 'pending'
+                      ? 'bg-[#FAB219]/20 border-[#FAB219] text-[#FAB219]'
+                      : 'text-fg-3 hover:text-fg border-line hover:bg-surface-3'
+                  }`}
+                  title="Reset status back to pending"
+                >
+                  <Undo2 className="w-3.5 h-3.5" strokeWidth={1.5} /> Reset to Pending
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Query Status Selector */}
           {isQuery && (
             <div className="mt-4 p-3.5 rounded-xl border border-line bg-surface-1">
@@ -2412,20 +2597,6 @@ function Drawer({ record, onClose, onToggleFlag, onUpdateStatus }) {
             </details>
           )}
 
-          {/* Review Approval Controls */}
-          {TYPES[r.type]?.approvable && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {r.status !== 'approved' && (
-                <button onClick={() => decide(r.id, 'approved')} className="ad-btn ad-btn-approve"><Check className="w-4 h-4" strokeWidth={2} /> Approve</button>
-              )}
-              {r.status !== 'declined' && (
-                <button onClick={() => decide(r.id, 'declined')} className="ad-btn ad-btn-decline"><X className="w-4 h-4" strokeWidth={2} /> Decline</button>
-              )}
-              {r.status !== 'pending' && (
-                <button onClick={() => decide(r.id, 'pending')} className="ad-btn"><Undo2 className="w-4 h-4" strokeWidth={1.5} /> Back to pending</button>
-              )}
-            </div>
-          )}
 
           {r.email && (
             <div className="mt-5 pt-3 border-t border-line flex items-center justify-between">
