@@ -1324,7 +1324,6 @@ export default function AimfPage({ onNavigate }) {
           </div>
         </div>
       )}
-            </div>
           </>
         )}
       </div>

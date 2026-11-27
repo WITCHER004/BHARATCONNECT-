@@ -1379,7 +1379,6 @@ export default function StartupsPage({ onNavigate }) {
         </div>
       )}
 
-            </div>
           </>
         )}
       </div>
